@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en" class="feedback">
+
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>问题反馈</title>
+
+		<link rel="stylesheet" type="text/css" href="{MODULE_URL}template/mobile/css/mui.min.css" />
+		<link href="{$_W['siteroot']}app/resource/css/common.min.css?v=20160906" rel="stylesheet">
+		<link rel="stylesheet" type="text/css" href="{MODULE_URL}template/mobile/css/feedback.css" />
+		<link rel="stylesheet" type="text/css" href="{MODULE_URL}template/mobile/css/webuploader.min.css" />
+		<link rel="stylesheet" href="{MODULE_URL}template/mobile/css/mui.css">
+		<link rel="stylesheet" type="text/css" href="{MODULE_URL}template/mobile/css/header.css" />
+		<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+		<script type="text/javascript" src="{$_W['siteroot']}app/resource/js/lib/jquery-1.11.1.min.js?v=20160906"></script>
+		<script type="text/javascript" src="{$_W['siteroot']}app/resource/js/app/util.js"></script>
+		<script src="{$_W['siteroot']}app/resource/js/require.js"></script>
+		<style>
+			.mui-toast-container {
+				margin-left: 0px;
+				top: auto;
+				min-height: auto;
+			}
+			
+			.mui-image-uploader {
+				float: left;
+			}
+		</style>
+
+	</head>
+
+	<body>
+		<div class="follow_topbar" style="display: none;">
+			<div class="headimg"><img src="{$_W['attachurl']}{$setting['qrcode']}"></div>
+			<div class="info">
+				<div class="i">{$_W['account']['name']}</div>
+				<div class="i">关注公众号，享海量课程</div>
+			</div>
+			<div class="sub" onclick="location.href='{php echo $this->createMobileUrl('follow');}'">立即关注</div>
+		</div>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<button id="submit" class="mui-btn mui-btn-blue mui-btn-link mui-pull-right">发送</button>
+			<h1 class="mui-title">问题反馈</h1>
+		</header>
+		<script type="text/javascript">
+			{
+				if $setting['isfollow'] == 1 && !empty($fans) && $fans['follow'] == 0
+			}
+			$('.follow_topbar').show();
+			$('header').css('top', '44px'); {
+				else
+			}
+			$('.follow_topbar').hide();
+			$('header').css('top', '0'); {
+				/if}
+		</script>
+		<nav class="mui-bar mui-bar-tab">
+			<a class="mui-tab-item " href="{php echo $this->createMobileUrl('index');}">
+				<span class="mui-icon mui-icon-home"></span>
+				<span class="mui-tab-label">首页</span>
+			</a>
+
+			<a class="mui-tab-item" href="{php echo $this->createMobileUrl('player');}">
+				<span class="mui-icon mui-icon-personadd-filled"></span>
+				<span class="mui-tab-label">棋手</span>
+			</a>
+			<a class="mui-tab-item " href="#center">
+				<span class="mui-icon mui-icon-compose"></span>
+				<span class="mui-tab-label">拆棋</span>
+
+			</a>
+			<a class="mui-tab-item" href="{php echo $this->createMobileUrl('search');}">
+				<span class="mui-icon mui-icon-search"></span>
+				<span class="mui-tab-label">搜索</span>
+			</a>
+
+			<a class="mui-tab-item mui-active" href="{php echo $this->createMobileUrl('self');}">
+				<span class="mui-icon mui-icon-contact"></span>
+				<span class="mui-tab-label">我的</span>
+			</a>
+		</nav>
+
+		<div id="center" class="mui-popover mui-bar-popover">
+			<div class="mui-popover-arrow"></div>
+			<ul class="mui-table-view" style="margin:0">
+				<li class="mui-table-view-cell">
+					<a href="{php echo $this->createMobileUrl('publish',array('op'=>'create'));}">创建棋谱</a>
+				</li>
+				<li class="mui-table-view-cell">
+					<a href="{php echo $this->createMobileUrl('publish',array('op'=>'ai'));}">人机对弈</a>
+				</li>
+				<li class="mui-table-view-cell">
+					<a href="{if $this->isvip(mc_openid2uid($_W['openid']))==1}{php echo $this->createMobileUrl('publish',array('op'=>'analyse_vip'));}{else}{php echo $this->createMobileUrl('publish',array('op'=>'analyse'));}{/if}">研究复盘</a>
+				</li>
+			</ul>
+		</div>
+		<div class="mui-content" style="margin-bottom: 50px;">
+			<div class="mui-content-padded">
+				<div class="mui-inline">问题和意见</div>
+				<a class="mui-pull-right mui-inline" href="#popover">
+					快捷输入
+					<span class="mui-icon mui-icon-arrowdown"></span>
+				</a>
+				<!--快捷输入具体内容，开发者可自己替换常用语-->
+				<div id="popover" class="mui-popover">
+					<div class="mui-popover-arrow"></div>
+					<div class="mui-scroll-wrapper" style="height:200px">
+						<div class="mui-scroll">
+							<ul class="mui-table-view">
+								<!--仅流应用环境下显示-->
+								<li class="mui-table-view-cell stream">
+									<a href="#">桌面快捷方式创建失败</a>
+								</li>
+								<li class="mui-table-view-cell">
+									<a href="#">界面显示错乱</a>
+								</li>
+								<li class="mui-table-view-cell">
+									<a href="#">启动缓慢，卡出翔了</a>
+								</li>
+								<li class="mui-table-view-cell">
+									<a href="#">偶发性崩溃</a>
+								</li>
+								<li class="mui-table-view-cell">
+									<a href="#">UI无法直视，丑哭了</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+
+				</div>
+			</div>
+			<div class="row mui-input-row">
+				<textarea id='question' class="mui-input-clear question" placeholder="请详细描述你的问题和意见..."></textarea>
+			</div>
+			<p>图片(选填,提供问题截图,总大小4M以下)</p>
+			<div id='image-list' class="row image-list">
+				{php echo $this->tpl_app_form_field_image('photo')}
+
+			</div>
+			<p>QQ/邮箱</p>
+			<div class="mui-input-row">
+				<input id='contact' type="text" class="mui-input-clear contact" placeholder="(选填,方便我们联系你 )" />
+			</div>
+			<div class="mui-content-padded">
+				<div class="mui-inline">应用评分</div>
+				<div class="icons mui-inline" style="margin-left: 6px;">
+					<i data-index="1" class="mui-icon mui-icon-star"></i>
+					<i data-index="2" class="mui-icon mui-icon-star"></i>
+					<i data-index="3" class="mui-icon mui-icon-star"></i>
+					<i data-index="4" class="mui-icon mui-icon-star"></i>
+					<i data-index="5" class="mui-icon mui-icon-star"></i>
+				</div>
+			</div>
+		</div>
+
+		<!--{php echo register_jssdk(false);}-->
+
+		<!--<script type="text/javascript">
+    wx.ready(function(){
+        var shareData = {
+            title: "{$setting['sitename']}-{$_W['account']['name']}",
+            desc: "{php echo $sharedesc;}",
+            link: "{php echo $shareurl;}",
+            imgUrl: "{php echo $sharelogo;}",
+            trigger: function (res) {},
+            complete: function (res) {},
+            success: function (res) {},
+            cancel: function (res) {},
+            fail: function (res) {}
+        };
+        wx.onMenuShareTimeline(shareData);
+        wx.onMenuShareAppMessage(shareData);
+        wx.onMenuShareQQ(shareData);
+        wx.onMenuShareWeibo(shareData);
+        wx.onMenuShareQZone(shareData);
+
+    });
+</script>-->
+
+		<script src="{MODULE_URL}template/mobile/js/mui.min.js"></script>
+		<script type="text/javascript">
+			mui.init();
+
+			mui(".mui-bar-tab").on('tap', '.mui-tab-item', function() {
+				mui.openWindow({
+					id: this.href,
+					url: this.href,
+					waiting: {
+						autoShow: true, //自动显示等待框，默认为true
+						title: '正在加载...', //等待对话框上显示的提示内容
+
+					}
+				});
+			});
+			var index = 1;
+			var size = null;
+			var imageIndexIdNum = 0;
+			var starIndex = 0;
+			var feedback = {
+				question: document.getElementById('question'),
+				contact: document.getElementById('contact'),
+				imageList: document.getElementById('image-list'),
+				submitBtn: document.getElementById('submit')
+			};
+
+			feedback.files = [];
+			feedback.uploader = null;
+			feedback.deviceInfo = null;
+			feedback.clearForm = function() {
+				feedback.question.value = '';
+				feedback.contact.value = '';
+				feedback.imageList.innerHTML = '';
+				//feedback.newPlaceholder();
+				feedback.files = [];
+				index = 0;
+				size = 0;
+				imageIndexIdNum = 0;
+				starIndex = 0;
+				//清除所有星标
+				mui('.icons i').each(function(index, element) {
+					if(element.classList.contains('mui-icon-star-filled')) {
+						element.classList.add('mui-icon-star')
+						element.classList.remove('mui-icon-star-filled')
+					}
+				})
+			};
+			var url = '{php echo $this->createMobileUrl("self",array("op"=>"feedback"))}';
+			feedback.submitBtn.addEventListener('tap', function(event) {
+				if(feedback.question.value == '' ||
+					(feedback.contact.value != '' &&
+						feedback.contact.value.search(/^(\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z0-9]+)|([1-9]\d{4,9})$/) != 0)) {
+					mui.toast('信息填写不符合规范');
+				}
+				if(feedback.question.value.length > 200 || feedback.contact.value.length > 200) {
+					mui.toast('信息超长,请重新填写~');
+				}
+				var photo = getImagesRes('photo[]');
+				mui.post(url, {
+					description: feedback.question.value,
+					photo: photo,
+					contact: feedback.contact.value,
+					score: '' + starIndex
+				}, function(data) {
+
+					if(data === 'success') {
+						mui.alert("感谢反馈，点击确定关闭", "问题反馈", "确定", function() {
+							feedback.clearForm();
+							mui.back();
+						});
+					}
+				}, 'json');
+			});
+
+			//应用评分
+			mui('.icons').on('tap', 'i', function() {
+				var index = parseInt(this.getAttribute("data-index"));
+				var parent = this.parentNode;
+				var children = parent.children;
+				if(this.classList.contains("mui-icon-star")) {
+					for(var i = 0; i < index; i++) {
+						children[i].classList.remove('mui-icon-star');
+						children[i].classList.add('mui-icon-star-filled');
+					}
+				} else {
+					for(var i = index; i < 5; i++) {
+						children[i].classList.add('mui-icon-star');
+						children[i].classList.remove('mui-icon-star-filled');
+					}
+				}
+				starIndex = index;
+			});
+			//选择快捷输入
+			mui('#popover').on('tap', 'li', function(e) {
+				document.getElementById("question").value = document.getElementById("question").value + this.children[0].innerHTML;
+				mui('#popover').popover('toggle');
+			})
+
+			//获取上传图片列表的值
+			function getImagesRes(name) {
+				var rdsObj = document.getElementsByName(name);
+				var checkVal = new Array();
+				var k = 0;
+				for(i = 0; i < rdsObj.length; i++) {
+					checkVal[k] = rdsObj[i].value;
+					k++;
+				}
+				return checkVal;
+			}
+		</script>
+	</body>
+
+</html>

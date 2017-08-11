@@ -1,0 +1,201 @@
+{template 'common/header'}
+<body>
+<link rel="stylesheet" href="{MODULE_URL}template/mobile/lib/weui.min.css">
+<link rel="stylesheet" href="{MODULE_URL}template/mobile/css/jquery-weui.css">
+<link rel="stylesheet" href="{MODULE_URL}template/mobile/css/mui.css">
+<link href="{$_W['siteroot']}app/resource/css/common.min.css" rel="stylesheet">
+<link rel="stylesheet" href="{MODULE_URL}template/mobile/css/common.css">
+<form id='myform'>
+
+    <div class="mui-input-group">
+
+        <div class="mui-input-row mui-radio">
+            <label>特级大师</label>
+            <input name="playerlevel" type="radio" value="特级大师" {if $player["playerlevel"]=="特级大师"||$player["playerlevel"]==""}
+            checked{/if}>
+        </div>
+        <div class="mui-input-row mui-radio">
+            <label>国家大师</label>
+            <input name="playerlevel" type="radio" value="国家大师" {if $player["playerlevel"]=="国家大师"} checked{/if}>
+        </div>
+        <div class="mui-input-row mui-radio">
+            <label>一级棋士</label>
+            <input name="playerlevel" type="radio" value="一级棋士" {if $player["playerlevel"]=="一级棋士"} checked{/if}>
+        </div>
+        <div class="mui-input-row mui-radio">
+            <label>二级棋士</label>
+            <input name="playerlevel" type="radio" value="二级棋士" {if $player["playerlevel"]=="二级棋士"} checked{/if}>
+        </div>
+        <div class="mui-input-row mui-radio">
+            <label>三级棋士</label>
+            <input name="playerlevel" type="radio" value="三级棋士" {if $player["playerlevel"]=="三级棋士"} checked{/if}>
+        </div>
+        <div class="mui-input-row mui-radio">
+            <label>业余棋手</label>
+            <input name="playerlevel" type="radio" value="业余棋手" {if $player["playerlevel"]=="业余棋手"} checked{/if}>
+        </div>
+
+
+        <h5 class="mui-content-padded">详细信息</h5>
+        <div class="mui-input-row">
+            <label>姓名:</label>
+            <input type="text" name="playername" class="mui-input-clear" placeholder="请输入姓名"
+                   value="{$player['playername']}">
+        </div>
+        <div class="mui-input-row">
+            <label>电话:</label>
+            <input type="number" name="phone" class="mui-input-clear" placeholder="请输入电话号码" value="{$player['phone']}">
+        </div>
+        <div class="mui-input-row">
+            <label>QQ:</label>
+            <input type="number" name="qq" class="mui-input-clear" placeholder="请输入qq号码" value="{$player['qq']}">
+        </div>
+
+        <div class="mui-input-row">
+            <label>介绍:</label>
+            <input name="playerdes" type="text" class="mui-input-clear" placeholder="一句话介绍自己"
+                   value="{$player['playerdes']}"></input>
+        </div>
+
+        <div class="mui-input-row">
+            <btn id="submit" class="weui-btn weui-btn_primary">确定</btn>
+
+            <a id="cancel" href="{php echo $this->createMobileUrl('self');}"
+               class="weui-btn weui-btn_default mui-action-back">取消</a>
+
+        </div>
+
+    </div>
+</form>
+<script type="text/javascript">
+    mui.init();
+    mui('#myform').scroll();
+    var buttonSubmit = {
+
+        playername: document.getElementsByName('playername')[0],
+        phone: document.getElementsByName('phone')[0],
+        qq: document.getElementsByName('qq')[0],
+        playerdes: document.getElementsByName('playerdes')[0],
+
+        submitBtn: document.getElementById('submit')
+    };
+
+    buttonSubmit.submitBtn.addEventListener('tap', function (event) {
+        var url = "{php echo $this->createMobileUrl('self', array('op'=>'applyplayer'));}";
+        var playerlevel = getRadioRes('playerlevel');
+        if (document.getElementsByName('photo').length != 0) {
+            var photo = document.getElementsByName('photo')[0].value;
+        }
+
+        var certificate = getImagesRes('certificate[]');
+        //console.log( document.getElementsByTagName('img'));
+        if (playerlevel == '') {
+            return mui.toast('请选择您的级别！');
+        }
+        if (buttonSubmit.playername.value == '') {
+            return mui.toast('姓名不能为空');
+        }
+        mui.post(url, {
+            playerlevel: playerlevel,
+            playername: buttonSubmit.playername.value,
+            phone: buttonSubmit.phone.value,
+            qq: buttonSubmit.qq.value,
+            playerdes: buttonSubmit.playerdes.value,
+            photo: photo,
+            playerlevel: playerlevel,
+            certificate: certificate
+        }, function (data) {
+            console.log(data);
+            if (data === '0') {
+                return mui.toast("对不起，该名字已经有人注册了");
+            }
+            else if (data === '1') {
+
+                mui.alert("感谢注册，请等待审核", "恭喜你！", "确定", function () {
+                    mui.openWindow({
+                        url: "{php echo $this->createMobileUrl('index');}"
+                    });
+                });
+            }
+            else if (data === '2') {
+
+                mui.alert("信息更新成功，请等待审核", "恭喜你！", "确定", function () {
+                    mui.openWindow({
+                        url: "{php echo $this->createMobileUrl('index');}"
+                    });
+                });
+            }
+
+        }, 'json');
+
+    })
+
+
+    mui('.demos-content-padded').on('tap', '#cancel', function () {
+        mui.openWindow({
+            id: this.href,
+            url: this.href,
+            waiting: {
+                autoShow: true,//自动显示等待框，默认为true
+                title: '正在加载...',//等待对话框上显示的提示内容
+
+            }
+        });
+    });
+    //获取单选框的值
+    var name = '';
+    function getRadioRes(Name) {
+        var rdsObj = document.getElementsByName(Name);
+        var checkVal = '';
+        for (i = 0; i < rdsObj.length; i++) {
+            if (rdsObj[i].checked) {
+                checkVal = rdsObj[i].value;
+            }
+        }
+        return checkVal;
+
+    }
+    //获取上传图片列表的值
+    function getImagesRes(name) {
+        var rdsObj = document.getElementsByName(name);
+        var checkVal = new Array();
+        var k = 0;
+        for (i = 0; i < rdsObj.length; i++) {
+            checkVal[k] = rdsObj[i].value;
+            k++;
+        }
+        return checkVal;
+    }
+    {if $setting['isfollow']==1 && !empty($fans) && $fans['follow']==0}
+        $('.follow_topbar').show();
+        $('#myform').css('top','44px');
+    {else}
+        $('.follow_topbar').hide();
+        $('#myform').css('top','0');
+    {/if}
+
+</script>
+<!--by gyy
+<script>
+$('#submit').click(function(){
+	var ajaxurl = "{php echo $this->createMobileUrl('self', array('op'=>'applyplayer'));}";
+	$.ajax({
+        type:'post',
+        url:ajaxurl,
+        data:$('#myform').serialize(),
+        dataType:'json',     
+        success:function(data){
+			
+			console.log(data);
+			
+			}
+	});
+
+	
+	})
+	
+</script>	-->
+
+
+</body>
+</html>

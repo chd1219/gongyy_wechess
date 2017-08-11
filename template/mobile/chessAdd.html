@@ -1,0 +1,138 @@
+{template 'header'}
+
+<style type="text/css">
+    .form-horizontal .form-group{
+        border-bottom: 1px solid gainsboro; ;
+        margin: 0;
+
+    }
+.form-horizontal .form-group .control-label{
+    text-align: center;
+    margin-top: 10px;
+    font-weight: 100;
+}
+.form-horizontal .form-group .login_body_input{
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+    .form-horizontal .form-group .checkbox-inline{
+        height: 40px;
+    }
+    .form-horizontal .form-group .login_body_input .form-control{
+        border: none;
+        height: 40px;
+        padding: 0;
+        margin: 0;
+        border-radius:0;
+    }
+
+
+</style>
+
+<form class="form-horizontal" action="{php echo $this->createMobileUrl('Chess_Add',array('op'=>'post'));}" name="addchess" method="post">
+        <div class="form-group">
+            <label for="inputEmail3" class="col-sm-3 col-xs-3 control-label">标题</label>
+            <div class="col-sm-9 col-xs-9 login_body_input">
+                <input type="text" class="form-control" name="title" id="inputEmail3" placeholder="可输入100中文字符" maxlength="100">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="inputEmail3" class="col-sm-3 col-xs-3 control-label">红方</label>
+             <div class="col-sm-9 col-xs-9 login_body_input">
+                <input type="text" class="form-control" name="redname" id="inputEmai_redname" placeholder="请输入红方姓名(默认自己)" maxlength="10">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputEmail3" class="col-sm-3 col-xs-3 control-label">黑方</label>
+             <div class="col-sm-9 col-xs-9 login_body_input">
+                <input type="text" class="form-control" name="blackname" id="inputEmai_blackname" placeholder="请输入黑方姓名(默认电脑）" maxlength="10">
+             </div>
+        </div>
+         <div class="form-group" >
+            <label class="col-sm-3 col-xs-3 checkbox-inline control-label " style="margin-top: 3px;" > 结果</label>
+            <label class="checkbox-inline " style="margin-left: 0;" >
+                    <input type="radio"  style="margin-left: 0;" name="result" id="optionsRadios3" value="0" checked> 红胜
+            </label>
+            <label class="checkbox-inline">
+                    <input type="radio" name="result" id="optionsRadios4"  value="1"> 黑胜
+            </label>
+            <label class="checkbox-inline">
+                    <input type="radio" name="result" id="optionsRadios5"  value="2"> 和
+            </label>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 col-xs-3 control-label">选择分组</label>
+            <div class="col-sm-9 col-xs-9 tabs">
+                <select class="tabs" name="tabs">
+                    <option>无</option>
+                    {loop $tabs_top $adv}<!-- 可用隐藏input获取option的text值-->
+                       <option>{$adv['name']}</option>
+                    {/loop}
+
+                </select>
+            </div>
+         </div>
+
+        <div class="form-group">
+                <label for="inputEmail3" class="col-sm-3 col-xs-3 control-label">比赛日期</label>
+            <div class="col-sm-9 col-xs-9 login_body_input">
+                {php echo tpl_app_form_field_calendar('time',array('year'=>$timeplay['year'],'month'=>$timeplay['mon'],'day'=>$timeplay['mday']));}
+            </div>
+
+        </div>
+
+
+        <div class="form-group">
+            <label for="inputEmail3" class="col-sm-3 col-xs-3 control-label">描述</label>
+            <div class="col-sm-9 col-xs-9"  style="margin: 0;padding: 0;">
+                <textarea  rows="3" id="description" name="description" maxlength="500"></textarea>
+                <sub>可输入500中文字符</sub>
+            </div>
+        </div>
+        <div class="form-group pull-right" style="margin-right:20px" >
+                <button type="submit" class="btn btn-success btn-md send" name="submit">
+                发布
+            </button>
+        </div>
+
+</form>
+
+
+<script type="text/javascript">
+
+$(function() {
+
+    $("form[name='addchess']").submit(function () {
+        var img = $(".tmp_img").val();
+        var title = $("#inputEmail3").val();
+        var description = $("#description").val();
+        var blackname = $("#inputEmai_blackname").val();
+        var redname = $("#inputEmai_redname").val();
+        var imgs = $(".imgs").html();
+        var result = $("input:radio[name='result']:checked").val();
+        //alert('{$test}');
+        if (title == '') {
+            alert("标题不能为空");
+            return false;
+        }
+    })
+})
+
+
+
+</script>
+
+
+<script>
+    document.addEventListener('WeixinJSBridgeReady', function onBridgeReady() {
+        WeixinJSBridge.call('hideToolbar');
+        {if $_GPC['do'] == 'chess_Add'}
+        WeixinJSBridge.call('hideOptionMenu');
+        {else}
+        WeixinJSBridge.call('showOptionMenu');
+        {/if}
+    });
+</script>
+{php include $this->template('_footer');}

@@ -1,0 +1,205 @@
+body, html {
+  height: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+.demos-title {
+  text-align: center;
+  font-size: 34px;
+  color: #3cc51f;
+  font-weight: 400;
+  margin: 0 15%;
+}
+
+.demos-sub-title {
+  text-align: center;
+  color: #888;
+  font-size: 14px;
+}
+
+.demos-header {
+  padding: 35px 0;
+}
+
+.demos-content-padded {
+  padding: 15px;
+}
+
+.demos-second-title {
+  text-align: center;
+  font-size: 24px;
+  color: #3cc51f;
+  font-weight: 400;
+  margin: 0 15%;
+}
+
+footer {
+  text-align: center;
+  font-size: 14px;
+  padding: 20px;
+}
+
+footer a {
+  color: #999;
+  text-decoration: none;
+}
+
+.ellipsis {
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 1;
+	overflow:hidden;
+}
+
+.swiper-container {
+	
+}
+			
+.swiper-slide {
+	text-align: center;
+}
+
+/* 下拉下拉加载样式表 */
+.mui-pull-caption{
+	font-size:12px;
+	}
+
+
+/*新增会员中心CSS*/
+.vipcenter {font-family:"微软雅黑"; padding: 0px; font-size:14px;}
+.vipcenter .vipheader {padding: 10px; height: 120px; background: url(../images/centerbg.jpg); background-size: cover;text-align:center}
+.vipcenter .vipheader .touxiang {width: 72px; height: 72px; margin: 0px auto; border-radius: 100%; border: 2px solid #fff;}
+.vipcenter .vipheader .touxiang img { border-radius: 100%; width: 100%;}
+.vipcenter .vipheader .name {text-align: center; font-size:16px; line-height:1.5em;}
+.vipcenter .vipheader .gztt {text-align: center; line-height:1em;}
+.vipcenter .vipsan { padding: 8px 0; background: #fff; border-bottom:1px solid #ccc; overflow: auto; margin-bottom: 10px;}
+.vipcenter .vipsan div { border-right:1px solid #ccc; width:25%; float:left; text-align:center;}
+.vipcenter .vipsan div:last-child { border: 0px;}
+.vipcenter .vipsan a { color: #666; }
+.vipcenter .vipsan h4 { font-size: 14px; line-height: 1.5em;}
+.vipcenter .vipsan p {  padding: 0px; margin: 0px;}
+
+/* 反馈中心CSS*/
+/*!
+ * ======================================================
+ * FeedBack Template For MUI (http://dev.dcloud.net.cn/mui)
+ * =======================================================
+ * @version:1.0.0
+ * @author:cuihongbao@dcloud.io
+ */
+
+.feedback body {
+	background-color: #EFEFF4;
+}
+.feedback input,
+.feedback textarea {
+	border: none !important;
+}
+.feedback textarea {
+	height: 100px;
+	margin-bottom: 0 !important;
+	padding-bottom: 0 !important;
+}
+.feedback .row {
+	width: 100%;
+	background-color: #fff;
+}
+.feedback p {
+	padding: 10px 15px 0;
+}
+/*.feedback button#submit { 
+	width: 90%;
+	height: 46px;
+	left: 50%;
+	-webkit-transform: translate(-50%);
+}*/
+
+input::-webkit-input-placeholder,textarea::-webkit-input-placeholder{
+	font-size: 14px;
+}
+
+.feedback .hidden {
+	display: none;
+}
+.feedback .image-list {
+	width: 100%;
+	height: 85px;
+	background-size: cover;
+	padding: 10px 10px;
+	overflow: hidden;
+}
+.feedback .image-item {
+	width: 65px;
+	height: 65px;
+	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAABuwAAAbsBOuzj4gAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAOCSURBVHic7d0xSxxRFIbh15DOwl47u0MglVtEEQSL5B/YxtrKX2Jlra3/QAtBCGqxVoFwunRub2G9KeYuMbOzRhJnZtfve5pBZlcvnHfvjgujS+PxGNP1ru8FWL8cgDgHIO79Sx6UmZ+AXWAAbACrbS7K/tkIuAOGwGVE3P7tCUvPXQRm5gpwBOy/1gqtUyfAYUQ8zHrAzAAycws4A9aAR+AYuAGGETF6/bXa/8rMVapdehM4AJaBe2AvIq6bntMYQHnl/6Aa/jfga0T8bGnd1oLMXAdOgW2qCD407QSzLgKP+D38HQ9/8ZSZ7VDNcI1qplOmdoBywXdDte1/9PAXW9kJvlO9HWzWLwybdoDdcjz28BdfmeFx+XK3fr4pgEE53rS1KOvcZJaD+ommADbKcdjacqxrk1lu1E80BbAK4F/13o4ns5z6AM8fBYtzAOIcgDgHIM4BiHMA4hyAOAcgzgGIcwDiHIA4ByDOAYhzAOIcgDgHIM4BiHMA4hyAOAcgzgGIkw0gM88z87zvdfTtRX8f4I363PcC5oHsDmAVByDOAYhzAOIcgDgHIM4BiHMA4hyAOAcgzgGIcwDiHIA4ByDOAYhzAOIcgDgHIM4BiHMA4hyAOAcgzgGIcwDiHIA4ByDOAYibi3sDy02avdyrl5mz/3duOy4i4kvHP3Mm7wDi5mIH6OMVMXnlR8RS1z97nngHEOcAxDkAcQ5AnAMQ5wDEOQBxDkCcAxDnAMQ5AHEOQJwDEOcAxDkAcQ5AnAMQ5wDEOQBxDkCcAxDnAMQ5AHEOQJwDEOcAxDkAcXNxb2BPLvpewDyQDWCebtHuk98CxDkAcQ5AnAMQ5wDEOQBxDkCcAxDnAMQ5AHEOQJwDEOcAxDkAcQ5AnAMQ5wDEOQBxDkBcUwAjgMxc7Xgt1pInsxzVzzUFcFeOg9ZWZF2bzPKufqIpgGE5bra2HOvaZJbD+ommAC7L8SAz11tbknWizPCgfHlZPz8VQETcAifAMnCamb5QXFBldqdUszwps/3DrOEeAvfANnDlnWDxlJldUc3wnmqmU5bG4+b/m5iZW8AZsAY8AsfADTCMiKmrSetfudofUL3nH1C98u+BvYi4bnrOzADKN1wBjoD9V1+tdeEEOIyIh1kPeDaAicz8BOxS1bUB+DOC+TSi+lVvCFw2vefXvSgAe7t8hS/OAYhzAOJ+ATeBuJOueKnYAAAAAElFTkSuQmCC);
+	background-size: 100% 100%;
+	display: inline-block;
+	position: relative;
+	border-radius: 5px;
+	margin-right: 10px;
+	margin-bottom: 10px;
+	border: solid 1px #e8e8e8;
+}
+.feedback .image-item .file {
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	width: 100%;
+	height: 100%;
+	opacity: 0;
+	cursor: pointer;
+	z-index: 0;
+}
+.feedback .image-item.space {
+	border: none;
+}
+.feedback .image-item .image-close {
+	position: absolute;
+	display: inline-block;
+	right: -6px;
+	top: -6px;
+	width: 20px;
+	height: 20px;
+	text-align: center;
+	line-height: 20px;
+	border-radius: 12px;
+	background-color: #FF5053;
+	color: #f3f3f3;
+	border: solid 1px #FF5053;
+	font-size: 9px;
+	font-weight: 200;
+	z-index: 1;
+}
+.feedback .image-item.space .image-close {
+	display: none;
+}
+.feedback .mui-inline{
+	vertical-align: bottom;
+	font-size: 14px;
+	color: #8f8f94;
+}
+.mui-icon-star{
+	color: #B5B5B5;
+	font-size: 22px;
+}
+.mui-icon-star-filled{
+	color: #FFB400;
+	font-size: 22px;
+}
+.mui-popover {
+	height: 180px;
+}
+.stream{
+	display: none;
+}
+.mui-plus-stream .stream{
+	display: block;
+}
+
+
+.mui-toast-container {
+	margin-left:0px;
+	top:auto;
+	
+	min-height:auto;
+}

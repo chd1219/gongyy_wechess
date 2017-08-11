@@ -1,0 +1,114 @@
+﻿body{padding: 0px;margin: 0px;background-image: url("../assets/images/chess_bg.jpg");background-color: #6A4C30;}
+#chessBox {display:table;bottom:0;width:100%;height:50px;padding:0;position:fixed;text-align:center;table-layout:fixed;border-top:0;border-bottom:0;-webkit-touch-call;}
+#chess {/*background: url(../assets/images/bg.jpg) no-repeat;*/ margin:0 auto;position: absolute;top: 0; left: 0; bottom: 0; right: 0;}
+#tipsInfo{margin: auto ;width:100%;position: absolute; top: 1%; text-align: center;color: #BFA28A;display: none;font-size: inherit;}
+#playmode{margin: auto ;width:100%;text-align: center;color: #BFA28A;font-size: 0.85em;z-index: 555;top: 5%;position:absolute;display: none;}
+#AIThink{margin: auto ;width:100%;text-align: center;color: #BFA28A;font-size: 0.85em;z-index: 555;top: 9%;position:absolute;display: none;}
+.btnBase{width:141px;height:52px;border-style:none;background-color: transparent;}
+.newgameBtn{background: url("../assets/images/b2.png") no-repeat -300px -477px;}
+.resignBtn{background: url("../assets/images/b2.png") no-repeat -158px -477px;}
+.offerdrawBtn{background: url("../assets/images/b2.png") no-repeat 0px -535px;}
+.restartBtn{background: url("../assets/images/a.png") no-repeat 0px -120px;}
+.regretBtn{background: url("../assets/images/a.png") no-repeat -300px -121px;}
+.regretBtnDisable{display: none;}
+.helpBtn{background: url("../assets/images/a.png") no-repeat -150px -120px;}
+
+.chessbaseBtn{width:60px;height:60px;border-style:none;background-color: transparent;}
+.chess0Btn{background: url("../assets/images/b.png") no-repeat -5px -433px;}
+.chess1Btn{background: url("../assets/images/b.png") no-repeat -75px -433px;}
+.chess2Btn{background: url("../assets/images/b.png") no-repeat -150px -433px;}
+.chess3Btn{background: url("../assets/images/b.png") no-repeat -220px -432px;}
+.chess4Btn{background: url("../assets/images/b.png") no-repeat -290px -431px;}
+.chess5Btn{background: url("../assets/images/b.png") no-repeat -360px -430px;}
+.chess6Btn{background: url("../assets/images/b.png") no-repeat -5px -503px;}
+.chess7Btn{background: url("../assets/images/b.png") no-repeat -77px -507px;}
+.chess8Btn{background: url("../assets/images/b.png") no-repeat -152px -507px;}
+.chess9Btn{background: url("../assets/images/b.png") no-repeat -218px -502px;}
+.chess10Btn{background: url("../assets/images/b.png") no-repeat -290px -507px;}
+.chess11Btn{background: url("../assets/images/b.png") no-repeat -360px -502px;}
+
+.pop-box { 	
+	z-index: 9999999; /*这个数值要足够大，才能够显示在最上层*/ 
+	margin: auto ;width:100%;position: fixed; top: 20%; text-align: center; background: #6A4C30; border: solid1px #6e8bde; 
+} 
+#bg {
+	width: 100%; height: 100%; position: absolute; top: 0; left: 0; 
+	z-index: 1001; background-color: #6A4C30; -moz-opacity: 0.6; opacity: .60; filter: alpha(opacity = 60); 
+}
+#bg1 {
+	width: 100%; height: 100%; position: absolute; top: 0; left: 0; 
+	z-index: 1001; background-color: #6A4C30; -moz-opacity: 0.0; opacity: .00; filter: alpha(opacity = 0); 
+}
+
+/*#shareBtn{width:139px;height:51px;background-image: url("../assets/images/share.png"); border-style:none;background-color: transparent;display: none}*/
+
+#btnBox{display: none}
+.coverMask {
+    position:fixed; top: 0px; right:0px; bottom:0px;filter: alpha(opacity=20); background-color: #000;
+    left: 0px;
+    opacity:0.2; -moz-opacity:0.2;
+}
+.cover {
+    position:fixed; top: 0px; right:0px; bottom:0px;
+    z-index: 2002; left: 0px; display:none;
+}
+.coverTips
+{
+    background: url("../assets/images/a.png") no-repeat 0px -600px;width: 285px;height: 100px;
+    float: right;position: relative;top: 20px;right: 20px;
+}
+.notedialog
+{
+	z-index: 9999999;
+    margin: auto ;width:100%;position: fixed; top: 20%; text-align: center;  font-size: inherit;word-break;break-all;word-wrap;break-word;
+	
+}
+.onlinedialog
+{
+	z-index: 9999999;
+    margin: auto ;width:100%;position: fixed; top: 0%; text-align: center;  font-size: inherit;word-break;break-all;word-wrap;break-word;
+	
+}
+.settingdialog
+{
+	z-index: 9999999;
+    margin: auto ;width:100%;position: fixed; top: 0%; text-align: center;  font-size: inherit;word-break;break-all;word-wrap;break-word;display:none;	
+}
+.restartdialog
+{
+	z-index: 9999999;
+    margin: auto ;width:100%;position: fixed; top: 45%; text-align: center;  font-size: inherit;word-break;break-all;word-wrap;break-word;display:none;	
+}
+.replaydialog
+{
+	z-index: 9999999;
+    margin: auto ;width:100%;position: fixed; top: 45%; text-align: center;  font-size: inherit;word-break;break-all;word-wrap;break-word;display:none;	
+}
+.nextstepdialog
+{
+	z-index: 9999999;
+    margin: auto ;width:100%;position: fixed; top: 45%; text-align: center; display:none;	
+}
+.notedialog
+{
+    width:100%;position:absolute;border:1px solid red;color: #BFA28A;
+}
+.loading {position:fixed; top: 0px; right:0px; bottom:0px; background-color: #6A4C30;
+    z-index: 1002; left: 0px;}
+
+.percent
+{
+    position: absolute; top: 250px; left: 150px;color: aliceblue;font-size: inherit;
+}
+#gameResult{
+    position:absolute; top: 0px; right:0px; bottom:0px;
+     left: -430px;display: none;
+}
+#gameWin{
+    background: url("../assets/images/a.png") no-repeat 0px -500px; width: 432px;height: 90px;
+    position: absolute;bottom: 50%; left: 50%;display: none;
+}
+#gameLose{
+    background: url("../assets/images/a.png") no-repeat 0px -400px; width: 436px;height: 94px;
+    position: absolute;bottom: 50%; left: 50%;display: none;
+}

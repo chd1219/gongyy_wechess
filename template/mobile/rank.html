@@ -1,0 +1,162 @@
+{template 'header'}
+<body>
+  <div class="weui-tab">
+    <div class="weui-navbar">
+      <a class="weui-navbar__item weui-bar__item--on" href="#credit">
+        积分排行榜
+      </a>
+      <a class="weui-navbar__item" href="#sign">
+        签到排行榜
+      </a>
+      <a class="weui-navbar__item" href="#chess">
+        棋谱排行榜
+      </a>
+    </div>
+    <div class="weui-tab__bd mui-scroll-wrapper" id='refreshContainer'>
+      <div id="credit" class="weui-tab__bd-item weui-tab__bd-item--active">
+        <div class="mui-content" style="top:-15px;">
+          <ul class="mui-table-view mui-table-view-chevron">
+           {loop $memberinfo $index $member}
+            <li class="mui-table-view-cell mui-media">
+              <a><span class="mui-badge mui-badge-success mui-badge-inverted" style="right: 30px;border: none;font-weight: bold;font-size: 20px;">{$member['credit1']}</span>
+               <span class="mui-media-object mui-pull-left" style="font-weight: bold;font-size: 18px;margin-right: 20px;">{php echo bcadd($index,1);}</span>
+               <img class="mui-media-object mui-pull-left" style="border-radius:42px;margin-right: 20px;" src='{$member["avatar"]}'>
+               <div class="mui-media-body" style="padding-top: 10px;font-weight: bold;font-size: 18px;">
+                {$member['nickname']}
+              </div>
+            </a>
+          </li>
+          {/loop}
+        </ul>
+      </div> 
+    </div>
+    <div id="sign" class="weui-tab__bd-item">
+      <h1 class="doc-head">页面二</h1>
+    </div>
+    <div id="chess" class="weui-tab__bd-item">
+      <h1>页面3</h1>
+    </div>
+  </div>
+</div>
+<nav class="mui-bar mui-bar-tab">
+  <a class="mui-tab-item" href="{php echo $this->createMobileUrl('index');}">
+    <span class="mui-icon mui-icon-home"></span>
+    <span class="mui-tab-label">首页</span>
+  </a>
+
+  <a class="mui-tab-item" href="{php echo $this->createMobileUrl('player');}">
+    <span class="mui-icon mui-icon-personadd-filled"></span>
+    <span class="mui-tab-label">棋手</span>
+  </a>
+  <a class="mui-tab-item " href="#center">
+    <span class="mui-icon mui-icon-compose"></span>
+    <span class="mui-tab-label">拆棋</span>
+
+  </a>
+  <a class="mui-tab-item" href="{php echo $this->createMobileUrl('search');}">
+    <span class="mui-icon mui-icon-search"></span>
+    <span class="mui-tab-label">搜索</span>
+  </a>
+
+  <a class="mui-tab-item  mui-active" href="{php echo $this->createMobileUrl('self');}">
+    <span class="mui-icon mui-icon-contact"></span>
+    <span class="mui-tab-label">我的</span>
+  </a>
+</nav>
+
+<div id="center" class="mui-popover mui-bar-popover">
+  <div class="mui-popover-arrow"></div>
+  <ul class="mui-table-view" style="margin:0">
+    <li class="mui-table-view-cell"><a href="{php echo $this->createMobileUrl('publish',array('op'=>'create'));}">创建棋谱</a>
+    </li>
+    <li class="mui-table-view-cell"><a href="{php echo $this->createMobileUrl('publish',array('op'=>'ai'));}">人机对弈</a>
+    </li>
+    <li class="mui-table-view-cell"><a href="{php echo $this->createMobileUrl('publish',array('op'=>'analyse'));}">研究复盘</a>
+    </li>
+  </ul>
+</div>
+<script type="text/javascript">
+  mui(".mui-bar-tab").on('tap', '.mui-tab-item', function () {
+
+    mui.openWindow({
+      id: this.href,
+      url: this.href,
+      waiting: {
+            autoShow: true,//自动显示等待框，默认为true
+            title: '正在加载...',//等待对话框上显示的提示内容
+
+          }
+        });
+  })
+/*  $('#sign').pullToRefresh();
+  $('#sign').on("pull-to-refresh", function() {
+  console.log('st');
+});
+$('#sign').pullToRefreshDone();*/
+pagenumber = 2;
+mui.init({
+  pullRefresh: {
+            container: "#refreshContainer",//下拉刷新容器标识，querySelector能定位的css选择器均可，比如：id、.class等
+            down: {
+                height: 50,//可选,默认50.触发下拉刷新拖动距离,
+                auto: false,//可选,默认false.自动下拉刷新一次
+                contentdown: "下拉刷新",//可选，在下拉可刷新状态时，下拉刷新控件上显示的标题内容
+                contentover: "释放立即刷新",//可选，在释放可刷新状态时，下拉刷新控件上显示的标题内容
+                contentrefresh: "正在刷新...",//可选，正在刷新状态时，下拉刷新控件上显示的标题内容
+                callback: __pulldownfresh //必选，刷新函数，根据具体业务来编写，比如通过ajax从服务器获取新数据；
+              },
+              up: {
+                height: 50,//可选.默认50.触发上拉加载拖动距离
+                auto: false,//可选,默认false.自动上拉加载一次
+                contentrefresh: "正在加载...",//可选，正在加载状态时，上拉加载控件上显示的标题内容
+                contentnomore: '没有更多数据了',//可选，请求完毕若没有更多数据时显示的提醒内容；
+                callback: __pullupfresh //必选，刷新函数，根据具体业务来编写，比如通过ajax从服务器获取新数据；
+              }
+            }
+          });
+function __pulldownfresh() {
+        //业务逻辑代码，比如通过ajax从服务器获取新数据；
+        $('.weui-tab__bd-item').each(function(index){
+          if($(this).hasClass('weui-tab__bd-item--active')){
+            if(index==0){
+              $.post("{php echo $this->createMobileUrl('self',array('op'=>'rank','type'=>'credit'));}", {page: 1}, function (data) {
+            //服务器返回响应，根据响应结果，分析是否登录成功；
+            console.log($.parseJSON(data));
+            pagenumber = 2;
+            $('.ul').html($.parseJSON(data));
+
+            mui('#refreshContainer').pullRefresh().endPulldownToRefresh();
+            mui('#refreshContainer').pullRefresh().refresh(true);
+          });
+            }
+          }
+        })
+
+
+      }
+
+      function __pullupfresh() {
+        //业务逻辑代码，比如通过ajax从服务器获取新数据；
+
+
+        $.post("{php echo $this->createMobileUrl('index',array('op'=>'ajax','categoryid'=>$categoryid,'keywords'=>$keywords));}", {page: pagenumber}, function (data) {
+            //服务器返回响应，根据响应结果，分析是否登录成功；
+            pagenumber += 1;
+            console.log(pagenumber);
+            console.log(data);
+            var apphtml = $.parseJSON(data);
+            if (apphtml) {
+              $('.ul').append(apphtml);
+              mui('#refreshContainer').pullRefresh().endPullupToRefresh(false);
+            } else {
+              console.log('wanle');
+              mui('#refreshContainer').pullRefresh().endPullupToRefresh(true);
+            }
+
+          });
+
+      }
+    </script>
+
+  </body>
+  </html>

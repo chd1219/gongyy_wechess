@@ -1,0 +1,128 @@
+{template 'header'}
+<script type="text/javascript" src="{$_W['siteroot']}addons/chessroom/template/mobile/style/js/jquery.min.js"></script>
+<body style="padding-bottom: 70px">
+
+<!--<div class="panel panel-default ">
+    <div class="panel-heading" style="background: blue">
+        <a href="javascript:history.go(-1)" class="navbar-link pull-left"> <i class="glyphicon glyphicon-chevron-left"></i> </a>
+        <span style="text-align: center;">棋谱</span>
+        <a href="{php echo $this->createMobileUrl('more', array());}" class="navbar-link pull-right"><i class="glyphicon glyphicon-chevron-right"> 更多 </a>
+    </div>
+    <img src="{php echo tomedia($tab['thumb']);}" title="{$tab['name']}" style="width:100%"/>
+    <div class="num center"><strong>共{$tab['num']}张</strong></div>
+    <div class="panel-heading">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 col-xs-4"><a id="hits" href="javascript:;" onclick="getCon('hits')">排行榜</a></div>
+                <div class="col-md-4 col-xs-4"><a id="click" href="javascript:;" onclick="getCon('click')" class="active">最热</a></div>
+                <div class="col-md-4 col-xs-4"><a id="matchtime" href="javascript:;" onclick="getCon('matchtime')">最新</a></div>
+            </div>
+        </div>
+    </div>
+    -->
+<div class="panel panel-info">
+    <div class="panel-heading" style="text-align:center;background: #408BE1;">
+        <span class="glyphicon  glyphicon-chevron-left " aria-hidden="true" style="float:left;"></span> <span style="color: #FEFFFF;font-size: large;" >棋谱</span><span class="glyphicon glyphicon-search " aria-hidden="true" style="float:right;"></span>
+    </div>
+    <div class="panel-heading">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 col-xs-4"><a id="hits" href="javascript:;" onclick="getCon('hits')">排行榜</a></div>
+                <div class="col-md-4 col-xs-4"><a id="click" href="javascript:;" onclick="getCon('click')" class="active">最热</a></div>
+                <div class="col-md-4 col-xs-4"><a id="matchtime" href="javascript:;" onclick="getCon('matchtime')">最新</a></div>
+            </div>
+        </div>
+    </div>
+</div>
+    <div class="panel-body">
+
+            {loop $tab['contents'] $item}
+                <a style="color: #3c3c3c" href="{php echo $item['url']."&file=".$item['filename'];}" >
+                    <div class="container border">
+
+                        <div class="row">
+                            <div class="col-lg-6 col-xs-12" ><strong>{$item['title']}</strong></div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6 col-xs-6"><img src="{$_W['siteroot']}addons/chessroom/template/mobile/images/shuai.jpg" class="img-circle" style="height: 15px;width: 15px;"><small>{$item['redname']}</small></div>
+                            <div class="col-lg-6 col-xs-6"><img src="{$_W['siteroot']}addons/chessroom/template/mobile/images/jiang.jpg" class="img-circle" style="height: 15px;width: 15px;"><small>{$item['blackname']}</small></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6 col-xs-6"><span class="	glyphicon glyphicon-time" aria-hidden="true"><small style="color: black;">{php echo date('Y-m-d',$item['matchtime']);}</small></div>
+                            <div class="col-lg-6 col-xs-6"><span class="glyphicon glyphicon-circle-arrow-up" aria-hidden="true"><span style="color: red">{$item['result']}</span></div>
+                        </div>
+                    </div>
+                </a>
+            {/loop}
+    </div>
+</div>
+<script src="{$_W['siteroot']}addons/chessroom/template/mobile/style/js/bootstrap.min.js" type="text/javascript"></script>
+</body>
+
+<style>
+    .panel .center{
+        margin-left:auto;
+        margin-right:auto;
+        margin-bottom:5px;
+    }
+    .border{
+        border-bottom:solid black 1px;
+        border-top:solid black 1px;
+        padding:5px;
+    }
+    .panel{
+        margin-bottom: 40px;
+    }
+    .panel .panel-body{
+        background: #F2F2F2;
+        padding:0;border:0px;height:100%;overflow-y:auto;
+    }
+    .glyphicon-time{
+        color: #00b7ee;
+    }
+     .panel-heading .row a .active{
+        border-bottom: 2px solid #2fa5ff;
+        color: #2fa5ff;
+    }
+</style>
+<script>
+    function getCon(desc){
+        $('.panel-body').html('');
+
+        $(".panel-heading .row a").removeClass("active");
+        $("#"+desc).addClass("active");
+        playmasonry(desc);
+    }
+    function playmasonry(desc){
+           $.post("{php echo $this->createMobileUrl('tabs_list', array('id'=>$id));}",{order:desc},function(data){
+            if (data !="undefined" && data!="0") {
+                var sqlJson = $.parseJSON(data);
+
+                (function(sqlJson){
+                    /*这里会根据后台返回的数据来判断是否你进行分页或者数据加载完毕这里假设大于30就不在加载数据*/
+
+                    var html="";
+                    for(var i in sqlJson){
+                        html+="<a style='color: #3c3c3c' href="+sqlJson[i].url+"&file="+sqlJson[i].filename +">";
+                        html+=" <div class='container border'> <div class='row'> <div class='col-lg-6 col-xs-12' ><strong>";
+                        html+=sqlJson[i].title+"</strong></div>";
+                        html+="</div> <div class='row'> <div class='col-lg-6 col-xs-6'><img src='{$_W["siteroot"]}addons/chessroom/template/mobile/images/shuai.jpg' class='img-circle' style='height: 15px;width: 15px;'><small>"+sqlJson[i].redname+"</small></div>";
+                        html+="<div class='col-lg-6 col-xs-6'><img src='{$_W["siteroot"]}addons/chessroom/template/mobile/images/jiang.jpg' class='img-circle' style='height: 15px;width: 15px;'><small>"+sqlJson[i].blackname+"</small></div> </div>";
+                        html+=" <div class='row'> <div class='col-lg-6 col-xs-6'><span class='glyphicon glyphicon-time' aria-hidden='true'><small style='color: black;'>"+sqlJson[i].matchtime+"</small></div>";
+                        html+="<div class='col-lg-6 col-xs-6'><span class='glyphicon glyphicon-circle-arrow-up' aria-hidden='true'><span style='color: red'>"+sqlJson[i].result+"</span></div> </div></div></a>";
+                    }
+                    $('.panel-body').html(html);
+
+                   })(sqlJson);
+
+            }else {
+                $('.panel-body').html("<h3 style='text-align: center'>暂时还没有棋谱，欢迎您<br/> <a href='http://westudy.chinaxueyun.com/match/'>点此</a>添加</h3>");
+            }
+
+        });
+    }
+
+</script>
+{template '_footer'}
+

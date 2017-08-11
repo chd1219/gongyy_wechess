@@ -1,0 +1,69 @@
+{template 'header'}
+<body>
+<nav class="mui-bar mui-bar-tab">
+    <a class="mui-tab-item " href="{php echo $this->createMobileUrl('index');}">
+        <span class="mui-icon mui-icon-home"></span>
+        <span class="mui-tab-label">首页</span>
+    </a>
+
+    <a class="mui-tab-item" href="{php echo $this->createMobileUrl('player');}">
+        <span class="mui-icon mui-icon-personadd-filled"></span>
+        <span class="mui-tab-label">棋手</span>
+    </a>
+    <a class="mui-tab-item " href="#center">
+        <span class="mui-icon mui-icon-compose"></span>
+        <span class="mui-tab-label">拆棋</span>
+       
+    </a>
+    <a class="mui-tab-item" href="{php echo $this->createMobileUrl('search');}">
+        <span class="mui-icon mui-icon-search"></span>
+        <span class="mui-tab-label">搜索</span>
+    </a>
+
+    <a class="mui-tab-item mui-active" href="{php echo $this->createMobileUrl('self');}">
+        <span class="mui-icon mui-icon-contact"></span>
+        <span class="mui-tab-label">我的</span>
+    </a>
+</nav>
+<div id="center" class="mui-popover mui-bar-popover">
+    <div class="mui-popover-arrow"></div>
+    <ul class="mui-table-view" style="margin:0">
+        <li class="mui-table-view-cell"><a href="{php echo $this->createMobileUrl('publish',array('op'=>'create'));}">创建棋谱</a>
+        </li>
+        <li class="mui-table-view-cell"><a href="{php echo $this->createMobileUrl('publish',array('op'=>'ai'));}">人机对弈</a>
+        </li>
+        <li class="mui-table-view-cell"><a href="{php echo $this->createMobileUrl('publish',array('op'=>'analyse'));}">研究复盘</a>
+        </li>
+    </ul>
+</div>
+<style>
+    .mui-btn {
+        font-size: 16px;
+        padding: 8px;
+        margin: 3px;
+    }
+	.info{
+		line-height: 40px;
+		color: #04BE02;
+	}
+</style>
+<div class="mui-content">
+    <form action="{php echo $this->createMobileUrl('credit', array('op'=>'recharge'));}" method="post"
+          class="form-horizontal" onsubmit="return checkSubmit();">
+        <div>
+            <div class="mui-control-content  mui-active">
+                <div class="mui-table-view" style="min-height:200px">
+                    <div class="mui-input-group">
+						<div class="mui-input-row">
+                            <label>当前会员</label>
+                            <span class="info">{$memberInfo['nickname']}</span>
+                        </div>
+
+                        <div class="mui-input-row">
+                            <label>当前积分</label>
+                            <span class="info">{$memberInfo['credit1']}</span>
+                        </div>
+
+                        <div class="mui-input-row">
+                            <label>充值积分</label>
+                            <input type="text" name="credit_number" class="mui-input-cle

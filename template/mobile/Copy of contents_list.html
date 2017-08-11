@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>{if !empty($title)}{$title} - {/if}{$setting['sitename']} - {$_W['uniaccount']['name']}</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/css/mui.min.css">
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/css/comment.css">
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/lib/weui.min.css">
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/css/jquery-weui.css">
+
+    <script type="text/javascript" src="{MODULE_URL}template/mobile/js/zepto.js"></script>
+    <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script type="text/javascript" src="{MODULE_URL}template/mobile/js/mui.min.js"></script>
+    <script src="{MODULE_URL}template/mobile/js/jquery-weui.js"></script>
+</head>
+<body>
+<header id="header" class="mui-bar mui-bar-nav">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+    <h5 class="mui-title">{$title}</h5>
+    <a class="mui-icon mui-icon-home mui-pull-right" href="{php echo $this->createMobileUrl('index');}"></a></header>
+
+<div class="weui-search-bar" id="searchBar" style="position: fixed; bottom: 0px; width: 100%;z-index: 999;">
+    <form action="{php echo $this->createMobileUrl('index', array('op'=>'search','categoryid'=>$categoryid));}"
+          method="post" class="weui-search-bar__form" role="form" target="index_main">
+        <div class="weui-search-bar__box" style="padding-left: 10px;">
+
+            <input type="text" class="weui-search-bar__input" name='keywords' style="margin-bottom:0px;"
+                   id="searchInput" placeholder="评论" value='{$keywords}' required="">
+            <a href="javascript:" class="weui-icon-clear" id="searchClear"></a>
+        </div>
+        <label class="weui-search-bar__label" id="searchText">
+            <span class="mui-icon mui-icon-compose">评论</span>
+
+        </label>
+    </form>
+    <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
+</div>
+<div class="mui-content" style="margin-bottom: 50px;">
+    <div class="video-video-container">
+        <div class="video-info"><h1 class="info-title">话说‘教会徒弟饿死师傅’听岳云鹏如何搞笑‘调戏’郭德纲</h1><span class="watched-times">宫易 上传于2天前</span><span class="watched-times" style="float: right;margin-right:20px ;">20.1万 次浏览</span></div>
+
+        </div>
+
+    <div class="comments-container box-content">
+        <div class="popbox-container"><span></span></div>
+        <div class="no-action comment-share-container">
+            <div class="comment-content">
+                <div class="avatar btn"><a class="btn" data-position="comment"><span><img
+                        src="http://p0.pstatp.com/origin/3791/5035712059"></span></a></div>
+                <div class="name">
+
+                    <a class="btn text-ellipsis" data-position="comment"
+                                     title="放飞梦想8612170"><span class="mui-badge">作者</span>放飞梦想8612170</a>
+                </div>
+                <div class="content"><a data-node="commentText" data-position="comment" class="btn">
+                    <div class="expand-container">
+                        <div class="expand__text">我喝醉了就是在床上睡觉一.到天亮。</div>
+
+                    </div>
+                </a>
+
+                </div>
+                <div class="time">02-26 22:40 · <a
+                        href="{php echo $this->createMobileUrl('comment',array('op'=>'reply'));}"
+                        class="">4条回复<span class="mui-icon mui-icon-arrowright"
+                                           style="font-size: 14px;"></span></a></div>
+
+                <div class="action_pane"><a class="btn digg" data-comment-id="55215234240" href="javascript:;">10</a><a
+                        class="list_action btn"></a></div>
+            </div>
+            <div class="comment-content">
+                <div class="avatar btn"><a class="btn" data-position="comment"><span><img
+                        src="http://p1.pstatp.com/thumb/3796/2975850990"></span></a></div>
+                <div class="name"><a class="btn text-ellipsis" data-position="comment" title="南极小仙翁">南极小仙翁</a></div>
+                <div class="content"><a data-node="commentText" data-position="comment" class="btn">
+                    <div class="expand-container">
+                        <div class="expand__text">问一下，大麻代替酒可以不，不会喝酒</div>
+                    </div>
+                </a></div>
+                <div class="action_pane"><a class="btn digg" data-comment-id="55210196936" href="javascript:;">15</a><a
+                        class="list_action btn"></a></div>
+            </div>
+            <div class="comment-content">
+                <div class="avatar btn"><a class="btn" data-position="comment"><span><img
+                        src="http://p1.pstatp.com/thumb/3796/2975850990"></span></a></div>
+                <div class="name"><a class="btn text-ellipsis" data-position="comment" title="南极小仙翁">南极小仙翁</a></div>
+                <div class="content"><a data-node="commentText" data-position="comment" class="btn">
+                    <div class="expand-container">
+                        <div class="expand__text">问一下，大麻代替酒可以不，不会喝酒</div>
+                    </div>
+                </a></div>
+                <div class="action_pane"><a class="btn digg" data-comment-id="55210196936" href="javascript:;">15</a><a
+                        class="list_action btn"></a></div>
+            </div>
+            <div class="comment-content">
+                <div class="avatar btn"><a class="btn" data-position="comment"><span><img
+                        src="http://p1.pstatp.com/thumb/3796/2975850990"></span></a></div>
+                <div class="name"><a class="btn text-ellipsis" data-position="comment" title="南极小仙翁">南极小仙翁</a></div>
+                <div class="content"><a data-node="commentText" data-position="comment" class="btn">
+                    <div class="expand-container">
+                        <div class="expand__text">问一下，大麻代替酒可以不，不会喝酒</div>
+                    </div>
+                </a></div>
+                <div class="action_pane"><a class="btn digg" data-comment-id="55210196936" href="javascript:;">15</a><a
+                        class="list_action btn"></a></div>
+            </div>
+            <div class="comment-content">
+                <div class="avatar btn"><a class="btn" data-position="comment"><span><img
+                        src="http://p1.pstatp.com/thumb/3796/2975850990"></span></a></div>
+                <div class="name"><a class="btn text-ellipsis" data-position="comment" title="南极小仙翁">南极小仙翁</a></div>
+                <div class="content"><a data-node="commentText" data-position="comment" class="btn">
+                    <div class="expand-container">
+                        <div class="expand__text">问一下，大麻代替酒可以不，不会喝酒</div>
+                    </div>
+                </a></div>
+                <div class="action_pane"><a class="btn digg" data-comment-id="55210196936" href="javascript:;">15</a><a
+                        class="list_action btn"></a></div>
+            </div>
+            <div class="comment-content">
+                <div class="avatar btn"><a class="btn" data-position="comment"><span><img
+                        src="http://p1.pstatp.com/thumb/3796/2975850990"></span></a></div>
+                <div class="name"><a class="btn text-ellipsis" data-position="comment" title="南极小仙翁">南极小仙翁</a></div>
+                <div class="content"><a data-node="commentText" data-position="comment" class="btn">
+                    <div class="expand-container">
+                        <div class="expand__text">问一下，大麻代替酒可以不，不会喝酒</div>
+                    </div>
+                </a></div>
+                <div class="action_pane"><a class="btn digg" data-comment-id="55210196936" href="javascript:;">15</a><a
+                        class="list_action btn"></a></div>
+            </div>
+            <div class="comment-content">
+                <div class="avatar btn"><a class="btn" data-position="comment"><span><img
+                        src="http://p1.pstatp.com/thumb/3796/2975850990"></span></a></div>
+                <div class="name"><a class="btn text-ellipsis" data-position="comment" title="南极小仙翁">南极小仙翁</a></div>
+                <div class="content"><a data-node="commentText" data-position="comment" class="btn">
+                    <div class="expand-container">
+                        <div class="expand__text">问一下，大麻代替酒可以不，不会喝酒</div>
+                    </div>
+                </a></div>
+                <div class="action_pane"><a class="btn digg" data-comment-id="55210196936" href="javascript:;">15</a><a
+                        class="list_action btn"></a></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

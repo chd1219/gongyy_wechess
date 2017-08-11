@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns="http://www.we7.cc" versionCode="0.6">
+	<application setting="true">
+		<name><![CDATA[象棋服务]]></name>
+		<identifie><![CDATA[gongyy_wechess]]></identifie>
+		<version><![CDATA[0.1]]></version>
+		<type><![CDATA[biz]]></type>
+		<ability><![CDATA[一站式象棋服务]]></ability>
+		<description><![CDATA[一站式象棋服务]]></description>
+		<author><![CDATA[宫易]]></author>
+		<url><![CDATA[http://bbs.we7.cc/]]></url>
+	</application>
+	<platform>
+		<subscribes>
+			<message type="text" />
+			<message type="image" />
+			<message type="voice" />
+			<message type="video" />
+			<message type="shortvideo" />
+			<message type="location" />
+			<message type="link" />
+			<message type="subscribe" />
+			<message type="unsubscribe" />
+			<message type="qr" />
+			<message type="trace" />
+			<message type="click" />
+			<message type="view" />
+			<message type="merchant_order" />
+		</subscribes>
+		<handles>
+			<message type="image" />
+			<message type="voice" />
+			<message type="video" />
+			<message type="shortvideo" />
+			<message type="location" />
+			<message type="link" />
+			<message type="subscribe" />
+			<message type="qr" />
+			<message type="trace" />
+			<message type="click" />
+			<message type="merchant_order" />
+			<message type="text" />
+		</handles>
+		<rule embed="true" />
+		<card embed="false" />
+	</platform>
+	<bindings>
+		<cover>
+			<entry title="首页入口" do="index" state="" direct="false" />
+		</cover>
+		<rule>
+			<entry title="规则列表" do="rule" state="data" direct="false" />
+		</rule>
+		<menu>
+			<entry title="分类管理" do="category" state="" direct="false" />
+			<entry title="用户管理" do="user" state="" direct="false" />
+			<entry title="棋谱管理" do="chess" state="" direct="false" />
+			<entry title="棋手管理" do="player" state="" direct="false" />
+			<entry title="用户反馈管理" do="feedback" state="" direct="false" />
+			<entry title="积分充值订单" do="order" state="" direct="false" />
+			<entry title="基本设置" do="setting" state="" direct="false" />
+		</menu>
+		<home>
+			<entry title="微站首页导航图标1" do="website1" state="" direct="false" />
+		</home>
+		<profile>
+			<entry title="微站个人中心导航1" do="user1" state="" direct="false" />
+		</profile>
+		<shortcut>
+			<entry title="微站快捷功能导航1" do="shotcut1" state="" direct="false" />
+		</shortcut>
+		<function>
+			<entry title="微站独立功能1" do="special1" state="" direct="false" />
+		</function>
+	</bindings>
+	<permissions>
+	</permissions>
+	<install><![CDATA[install.php]]></install>
+	<uninstall><![CDATA[]]></uninstall>
+	<upgrade><![CDATA[]]></upgrade>
+</manifest>

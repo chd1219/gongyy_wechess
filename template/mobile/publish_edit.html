@@ -1,0 +1,152 @@
+{template 'header'}
+<body>
+<header id="header" class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h5 class="mui-title">{$title}</h5>
+		<a class="mui-icon mui-icon-home mui-pull-right" href="{php echo $this->createMobileUrl('index');}"></a></header>
+<div id="refreshContainer" class="mui-content mui-scroll-wrapper" style="margin-top:45px;">
+    <div class="mui-content">
+        <form id='myform' action="{php echo $this->createMobileUrl('chess',array('op'=>'edit','file'=>$chess['filename']));}" method="post"
+              class="form-horizontal" role="form" target="_self">
+            <div class="mui-table-view" style="min-height:200px">
+
+                <div class="mui-input-group">
+                    <input type="hidden" name='id' value="{$chess['id']}">
+                    <input type="hidden" id='categoryid' name='categoryid' value="{$chess['categoryid']}">
+
+                    <div class="mui-input-row">
+                        <label>分类</label>
+                        <input type="text" id="showUserPicker" class="mui-input-clear"
+                               value="{php echo $this->getCategoryiconameById($_W['uniacid'],$chess['categoryid'])}"
+                               placeholder="请输入标题关键词" readonly>
+                    </div>
+
+                    <div class="mui-input-row">
+                        <label>标题</label>
+                        <input type="text" name="title" class="mui-input-clear" value="{$chess['title']}"
+                               placeholder="请输入标题关键词">
+                    </div>
+
+                    <div class="mui-input-row">
+                        <label>红方</label>
+                        <input type="text" name="redname" class="mui-input-clear" value="{$chess['redname']}"
+                               placeholder="红方棋手名字">
+                    </div>
+                    <div class="mui-input-row">
+                        <label>黑方</label>
+                        <input type="text" name="blackname" class="mui-input-clear" value="{$chess['blackname']}"
+                               placeholder="黑方棋手名字">
+                    </div>
+
+                    <div class="mui-input-row" style="height:auto">
+                        <label>说明</label>
+                        <textarea id="textarea" rows="5" name="comment"  placeholder="请输入说明">{$chess['comment']}</textarea>
+                    </div>
+
+
+                </div>
+
+                <div class="demos-content-padded">
+                    <a class="weui-btn weui-btn_primary" href="javascript:checksubmit()" id="showTooltips">确定</a>
+                    <a class="weui-btn weui-btn_default" href="javascript:history.back(-1);" id="showTooltips">取消</a>
+                </div>
+
+            </div>
+        </form>
+    </div>
+
+</div>
+<link rel="stylesheet" href="{MODULE_URL}template/mobile/lib/picker/css/mui.picker.min.css">
+<link rel="stylesheet" href="{MODULE_URL}template/mobile/lib/picker/css/mui.poppicker.css">
+<script src="{MODULE_URL}template/mobile/lib/picker/js/mui.picker.min.js"></script>
+<script src="{MODULE_URL}template/mobile/lib/picker/js/mui.poppicker.js"></script>
+<script>
+
+
+    mui('body').on('tap', 'a', function () {
+        document.location.href = this.href;
+    });
+
+
+    mui.init({
+        pullRefresh: {
+            container: "#refreshContainer",//下拉刷新容器标识，querySelector能定位的css选择器均可，比如：id、.class等
+            down: {
+                height: 50,//可选,默认50.触发下拉刷新拖动距离,
+                auto: false,//可选,默认false.自动下拉刷新一次
+                contentdown: "下拉刷新",//可选，在下拉可刷新状态时，下拉刷新控件上显示的标题内容
+                contentover: "释放立即刷新",//可选，在释放可刷新状态时，下拉刷新控件上显示的标题内容
+                contentrefresh: "正在刷新...",//可选，正在刷新状态时，下拉刷新控件上显示的标题内容
+                callback: __pulldownfresh //必选，刷新函数，根据具体业务来编写，比如通过ajax从服务器获取新数据；
+            },
+
+        }
+    });
+
+    function __pulldownfresh() {
+        //业务逻辑代码，比如通过ajax从服务器获取新数据；
+
+        mui('#refreshContainer').pullRefresh().endPulldownToRefresh();
+
+    }
+
+    mui('.mui-table-view .mui-switch').each(function () { //循环所有toggle
+        //toggle.classList.contains('mui-active') 可识别该toggle的开关状态
+
+        /**
+         * toggle 事件监听
+         */
+        this.addEventListener('toggle', function (event) {
+            //event.detail.isActive 可直接获取当前状态
+            this.parentNode.querySelector('input').value = (event.detail.isActive ? '1' : '0');
+        });
+    });
+
+
+</script>
+
+<script>
+
+
+    (function ($, doc) {
+        $.init();
+        $.ready(function () {
+            //普通示例
+            var userPicker = new $.PopPicker();
+            userPicker.setData([
+                {loop $categories $index $cat}
+                {
+                    value: "{$cat['id']}",
+                    text: "{$cat['name']}"
+                },
+                {/loop}
+
+
+            ])
+            ;
+            var showUserPickerButton = doc.getElementById('showUserPicker');
+            var userResult = doc.getElementById('showUserPicker');
+            var categoryidInput = doc.getElementById('categoryid');
+            showUserPickerButton.addEventListener('tap', function (event) {
+                userPicker.show(function (items) {
+
+                    userResult.value = items[0]['text'];
+                    categoryidInput.value = items[0]['value'];
+                    //返回 false 可以阻止选择框的关闭
+                    //return false;
+                });
+            }, false);
+
+        });
+    })(mui, document);
+
+</script>
+
+<script>
+
+    function checksubmit() {
+        $('#myform').submit();
+    }
+</script>
+</body>
+</html>

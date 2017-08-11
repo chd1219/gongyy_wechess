@@ -1,0 +1,240 @@
+{template 'header'}
+<body>
+<style>
+
+    .title {
+        margin: 20px 15px 10px;
+        color: #6d6d72;
+        font-size: 15px;
+    }
+
+    .oa-contact-cell.mui-table .mui-table-cell {
+        padding: 11px 0;
+        vertical-align: middle;
+    }
+
+    .oa-contact-cell {
+        position: relative;
+        margin: -11px 0;
+    }
+
+    .oa-contact-avatar {
+        width: 75px;
+    }
+
+    .oa-contact-avatar img {
+        border-radius: 50%;
+    }
+
+    .oa-contact-content {
+        width: 100%;
+    }
+
+    .oa-contact-name {
+        margin-right: 20px;
+    }
+
+    .oa-contact-name, oa-contact-position {
+        float: left;
+    }
+</style>
+<div id="refreshContainer" class="mui-content mui-scroll-wrapper">
+    <div class="mui-scroll">
+        <div id="tabbar-with-contact" class="mui-control-content mui-active">
+
+            <ul class="mui-table-view mui-table-view-striped mui-table-view-condensed" style="margin-top:0px">
+
+                <li class="mui-table-view-cell">
+
+                    <div class="mui-slider-cell">
+                        <div class="oa-contact-cell mui-table">
+                            <div class="oa-contact-avatar mui-table-cell">
+                                <a href="{php echo $this->createMobileUrl('center',array('op'=>'display','playerid'=>$playerid));}">
+                                    {if !empty($player['photo'])}
+                                    <img src="{php echo tomedia($player['photo']);}" height="60px" width="60px">
+                                    {else}
+                                    <img src="{MODULE_URL}template/mobile/images/touxiang.jpg" height="60px"
+                                         width="60px">
+                                    {/if}
+                                </a>
+                            </div>
+                            <div class="oa-contact-content mui-table-cell">
+                                <div class="mui-clearfix">
+                                    <h4 class="oa-contact-name">{$player['playername']}</h4>
+                                    <span class="oa-contact-position mui-h5" style="float:left; line-height:2em">{$player['playerlevel']}</span>
+                                    <div style="float:right; background-color:#efeff4">
+                                        {if $this->isfollowed($openid,$player['id']) == '1'}
+                                        <button type="button" class="mui-btn mui-btn-outlined" playerid={$player['id']}
+                                                data-loading-icon='' style="color:#ccc">已关注
+                                        </button>
+                                        {else}
+                                        <button type="button" class="mui-btn mui-btn" playerid={$player['id']}
+                                                data-loading-icon='' style="color:#000">关注
+                                        </button>
+                                        {/if}
+
+                                    </div>
+                                </div>
+
+                                <ul class="weui-media-box__info" style="padding:5px 0px 0px 0px; margin:0">
+                                    <li class="weui-media-box__info__meta">棋谱：{$player['chesssum']}</li>
+                                    <li class="weui-media-box__info__meta weui-media-box__info__meta_extra">
+                                        粉丝：{$player['followsum']}
+                                    </li>
+
+
+                                </ul>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </li>
+
+            </ul>
+        </div>
+
+        <ul id='ajaxrefresh' class="mui-table-view" style='margin-top:2px;'>
+            {loop $list $index $chess}
+            <li class="mui-table-view-cell mui-media">
+                <a href="{php echo $this->createMobileUrl('chess',array('file'=>$chess['filename']));}"/>
+                <img class="mui-media-object mui-pull-left"
+                     src="{$_W['attachurl']}{php echo $this->getCategoryicoById($uniacid,$chess['categoryid']);}">
+                <div class="mui-media-body mui-ellipsis">
+                    {if $chess['iszhiding']}<span class="mui-badge mui-badge-primary"
+                                                  style="border-radius:2px;font-size:.8em;padding:3px 3px;">顶</span>{/if}
+                    {if $chess['isjinghua']}<span class="mui-badge mui-badge-success"
+                                                  style="border-radius:2px;font-size:.8em;padding:3px 3px;">精</span>{/if}
+                    {if $chess['ishot']}<span class="mui-badge mui-badge-warning"
+                                              style="border-radius:2px;font-size:.8em;padding:3px 3px;">火</span>{/if}
+
+                    <span>{$chess['title']}</span>
+                    <ul class="weui-media-box__info" style="padding:5px 0px 0px 0px; margin:5px 5px 5px  0">
+
+                        <li class="weui-media-box__info__meta">{$chess['redname']} VS {$chess['blackname']}</li>
+
+                        <li class="weui-media-box__info__meta  weui-media-box__info__meta_extra"><span
+                                style="display:block;text-align:right">{php echo $this->timeago($chess['addtime']);}</span>
+                        </li>
+
+                    </ul>
+                </div>
+                </a>
+            </li>
+            {/loop}
+
+        </ul>
+    </div>
+</div>
+
+<script>
+
+
+    //点击棋手链接打开新界面
+    mui(".mui-table-view").on('tap', 'a', function () {
+
+        mui.openWindow({
+            id: this.href,
+            url: this.href
+        });
+    });
+    //从第二页开始刷新
+    pagenumber = 2;
+    mui.init({
+        pullRefresh: {
+            container: "#refreshContainer",//下拉刷新容器标识，querySelector能定位的css选择器均可，比如：id、.class等
+            down: {
+                height: 50,//可选,默认50.触发下拉刷新拖动距离,
+                auto: false,//可选,默认false.自动下拉刷新一次
+                contentdown: "下拉刷新",//可选，在下拉可刷新状态时，下拉刷新控件上显示的标题内容
+                contentover: "释放立即刷新",//可选，在释放可刷新状态时，下拉刷新控件上显示的标题内容
+                contentrefresh: "正在刷新...",//可选，正在刷新状态时，下拉刷新控件上显示的标题内容
+                callback: __pulldownfresh //必选，刷新函数，根据具体业务来编写，比如通过ajax从服务器获取新数据；
+            },
+            up: {
+                height: 50,//可选.默认50.触发上拉加载拖动距离
+                auto: false,//可选,默认false.自动上拉加载一次
+                contentrefresh: "正在加载...",//可选，正在加载状态时，上拉加载控件上显示的标题内容
+                contentnomore: '没有更多数据了',//可选，请求完毕若没有更多数据时显示的提醒内容；
+                callback: __pullupfresh //必选，刷新函数，根据具体业务来编写，比如通过ajax从服务器获取新数据；
+            }
+        }
+    });
+
+
+    function __pulldownfresh() {
+        //业务逻辑代码，比如通过ajax从服务器获取新数据；
+        $.post("{php echo $this->createMobileUrl('center',array('op'=>'ajax','playerid'=>$player['id'],'keywords'=>$keywords));}", {page: 1}, function (data) {
+            //服务器返回响应，根据响应结果，分析是否登录成功；
+            console.log($.parseJSON(data));
+            pagenumber = 2;
+            $('#ajaxrefresh').html($.parseJSON(data));
+
+            mui('#refreshContainer').pullRefresh().endPulldownToRefresh();
+            mui('#refreshContainer').pullRefresh().refresh(true);
+        });
+
+    }
+
+    function __pullupfresh() {
+        //业务逻辑代码，比如通过ajax从服务器获取新数据；
+
+
+        $.post("{php echo $this->createMobileUrl('center',array('op'=>'ajax','playerid'=>$player['id'],'keywords'=>$keywords));}", {page: pagenumber}, function (data) {
+            //服务器返回响应，根据响应结果，分析是否登录成功；
+            pagenumber += 1;
+            console.log(pagenumber);
+            console.log(data);
+            var apphtml = $.parseJSON(data);
+            if (apphtml) {
+                $('#ajaxrefresh').append(apphtml);
+                mui('#refreshContainer').pullRefresh().endPullupToRefresh(false);
+            } else {
+                console.log('wanle');
+                mui('#refreshContainer').pullRefresh().endPullupToRefresh(true);
+            }
+
+        });
+
+    }
+
+
+    mui(document.body).on('tap', '.mui-btn', function (e) {
+        var myButton = mui(this);
+        var myButtonforJS = $(this);
+
+        var followdom = $(this).parent().parent().parent().find(".weui-media-box__info__meta_extra");
+        myButton.button('loading');
+        var playerid = $(this).attr('playerid');
+        console.log(playerid)
+        var ajaxurl = "{php echo $this->createMobileUrl('self', array('op'=>'edit_follow','openid'=>$openid));}";
+        $.ajax({
+            type: 'post',
+            url: ajaxurl,
+            data: {id: playerid},
+            dataType: 'json',
+            success: function (data) {
+                myButton.button('reset');
+                if (data['result'] == '2') {
+                    myButtonforJS.css('color', '#000');
+                    myButtonforJS.html('关注');
+                    myButtonforJS.attr('class', 'mui-btn mui-btn');
+                } else if (data['result'] == '1') {
+
+                    myButtonforJS.css('color', '#ccc');
+                    myButtonforJS.html('已关注');
+                    myButtonforJS.attr('class', 'mui-btn mui-btn-outlined');
+                }
+                followdom.html("粉丝：" + data['followsum']);
+            }
+
+        });
+
+
+    });
+     $('.follow_topbar').hide();
+</script>
+
+
+</body>
+</html>

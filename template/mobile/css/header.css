@@ -1,0 +1,42 @@
+.follow_topbar {
+    height: 44px;
+    width: 100%;
+    background: rgba(0,0,0,0.8);
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    z-index: 999;
+}
+.follow_topbar .headimg {
+    height: 32px;
+    width: 32px;
+    padding: 6px;
+    float: left;
+}
+.follow_topbar .headimg img {
+    height: 32px;
+    width: 32px;
+}
+.follow_topbar .info {
+    height: 40px;
+    float: left;
+    padding: 8px 10px;
+}
+.follow_topbar .info .i {
+    height: 14px;
+    line-height: 14px;
+    color: #ccc;
+    font-size: 12px;
+}
+.follow_topbar .sub {
+    height: 24px;
+    width: auto;
+    background: #32cd32;
+    padding: 0px 10px;
+    margin: 10px 8px 10px 0px;
+    float: right;
+    font-size: 12px;
+    color: #fff;
+    line-height: 26px;
+    border-radius: 3px;
+}

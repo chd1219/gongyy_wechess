@@ -1,0 +1,342 @@
+{template 'header'}
+<body>
+<div id="refreshContainer" class="mui-content mui-scroll-wrapper">
+    <div class="mui-scroll">
+        <div class="swiper-container" style= {if $setting['isfollow']==1 && !empty($fans) && $fans['follow']==0}"margin-top:54px;"{else} "margin-top:10px;" {/if}>
+            <div class="swiper-wrapper">
+                {loop $categories $index $cat}
+                <div class="swiper-slide"><a
+                        href="{php echo $this->createMobileUrl('index', array('op'=>'display','categoryid'=>$cat['id']));}"
+                        class="weui-tabbar__item">
+
+                    <div class="weui-tabbar__icon" style="width:42px; height:42px">
+                        <img src="{$_W['attachurl']}{$cat['ico']}" alt="">
+                    </div>
+                    <p class="weui-tabbar__label" style="font-size:14px;">{$cat['name']}</p>
+                </a></div>
+                {/loop}
+
+
+            </div>
+        </div>
+        <ul class="mui-table-view ul" style="margin-top:2px">
+            {loop $list $index $chess}
+            <li class="mui-table-view-cell mui-media manage" chessid='{$chess["id"]}'>
+                <a href="{php echo $this->createMobileUrl('chess',array('file'=>$chess['filename']));}">
+                    <img class="mui-media-object mui-pull-left"
+                         src="{$_W['attachurl']}{php echo $this->getCategoryicoById($uniacid,$chess['categoryid']);}">
+                    <div class="mui-media-body mui-ellipsis">
+                        <span class="mui-badge mui-badge-primary"
+                                                      style="border-radius:2px;font-size:.8em;padding:3px 3px;{if !$chess['iszhiding']}display: none;{/if}">顶</span>
+                        <span class="mui-badge mui-badge-success"
+                                                      style="border-radius:2px;font-size:.8em;padding:3px 3px;{if !$chess['isjinghua']}display: none;{/if}">精</span>
+                       <span class="mui-badge mui-badge-warning"
+                                                  style="border-radius:2px;font-size:.8em;padding:3px 3px; {if !$chess['ishot']}display: none;{/if}">火</span>
+
+                        <span>{$chess['title']}</span>
+                        <ul class="weui-media-box__info" style="padding:5px 0px 0px 0px; margin:5px 5px 5px  0">
+
+                            <li class="weui-media-box__info__meta">{$chess['redname']} VS {$chess['blackname']}</li>
+
+                            <li class="weui-media-box__info__meta  weui-media-box__info__meta_extra"><span
+                                    style="display:block;text-align:right">{php echo $this->timeago($chess['addtime']);}</span>
+                            </li>
+
+                        </ul>
+                    </div>
+                </a>
+
+            </li>
+            {/loop}
+
+        </ul>
+    </div>
+</div>
+<div id="popover" class="mui-popover" style="background: #fff">
+  <ul class="mui-table-view" style="text-align: center;">
+        <li class="mui-table-view-cell">设为置顶</li>
+        <li class="mui-table-view-cell">设为精华</li>
+        <li class="mui-table-view-cell">设为热门</li>
+  </ul>
+</div>
+<div id="black" class="mui-popover" style="background: #fff;height: 120px;">
+  <ul class="mui-table-view" style="text-align: center;">
+        <li class="mui-table-view-cell">把该棋谱作者拉黑</li>
+        <li class="mui-table-view-cell">删除该棋谱</li>
+  </ul>
+</div>
+
+<script>
+    //首部滚动条
+    var mySwiper = new Swiper('.swiper-container', {
+        height: 50,
+        width: window.innerWidth,
+        setWrapperSize: true,
+        slidesPerView: 4.5,
+        slidesOffsetAfter: 75,
+        onInit: function (swiper) {
+            $(".swiper-slide").bind("click", function () {
+                alert(1);
+            });
+        }
+    })
+
+</script>
+<script>
+
+    mui(".mui-table-view").on('tap', 'a', function () {
+
+        mui.openWindow({
+            id: this.href,
+            url: this.href,
+            waiting: {
+                autoShow: true,//自动显示等待框，默认为true
+                title: '正在加载...',//等待对话框上显示的提示内容
+
+            }
+        });
+    })
+    {if $this->ismanage($_W['openid'])=='1'}
+            var ding = 0;
+            var jing = 0;
+            var huo = 0;
+            var $this ;
+
+        mui('body').on('longtap','.manage',function(){
+             var chessid = $(this).attr('chessid');
+             $this = $(this);
+             console.log($(this).find('.mui-badge:eq(0)').css('display'));
+            if($(this).find('.mui-badge:eq(0)').css('display')!='none'){
+                var type = "ding";
+                $('#popover li:eq(0)').html('<a href="javascript:void(0);" onclick="manage('+chessid+',\''+type+'\')">取消置顶</a>');
+                ding = 0;
+            }else{
+                var type = "ding";
+                $('#popover li:eq(0)').html('<a href="javascript:void(0);" onclick="manage('+chessid+',\''+type+'\')">设为置顶</a>');
+                ding = 1;
+            }
+            if($(this).find('.mui-badge:eq(1)').css('display')!='none'){
+                var type = "jing";
+                $('#popover li:eq(1)').html('<a href="javascript:void(0);" onclick="manage('+chessid+',\''+type+'\')">取消精华</a>');
+                jing = 0;
+            }else{
+                var type = "jing";
+                $('#popover li:eq(1)').html('<a href="javascript:void(0);" onclick="manage('+chessid+',\''+type+'\')">设为精华</a>');
+                jing = 1;
+            }
+            if($(this).find('.mui-badge:eq(2)').css('display')!='none'){
+                var type = "huo";
+                $('#popover li:eq(2)').html('<a href="javascript:void(0);" onclick="manage('+chessid+',\''+type+'\')">取消热门</a>');
+                huo=0;
+            }else{
+                var type = "huo";
+                $('#popover li:eq(2)').html('<a href="javascript:void(0);" onclick="manage('+chessid+',\''+type+'\')">设为热门</a>');
+                huo=1;
+            }
+            mui('#popover').popover('toggle',this);
+        })
+        function manage(chessid,type){
+            var url = "{php echo $this->createMobileUrl('chess', array('op' => 'manage'));}";
+            $.post(url,{chessid:chessid,ding:ding,jing:jing,huo:huo,type:type},function(data){
+                data = $.parseJSON(data);
+               if(data=='ding'&&ding==0){
+                $this.find('.mui-badge:eq(0)').css('display','none');
+               }
+               else if(data=='ding'&&ding==1){
+                $this.find('.mui-badge:eq(0)').css('display','inline-block');
+               }
+                else if(data=='jing'&&jing==0){
+                $this.find('.mui-badge:eq(1)').css('display','none');
+               }
+                else if(data=='jing'&&jing==1){
+                $this.find('.mui-badge:eq(1)').css('display','inline-block');
+               }
+                else if(data=='huo'&&huo==0){
+                $this.find('.mui-badge:eq(2)').css('display','none');
+               }
+                else if(data=='huo'&&huo==1){
+                $this.find('.mui-badge:eq(2)').css('display','inline-block');
+               }
+                mui('#popover').popover('toggle',this);
+                mui.toast('设置成功');
+            });
+        }
+        function manage(chessid,type){
+            var url = "{php echo $this->createMobileUrl('chess', array('op' => 'manage'));}";
+            $.post(url,{chessid:chessid,ding:ding,jing:jing,huo:huo,type:type},function(data){
+                data = $.parseJSON(data);
+               if(data=='ding'&&ding==0){
+                $this.find('.mui-badge:eq(0)').css('display','none');
+               }
+               else if(data=='ding'&&ding==1){
+                $this.find('.mui-badge:eq(0)').css('display','inline-block');
+               }
+                else if(data=='jing'&&jing==0){
+                $this.find('.mui-badge:eq(1)').css('display','none');
+               }
+                else if(data=='jing'&&jing==1){
+                $this.find('.mui-badge:eq(1)').css('display','inline-block');
+               }
+                else if(data=='huo'&&huo==0){
+                $this.find('.mui-badge:eq(2)').css('display','none');
+               }
+                else if(data=='huo'&&huo==1){
+                $this.find('.mui-badge:eq(2)').css('display','inline-block');
+               }
+                mui('#popover').popover('toggle',this);
+                mui.toast('设置成功');
+            });
+        }
+        mui('body').on('swipeleft','.manage',function(){
+             var chessid = $(this).attr('chessid');
+             $this = $(this);
+             $('#black li:eq(0)').html('<a href="javascript:void(0);" onclick="black('+chessid+',0)">把该棋谱作者拉黑</a>');
+              $('#black li:eq(1)').html('<a href="javascript:void(0);" onclick="black('+chessid+',1)">删除该棋谱</a>');
+            mui('#black').popover('toggle',this);
+        });
+         function black(chessid,type){
+         	 var btnArray = ['否', '是'];
+           if(type==0){
+           	 mui.confirm('拉黑该作者，确认？', '系统提示', btnArray, function(e) {
+           	 	 if (e.index == 1) {
+           	 	 	$.post("{php echo $this->createMobileUrl('chess',array('op'=>'blacklist'));}", {chessid: chessid},function (data) {
+           	 	 		data = JSON.parse(data);
+           	 	 		if(data=='success'){
+           	 	 			mui.toast('拉黑成功', {duration: 'short', type: 'div'});
+           	 	 			 mui('#black').popover('toggle',this);
+           	 	 		}else if(data=='fail'){
+           	 	 			mui.toast('拉黑失败', {duration: 'short', type: 'div'});
+           	 	 			mui('#black').popover('toggle',this);
+           	 	 		}else if(data=='failed'){
+           	 	 			mui.toast('该作者已被拉黑', {duration: 'short', type: 'div'});
+           	 	 			mui('#black').popover('toggle',this);
+           	 	 		}
+           	 	 	});
+           	 	 }
+           	 });
+           }else if(type==1){
+           	
+           	            mui.confirm('删除棋谱，确认？', '系统提示', btnArray, function (e) {
+                if (e.index == 1) {
+                    $.post("{php echo $this->createMobileUrl('chess',array('op'=>'delete'));}", {id: chessid}, function (data) {
+                        if (data == '1') {
+                            mui.toast('删除成功', {duration: 'short', type: 'div'});
+                            //刷新页面
+							__pulldownfresh();
+                            mui('#black').popover('toggle',this);
+                            
+                        } else {
+                            mui.toast('删除失败', {duration: 'short', type: 'div'});
+                            
+                             __pulldownfresh();
+                              mui('#black').popover('toggle',this);
+                        }
+
+                    })
+
+                } else {
+                    setTimeout(function () {
+                        (function ($) {
+
+                            $.swipeoutClose(li);
+                        })(mui);
+                    }, 0);
+                }
+            })
+           }
+        }
+    {/if}
+         
+    $("#popover").on('tap', 'a', function (event) {
+        this.click();
+    });
+    $("#black").on('tap', 'a', function (event) {
+        this.click();
+    });
+    mui(".swiper-wrapper").on('tap', 'a', function () {
+
+        mui.openWindow({
+            id: this.href,
+            url: this.href,
+            waiting: {
+                autoShow: true,//自动显示等待框，默认为true
+                title: '正在加载...',//等待对话框上显示的提示内容
+
+            }
+        });
+    })
+
+    //从第二页开始刷新
+    pagenumber = 2;
+
+    mui.init({
+        pullRefresh: {
+            container: "#refreshContainer",//下拉刷新容器标识，querySelector能定位的css选择器均可，比如：id、.class等
+            down: {
+                height: 50,//可选,默认50.触发下拉刷新拖动距离,
+                auto: false,//可选,默认false.自动下拉刷新一次
+                contentdown: "下拉刷新",//可选，在下拉可刷新状态时，下拉刷新控件上显示的标题内容
+                contentover: "释放立即刷新",//可选，在释放可刷新状态时，下拉刷新控件上显示的标题内容
+                contentrefresh: "正在刷新...",//可选，正在刷新状态时，下拉刷新控件上显示的标题内容
+                callback: __pulldownfresh //必选，刷新函数，根据具体业务来编写，比如通过ajax从服务器获取新数据；
+            },
+            up: {
+                height: 50,//可选.默认50.触发上拉加载拖动距离
+                auto: false,//可选,默认false.自动上拉加载一次
+                contentrefresh: "正在加载...",//可选，正在加载状态时，上拉加载控件上显示的标题内容
+                contentnomore: '没有更多数据了',//可选，请求完毕若没有更多数据时显示的提醒内容；
+                callback: __pullupfresh //必选，刷新函数，根据具体业务来编写，比如通过ajax从服务器获取新数据；
+            }
+        },
+          gestureConfig:{
+               tap: true, //默认为true
+               doubletap: true, //默认为false
+               longtap: true, //默认为false
+               swipe: true, //默认为true
+               drag: true, //默认为true
+               hold:true,//默认为false，不监听
+               release:true//默认为false，不监听
+              }
+    });
+
+
+    function __pulldownfresh() {
+        //业务逻辑代码，比如通过ajax从服务器获取新数据；
+        $.post("{php echo $this->createMobileUrl('index',array('op'=>'ajax','categoryid'=>$categoryid,'keywords'=>$keywords));}", {page: 1}, function (data) {
+            //服务器返回响应，根据响应结果，分析是否登录成功；
+            console.log($.parseJSON(data));
+            pagenumber = 2;
+            $('.ul').html($.parseJSON(data));
+
+            mui('#refreshContainer').pullRefresh().endPulldownToRefresh();
+            mui('#refreshContainer').pullRefresh().refresh(true);
+        });
+
+    }
+
+    function __pullupfresh() {
+        //业务逻辑代码，比如通过ajax从服务器获取新数据；
+
+
+        $.post("{php echo $this->createMobileUrl('index',array('op'=>'ajax','categoryid'=>$categoryid,'keywords'=>$keywords));}", {page: pagenumber}, function (data) {
+            //服务器返回响应，根据响应结果，分析是否登录成功；
+            pagenumber += 1;
+            console.log(pagenumber);
+            console.log(data);
+            var apphtml = $.parseJSON(data);
+            if (apphtml) {
+                $('.ul').append(apphtml);
+                mui('#refreshContainer').pullRefresh().endPullupToRefresh(false);
+            } else {
+                console.log('wanle');
+                mui('#refreshContainer').pullRefresh().endPullupToRefresh(true);
+            }
+
+        });
+
+    }
+
+</script>
+
+</body>
+</html>

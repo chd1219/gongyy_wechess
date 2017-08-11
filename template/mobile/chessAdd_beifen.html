@@ -1,0 +1,357 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="format-detection" content="telephone=no, address=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-touch-fullscreen" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link href="{$_W['siteroot']}app/resource/css/bootstrap.min.css" rel="stylesheet">
+<link href="{$_W['siteroot']}app/resource/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="stylesheet" type="text/css" href="{$_W['siteroot']}addons/chessroom/images/css/base.css?{TIMESTAMP}">
+<link rel="stylesheet" type="text/css" href="{$_W['siteroot']}addons/chessroom/images/css/index.css?{TIMESTAMP}">
+
+
+<script type='text/javascript' src='{$_W['siteroot']}addons/chessroom/images/js/jquery-2.0.3.min.js'></script>
+<script type='text/javascript' src='{$_W['siteroot']}addons/chessroom/images/js/LocalResizeIMG.js'></script>
+<script type='text/javascript' src='{$_W['siteroot']}addons/chessroom/images/js/patch/mobileBUGFix.mini.js'></script>
+
+<style type="text/css">
+    body{font-family:"微软雅黑"; background-color: #272a31;}
+    .uploadbtn{    
+        position: absolute;
+        vertical-align: middle;
+        display: block;
+        height: 220px;
+        line-height: 220px;
+        color: #333;
+        text-align: center;
+        width: 100%;
+        text-decoration: none; 
+        font-size: 20px;
+    }
+    .imglist{width: 100%;height: 220px; overflow: hidden;}
+    .imglist img{width:100%;}
+    .fengmian{ width: 100%; padding-bottom: 10px;}
+    #inputEmail3,#inputPassword3,#inputEmail4,#redname_input_text{background:#272a31; border: none;box-shadow:none;}
+    .login_body_input{border-bottom: 1px solid #fff; }
+    #inputEmail3:focus,#inputPassword3:focus,#inputEmail4:focus,#redname_input_text:focus{box-shadow:none;}
+    .login_body label{ text-align: right;    line-height: 34px;font-size: 20px;}
+    .login_body label{ text-align: right;    line-height: 34px;font-size: 20px;}
+    label{line-height: 50px;}
+    #description{
+        border: none;
+        background-color: #1f232c;
+    }
+    .imgs img{
+        height: 50px;
+        width: 60px;
+        float: left;
+    }
+    .addimgs a{
+        background-color: #1f232c;
+        padding: 5px 10px;
+        font-size: 25px;
+        border: 1px solid #1f232c;
+    }
+    .tabs li{
+        padding: 5px;
+        margin: 3px;
+        background-color: #1f232c;
+        float: left;
+    }
+    .tabs li.active{
+        background-color: green;
+    }
+    .form-horizontal .form-group {
+        margin: 0px;
+    }
+    .form-horizontal .form-group .red{
+        width:40%;
+        float:left;
+    }
+    .form-horizontal .form-group .red 
+    .form-horizontal .form-group .result{
+        width:20%;
+        float:left;
+    }
+    .form-horizontal .form-group .black{
+        width:40%;
+        float:left;
+    }
+
+
+
+
+</style>
+
+
+<!--<div class="fengmian">
+    <input type="file" id="uploadphoto" name="uploadfile" value="请点击上传图片"   style="display:none;" /> 
+    <a href="javascript:void(0);" onclick="uploadphoto.click()" class="uploadbtn"><strong>点击上传文件</strong></a>
+    <div class="imglist">
+        <img src="{$_W['siteroot']}addons/chessroom/images/17.jpg" alt="">
+
+    </div> 
+    <input type="hidden" class="tmp_img" name="tmp_img" value="" />
+</div>-->
+
+
+
+<form class="form-horizontal">
+    <div class="form-group">
+        <label for="inputEmail3" class="col-sm-3 col-xs-3 control-label">标题</label>
+        <div class="col-sm-9 col-xs-9 login_body_input">
+            <input type="text" class="form-control" id="inputEmail3" placeholder="可输入100中文字符" maxlength="100">
+        </div>
+    </div>
+    <div class="form-group">
+      <div class="red">
+        <label class="redmame">红方</label>
+        <div class="redname_input">
+            <input type="text" id="redname_input_text" style="background:transparent;border-bottom:2px solid #ffffff" placeholder="红方姓名" maxlength="5">
+         </div>
+      </div>
+            <select class="result">
+            <option value="win" >胜</option>
+            <option value="loss">负</option>
+            <option value="equal">和</option>
+            </select>
+       <div class="black">
+        <label class="blackmame">黑方</label>
+        <div class="blackname_input">
+        <input type="text" placeholder="黑方姓名" maxlength="5">
+        </div>
+         </div>
+     </div>
+    <!--  
+    <div class="form-group">
+        <label for="inputEmail3" class="col-sm-3 col-xs-3 control-label">图片简介</label>
+        <div class="col-sm-9 col-xs-9">
+            <div class="fengmian addimgs">
+                <input type="file" id="uploadphoto1" name="uploadfile1" value="请点击上传图片"   style="display:none;" /> 
+                <a href="javascript:void(0);" onclick="uploadphoto1.click()" class="uploadbtn1"><strong>+</strong></a>
+            </div>
+        <input type="hidden" class="tmp_img" name="tmp_img" value="" />
+        </div>
+        
+    </div>
+   
+    <div class="form-group">
+        <label for="inputEmail3" class="col-sm-2 col-xs-2 control-label"></label>
+        <div class="col-sm-9 col-xs-9 imgs">
+            
+        </div>
+    </div>
+ -->
+  
+    <div class="form-group">
+        <label for="" class="col-sm-3 col-xs-3 control-label">选择标签</label>
+        <div class="col-sm-9 col-xs-9 tabs">
+            <ul class="tabs">
+            {loop $tabs_top $adv}
+                <li><a href="javascript:;">{$adv['name']}</a></li>
+            {/loop}
+                {if $_GPC['tab_key']!=''}
+                <li class="active tab_key"><a href="javascript:;">{$_GPC['tab_key']}
+                    <input class="tabnames" type="hidden" value="{$_GPC['tab_key']}" >
+                </a></li>
+                {/if}
+            </ul>
+        </div>
+    </div>
+    
+
+
+    <div class="form-group">
+        <label for="inputEmail4" class="col-sm-3 col-xs-3 control-label"></label>
+        <div class="col-sm-9 col-xs-9 login_body_input">
+                <div class="input-group">
+                    <input type="text" id="inputEmail4" class="form-control" placeholder="自定义标签(10个中文字符)" maxlength="10">
+                    <span class="input-group-btn">
+                        <button class="btn btn-success btn-sm addtab" type="button">ok!</button>
+                    </span>
+                </div>
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <label for="inputEmail3" class="col-sm-3 col-xs-3 control-label">描述</label>
+        <div class="col-sm-9 col-xs-9">
+            <textarea class="form-control" rows="3" id="description" maxlength="500"></textarea>
+            <sub>可输入500中文字符</sub>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-sm-9 col-xs-9 pull-right" >
+            <button type="button" class="btn btn-success btn-sm send" style="float: right;
+    margin-right: 30px;">发布</button>
+        </div>
+    </div>
+ <!-- <iframe src="http://chenfeiyu.xueyunkeji.com/1/index.html" width="100%" height="100%" scrolling="yes" frameborder="0"></iframe>-->
+</form>
+
+
+<script type="text/javascript">
+$(document).ready(function(e) {
+   $('#uploadphoto1').localResizeIMG({
+        width: 400,
+        quality: 1,
+        success: function (result) {  
+            var submitData={
+                base64_string:result.clearBase64, 
+            }; 
+
+            $.ajax({
+                type: "POST",
+                url: "{php echo $this->createMobileUrl('Upload', array());}",
+                data: submitData,
+                dataType:"json",
+                success: function(data){
+                    if (0 == data.status) {
+                        alert(data.content);
+                        return false;
+                    }else{
+                        alert(data.content);
+                        var attstr= '<img src="'+data.url+'">';
+                        $(".tmp_img").val(data.img); 
+                        $(".imglist").html(attstr);
+                        $(".imgs").append(attstr);
+                        return false;
+                    }
+               }, 
+                complete :function(XMLHttpRequest, textStatus){
+                },
+                error:function(XMLHttpRequest, textStatus, errorThrown){ //上传失败 
+                   alert(XMLHttpRequest.status);
+                   alert(XMLHttpRequest.readyState);
+                   alert(textStatus);
+                }
+            }); 
+        }
+    });
+}); 
+
+$(function(){
+    $(".send").click(function(){
+        var img = $(".tmp_img").val();
+        var title = $("#inputEmail3").val();
+        var description = $("#description").val();
+        var imgs =$(".imgs").html();
+
+        if(title==''){
+            alert("标题不能为空");
+            return ;
+        }
+        if(description==''){
+            alert("正文不能为空");
+            return ;
+        }
+
+        //description = imgs+description;
+        var tabs=new Array();
+        $(".tabnames").each(function(index,element){
+            if($(element).val() !=''){
+                tabs[index]=$(element).val();
+            }
+        });
+
+        $.post("{php echo $this->createMobileUrl('Chess_Add', array());}",{img:img,title:title,description:description,tabs:tabs},function(data){
+                
+            if (data!='0') {
+                alert("提交成功");
+				 //alert(data);
+                location.href = "index.php?i={$_W['uniacid']}&c=entry&id="+data+"&do=detail&m=_chessroom";
+            }else{
+                alert("保存失败");
+               // {php echo $this->createMobileUrl('Chess_delete');};
+				location.href = "{php echo $this->createMobileUrl('index', array());}";
+            }
+        });
+    });
+});
+
+
+$(function(){
+    $(".tabs li").click(function(){
+        
+        if($(this).hasClass('active') && !$(this).hasClass('tab_key')) {
+            $(this).removeClass('active');
+            $(".tabnames",this).remove();
+            return ;
+        };
+
+
+        var active_tab = $(".tabs .active").length;
+        if(active_tab>=5){
+            alert("只能添加5个标签");
+            return ;
+        }
+        var tabname = $("a",this).text();
+        a =0;
+        var tab_key=$(".tab_key a").text();
+
+        if($.trim(tabname) == $.trim(tab_key)){
+            alert('标签已存在');
+            a =1;
+            return ;
+        }
+    
+        if (a!=1) {
+            $(this).addClass('active');
+            $(this).append("<input type='hidden' class='tabnames' value='"+$.trim(tabname)+"'> ");
+        }
+        
+       
+    });
+
+    $(".addtab").click(function(){
+
+        var active_tab = $(".tabs .active").length;
+        if(active_tab>=5){
+            alert("只能添加5个标签");
+            return ;
+        }
+
+        var customTab = $("#inputEmail4").val();
+        if (customTab=="") {
+            alert("自定义标签为空");
+            return ;
+        }
+        a =0;
+        $(".tabs li a").each(function(index,element){
+            if($(element).text() ==customTab){
+                alert('标签已存在');
+                a =1;
+                return ;
+            }
+        });
+
+        if (a!=1) {
+            var li = '<li class="active"><a href="javascript:;" onclick="deltab(this)">'+customTab+'<input class="tabnames" type="hidden" value="'+customTab+'" ></a></li>';
+            $(".tabs ul").append(li);
+        };
+        
+    });
+});
+
+function deltab(obj){
+    if($(obj).parent().hasClass('active')) {
+        $(obj).parent().remove();
+        return ;
+    };
+}
+
+</script>
+
+<script>
+    document.addEventListener('WeixinJSBridgeReady', function onBridgeReady() {
+        WeixinJSBridge.call('hideToolbar');
+        {if $_GPC['do'] == 'chess_Add'}
+        WeixinJSBridge.call('hideOptionMenu');
+        {else}
+        WeixinJSBridge.call('showOptionMenu');
+        {/if}
+    });
+</script>
+{php include $this->template('footer');}

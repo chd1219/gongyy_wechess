@@ -1,0 +1,111 @@
+{template 'header'}
+<script type="text/javascript" src="{$_W['siteroot']}addons/chessroom/template/mobile/style/js/jquery.min.js"></script>
+<script src="{$_W['siteroot']}addons/chessroom/template/mobile/style/js/bootstrap.min.js" type="text/javascript"></script>
+<div class="panel panel-info" style="margin: 0;">
+    <div class="panel-heading" style="text-align:center;background:#5897FB;">
+        <a href='javascript:history.go(-1)'> <span class="glyphicon  glyphicon-chevron-left " aria-hidden="true" style="float:left;color: green;"></span></a> <span style="color: #FEFFFF;font-size: 20px;" >{$results_title}</span>
+    </div>
+
+    <div class="panel-body">
+        {if !empty($contents)}
+        {loop $contents $item}
+        <div class="content">
+
+            <div class="row" >
+                <a style="color: #3c3c3c" href="{php echo $item['url']."&file=".$item['filename'];}" class="list-group-item">
+
+                    <div class="col-lg-10 col-xs-10" style="float: left;">
+                        <div class="row">
+
+                            <div class="col-lg-12 col-xs-12" ><strong>{$item['title']}</strong></div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4 col-xs-4"><img src="{$_W['siteroot']}addons/chessroom/template/mobile/images/shuai.jpg" class="img-circle" style="height: 15px;width: 15px;"><small>{$item['redname']}</small></div>
+                            <div class="col-lg-4 col-xs-4"><img src="{$_W['siteroot']}addons/chessroom/template/mobile/images/jiang.jpg" class="img-circle" style="height: 15px;width: 15px;"><small>{$item['blackname']}</small></div>
+                            <div class="col-lg-4 col-xs-4"><!--<span class="	glyphicon glyphicon-time" aria-hidden="true">--><small style="color: black;">{php echo date('Y/m/d',$item['matchtime']);}</small></span></div>
+
+                        </div>
+                    </div>
+                </a>
+                <div class="col-lg-2 col-xs-2" style="margin-top:20px;">
+                    <span class="glyphicon glyphicon-align-justify" id="collect_{$item['id']}"></span>
+                </div>
+            </div>
+        </div>
+        {/loop}
+        {else}
+        <h3 style="text-align: center">没有找到棋谱！</h3>
+        {/if}
+    </div>
+</div>
+
+<style>
+
+    .container{
+        border: none;
+    }
+    .panel{
+        border: none;
+    }
+    .panel .row .active{
+        color: #3BC0B6;
+    }
+    .panel .panel-body .content{
+        background:#FFFFFF ;
+        padding:0;
+        border-bottom: 1px solid #D0D0D0;
+        margin-bottom: 3px;
+        line-height: 24px;
+    }
+    .panel .panel-body .content .list-group-item{
+        border: none;
+        padding: 0;
+        margin: 0;
+    }
+    .panel .panel-body {
+        background: #F8F8F8;
+        padding: 0;
+        margin: 0;
+        border: none;
+
+    }
+
+</style>
+<script>
+    $(function () {
+        $("span[id^='collect_']").each(function() {
+            var id=$(this).attr('id').substr(8);
+            var type='2';
+            $(this).popover({
+                trigger:"focus click ",    //如果设为focus 当按钮失去焦点提示层会消失，例如页面空白处单机提示层消失
+                placement:"bottom",
+                html:true,
+                container: 'body',
+                content:"<button class='btn btn-success cur' name='collect' > <span class='glyphicon glyphicon-heart heart'><span style='white-space:nowrap;' >取消收藏</span></span></button>"
+            }).on('shown.bs.popover', function () {
+                $(".heart").click(function () {
+                    var ajaxurl = "{php echo $this->createMobileUrl('collect');}";
+                    $.ajax({
+                        type:'post',
+                        url:ajaxurl,
+                        data:{id:id,type:type},
+                        dataType:'json',
+                        success:function(data){
+                            if(data=='3'){
+                                $(this).parent().addClass("cur");
+                                alert("取消收藏成功");
+                                location.reload();
+                            }
+                        }
+                    });
+                })
+            }).on("mouseleave", function () {
+                $(this).popover("hide");
+            });
+        });
+    })
+
+
+</script>
+{template '_footer'}

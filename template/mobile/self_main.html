@@ -1,0 +1,81 @@
+{template 'header'}
+<style type="text/css">
+.vip-switch{float:right;}
+.gray{color:#666;}
+.green{color:#04be02;}
+</style>
+<div id="refreshContainer" class="mui-content">
+    <div class="mui-scroll">
+        <ul class="mui-table-view" style="margin-top:2px">
+<!--             <li class="mui-table-view-cell">
+                <a class="mui-navigate-right"
+                   href="{php echo $this->createMobileUrl('vip');}">VIP服务<span class="vip-switch {php echo $userinfo['vip']==1?'green':'gray';}">{php echo $userinfo['vip']==1?'已开通':'未开通';}</span></a>
+            </li> -->
+            <li class="mui-table-view-cell">
+                <a class="mui-navigate-right"
+                   href="{php echo $this->createMobileUrl('self',array('op'=>'my','displaytype'=>'publish'));}">我的棋谱</a>
+            </li>
+            <li class="mui-table-view-cell">
+                <a class="mui-navigate-right"
+                   href="{php echo $this->createMobileUrl('self',array('op'=>'my','displaytype'=>'collect'));}">我的收藏</a>
+
+            </li>
+            <li class="mui-table-view-cell">
+                <a class="mui-navigate-right"
+                   href="{php echo $this->createMobileUrl('self',array('op'=>'my','displaytype'=>'follow'));}">我的关注</a>
+            </li>
+            <li class="mui-table-view-cell">
+                <a class="mui-navigate-right"
+                   href="{php echo $this->createMobileUrl('self',array('op'=>'send','displaytype'=>'myself'));}">我是棋手</a>
+            </li>
+        </ul>
+
+
+        <ul class="mui-table-view">
+<!--             <li class="mui-table-view-cell">
+    <a class="mui-navigate-right" href="{php echo $this->createMobileUrl('self',array('op'=>'rank'));}">查看排行榜</a>
+</li> -->
+            <li class="mui-table-view-cell">
+                <a class="mui-navigate-right" href="{php echo $this->createMobileUrl('self',array('op'=>'feedback'));}">用户反馈</a>
+            </li>
+            <li class="mui-table-view-cell">
+                <a class="mui-navigate-right"
+                   href="{php echo $this->createMobileUrl('self',array('op'=>'send','displaytype'=>'setting'));}">系统设置</a>
+
+            </li>
+
+        </ul>
+
+    </div>
+</div>
+<script>
+      mui.init({
+
+        gestureConfig:{
+            swipe:true, //启用右滑关闭功能
+        }
+
+    });
+    mui(".mui-table-view").on('tap', 'a', function () {
+
+        mui.openWindow({
+            id: this.href,
+            url: this.href,
+            waiting: {
+                autoShow: true,//自动显示等待框，默认为true
+                title: '正在加载...',//等待对话框上显示的提示内容
+
+            }
+        });
+    })
+    {if $setting['isfollow']==1 && !empty($fans) && $fans['follow']==0}
+        $('.follow_topbar').hide();
+        $('header').css('top','44px');
+    {else}
+        $('.follow_topbar').hide();
+        $('header').css('top','0');
+    {/if}
+</script>
+
+</body>
+</html>

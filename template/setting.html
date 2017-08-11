@@ -1,0 +1,320 @@
+<!-- 
+ * 参数设置
+ * ============================================================================
+ * 版权所有 2015-2016 风影随行，并保留所有权利。
+ * 网站地址: http://www.haoshu888.com
+ * ----------------------------------------------------------------------------
+ * 这不是一个自由软件！不允许对程序代码以任何形式任何目的的再发布，作者将保留
+ * 追究法律责任的权力和最终解释权。
+ * ============================================================================
+-->
+
+{template 'common/header'}
+<ul class="nav nav-tabs">
+    <li {if $op=='display'}class="active"{/if}><a href="{php echo $this->createWebUrl('setting');}">基本设置</a></li>
+    <li {if $op=='templatemsg'}class="active"{/if}><a href="{php echo $this->createWebUrl('setting', array('op'=>'templatemsg'));}">模版消息</a></li>
+	<li {if $op=='vipService'}class="active"{/if}><a href="{php echo $this->createWebUrl('setting', array('op'=>'vipService'));}">VIP服务</a></li>
+
+</ul>
+<style>
+    .item_box img {
+        width: 100%;
+        height: 100%;
+    }
+
+    .focus-setting {
+        border-bottom: 1px #428BCA dashed;
+        padding-bottom: 20px;
+    }
+</style>
+{if $op=='display'}
+<div class="main">
+    <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
+        <div class="panel panel-default">
+            <div class="panel-heading">基本设置</div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">网站名称</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="sitename" value="{$setting['sitename']}" class="form-control"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">网站版权</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="copyright" value="{$setting['copyright']}" class="form-control"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">网站描述</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="description" value="{$setting['description']}" class="form-control"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">引导语</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="followdescription" value="{$setting['followdescription']}" class="form-control"/>
+                </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">网站logo</label>
+                    <div class="col-sm-9">
+                        {php echo tpl_form_field_image('logo', $setting['logo']);}
+                        <span class="help-block">建议尺寸150px * 70px，建议格式PNG</span>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">引导关注</label>
+                    <div class="col-sm-9">
+                        <label class="radio-inline"><input type="radio" name="isfollow" value="1" {if $setting['isfollow']==1}checked{/if}
+                            /> 开启</label>
+                        &nbsp;
+                        <label class="radio-inline"><input type="radio" name="isfollow" value="0" {if $setting['isfollow']==0}checked{/if}
+                            /> 关闭</label>
+                        <span class="help-block"><strong></strong>开启引导关注公众号，未关注公众号的用户访问首页和课程页面时，顶部将出现引导关注公众号信息</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">公众号二维码</label>
+                    <div class="col-sm-9">
+                        {php echo tpl_form_field_image('qrcode', $setting['qrcode']);}
+                    </div>
+                </div>
+ <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">前台管理员openid</label>
+                    <div class="col-sm-9 col-xs-12">
+                       
+
+                        <div class='input-group'>
+                            <input type="text" id='salers' name="salers" maxlength="30" value="{loop $salers $saler} {$saler['openid']}; {/loop}" class="form-control" readonly />
+                            <div class='input-group-btn'>
+                                <button class="btn btn-default" type="button" onclick="popwin = $('#modal-module-menus').modal();">选择管理员</button>
+                            </div>
+                        </div>
+                        <div class="input-group multi-img-details" id='saler_container'>
+                            {loop $salers $saler}
+                            <div class="multi-item saler-item" openid='{$saler["openid"]}'>
+                                 <img class="img-responsive img-thumbnail" src='{$saler["avatar"]}' onerror="this.src='./resource/images/nopic.jpg'; this.title='图片未找到.'">
+                                 <div class='img-nickname'>{$saler['nickname']}</div>
+                                <input type="hidden" value="{$saler['openid']}" name="openids[]">
+                                <em onclick="remove_member(this)"  class="close">×</em>
+                            </div>
+                            {/loop}
+                        </div>
+                        <span class='help-block'>前台管理员</span>
+                        <div id="modal-module-menus"  class="modal fade" tabindex="-1">
+                            <div class="modal-dialog" style='width: 920px;'>
+                                <div class="modal-content">
+                                    <div class="modal-header"><button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button><h3>选择管理员</h3></div>
+                                    <div class="modal-body" >
+                                        <div class="row">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" name="keyword" value="" id="search-kwd" placeholder="请输入粉丝昵称" />
+                                                <span class='input-group-btn'><button type="button" class="btn btn-default" onclick="search_members();">搜索</button></span>
+                                            </div>
+                                        </div>
+                                        <div id="module-menus" style="padding-top:5px;"></div>
+                                    </div>
+                                    <div class="modal-footer"><a href="#" class="btn btn-default" data-dismiss="modal" aria-hidden="true">关闭</a></div>
+                                </div>
+
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+<script type="text/javascript">
+	 function search_members() {
+                    if ($.trim($('#search-kwd').val()) == '') {
+                        Tip.focus('#search-kwd', '请输入关键词');
+                        return;
+                    }
+                    $("#module-menus").html("正在搜索....");
+                    $.post('{php echo $this->createWebUrl("setting",array("op"=>"member_search"))}', { 
+                        keyword: $.trim($('#search-kwd').val())
+                    }, function (dat) {
+                        $('#module-menus').html(dat);
+                    });
+                }
+                function select_member(o) {
+
+                    if ($('.multi-item[openid="' + o.openid + '"]').length > 0) {
+                        return;
+                    }
+                    var html = '<div class="multi-item" openid="' + o.openid + '">';
+                    html += '<img class="img-responsive img-thumbnail" src="' + o.avatar + '" onerror="this.src=\'./resource/images/nopic.jpg\'; this.title=\'图片未找到.\'">';
+                    html += '<div class="img-nickname">' + o.nickname + '</div>';
+                    html += '<input type="hidden" value="' + o.openid + '" name="openids[]">';
+                    html += '<em onclick="remove_member(this)"  class="close">×</em>';
+                    html += '</div>';
+                    $("#saler_container").append(html);
+                    refresh_members();
+                }
+
+                function remove_member(obj) {
+                    $(obj).parent().remove();
+                    refresh_members();
+                }
+                function refresh_members() {
+                    var nickname = "";
+                    $('.multi-item').each(function () {
+                        nickname += " " + $(this).find('.img-nickname').html() + "; ";
+                    });
+                    $('#salers').val(nickname);
+                }
+</script>
+
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">积分充值付款比例</label>
+                    <div class="col-sm-9">
+                        <div class="input-group">
+                            <input type="text" name="credit1_ratio" value="{$setting['credit1_ratio']}" class="form-control">
+                            <span class="input-group-addon">%</span>
+                        </div>
+                        <div class="help-block">
+                            (0或留空表示关闭积分充值功能) 例如填写6%，表示充值100积分需要6元，即100*6%=6(元)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group col-sm-12">
+            <input type="hidden" name="id" value="{$setting['id']}"/>
+            <input type="submit" name="submit" value="保存设置" class="btn btn-primary col-lg-1"/>
+            <input type="hidden" name="token" value="{$_W['token']}"/>
+        </div>
+    </form>
+</div>
+
+{elseif $op=='templatemsg'}
+<div class="main">
+    <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                模版消息通知 (所在行业：IT科技/互联网|电子商务，IT科技/IT软件与服务)
+            </div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">是否开启</label>
+                    <div class="col-sm-9">
+                        <label class="radio-inline"><input type="radio" name="istemplate" value="1" id="isshow1" {if $setting['istemplate'] == 1}checked="true"{/if} /> 是</label>
+                        &nbsp;
+                        <label class="radio-inline"><input type="radio" name="istemplate" value="0" id="isshow2" 
+                        {if empty($setting) || $setting['istemplate'] == 0}checked="true"{/if} /> 否</label>
+                        <span class="help-block"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">公众号新增棋谱</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="chess_add_info" value="{$setting['chess_add_info']}" class="form-control"/>
+                        <div class="help-block">
+                            【留空为关闭该通知】公众号新增棋谱模板，选择编号wCydnNpc50h8rYnGs20d97gLjt5-C9hK_T71pWL4sz0(作品发布成功通知)
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">棋手新增棋谱通知</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="player_add_info" value="{$setting['player_add_info']}" class="form-control"/>
+                        <div class="help-block">
+                            【留空为关闭该通知】棋手新增棋谱通知wCydnNpc50h8rYnGs20d97gLjt5-C9hK_T71pWL4sz0(作品发布成功通知)
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">棋谱被收藏通知</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="collect_update_info" value="{$setting['collect_update_info']}" class="form-control"/>
+                        <div class="help-block">
+                            【留空为关闭该通知】棋谱被收藏通知，选择编号ppJ7pGAu3PgtvVu-rco380zr68o6XaPINTtLDQJU7yI(积分变动提醒)
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">棋谱被分享通知</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="publish_share_info" value="{$setting['publish_share_info']}" class="form-control"/>
+                        <div class="help-block">
+                            【留空为关闭该通知】棋谱被分享通知，选择编号ppJ7pGAu3PgtvVu-rco380zr68o6XaPINTtLDQJU7yI(积分变动提醒)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group col-sm-12">
+            <input type="hidden" name="id" value="{$setting['id']}"/>
+            <input type="submit" name="submit" value="保存设置" class="btn btn-primary col-lg-1"/>
+            <input type="hidden" name="token" value="{$_W['token']}"/>
+        </div>
+    </form>
+</div>
+{elseif $op=='vipService'}
+<div class="main">
+    <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
+        <div class="panel panel-default">
+            <div class="panel-heading">购买会员服务</div>
+            <div class="panel-body">
+                {loop $vip $k=>$v}
+                <div class="form-group item">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">套餐{php echo $k+1;}</label>
+                    <div class="col-sm-4">
+                        <div class="input-group">
+                            <span class="input-group-addon">充</span><input type="text" name="viptime[]" value="{$v['viptime']}" class="form-control"><span class="input-group-addon">天</span><span class="input-group-addon">需</span><input type="text" name="vipmoney[]" value="{$v['vipmoney']}" class="form-control"><span class="input-group-addon">积分</span>
+                        </div>
+                    </div>
+                </div>
+                {/loop}
+                <div id="vipdiv">
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+                    <div class="col-sm-9 col-xs-12">
+                        <a href="javascript:;" id="vip-add"><i class="fa fa-plus-circle"></i> 添加套餐列表</a>
+                        <span class="help-block">保存时，留空的套餐将自动删除</span>
+                    </div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">会员服务描述</label>
+                    <div class="col-sm-9">
+                        {php echo tpl_ueditor('vipdesc', $setting['vipdesc']);}
+                        <div class="help-block">
+                            该描述不为空时，会显示在前台手机端“VIP服务”页面，尽量仅填写文字而不包含图品、音视频等其他多媒体元素。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group col-sm-12">
+            <input type="hidden" name="id" value="{$setting['id']}" />
+            <input type="submit" name="submit" value="保存设置" class="btn btn-primary col-lg-1" />
+            <input type="hidden" name="token" value="{$_W['token']}" />
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+    $("#vip-add").click(function () {
+        var chtml = '';
+        chtml += '<div class="form-group item">';
+        chtml += '	<label class="col-xs-12 col-sm-3 col-md-2 control-label">新套餐</label>';
+        chtml += '	<div class="col-sm-4">';
+        chtml += '		<div class="input-group">';
+        chtml += '			<span class="input-group-addon">充</span><input type="text" name="viptime[]" class="form-control"><span class="input-group-addon">天</span><span class="input-group-addon">需</span><input type="text" name="vipmoney[]" class="form-control"><span class="input-group-addon">积分</span>';
+        chtml += '		</div>';
+        chtml += '	</div>';
+        chtml += '</div>';
+
+        $("#vipdiv").append(chtml);
+    });
+</script>
+{/if}
+
+
+{template 'common/footer'}

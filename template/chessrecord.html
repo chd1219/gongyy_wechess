@@ -1,0 +1,188 @@
+<!--
+ * 棋谱管理
+ * ============================================================================
+ * 版权所有 2015-2016 风影随行，并保留所有权利。
+ * 网站地址: http://www.haoshu888.com
+ * ----------------------------------------------------------------------------
+ * 这不是一个自由软件！不允许对程序代码以任何形式任何目的的再发布，作者将保留
+ * 追究法律责任的权力和最终解释权。
+ * ============================================================================
+-->
+{template 'common/header'}
+
+<ul class="nav nav-tabs">
+    <li {if $op=='display'}class="active"{/if}><a href="{php echo $this->createWebUrl('chessrecord');}">走棋记录</a></li>
+    </li>
+</ul>
+{if $operation == 'display'}
+<style type="text/css">
+    .form-controls {
+        display: inline-block;
+        width: 70px;
+    }
+
+    .cblock {
+        display: block !important;
+    }
+
+    .cnone {
+        display: none !important;
+    }
+
+    .cut {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+</style>
+<div class="main">
+    <div class="panel panel-info">
+        <div class="panel-heading">筛选</div>
+        <div class="panel-body">
+            <form action="./index.php" method="get" class="form-horizontal" role="form">
+                <input type="hidden" name="c" value="site">
+                <input type="hidden" name="a" value="entry">
+                <input type="hidden" name="m" value="gongyy_wechess">
+                <input type="hidden" name="do" value="chessrecord">
+                <input type="hidden" name="op" value="display">
+                 <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">服务器有无正常返回数据</label>
+                    <div class="col-sm-7 col-lg-9 col-xs-12">
+                        <div class="col-sm-3" style="width:20%;">
+                            <label class='radio-inline'>
+                                <input type='radio' value=0 name='status' {if $_GPC['status']=='0'}checked{/if}>不正常
+                            </label>
+                            <label class='radio-inline'>
+                                <input type='radio' value=1 name='status' {if $_GPC['status']=='1'}checked{/if}>正常
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">对弈时间</label>
+                    <div class="col-sm-7 col-lg-9 col-xs-12">
+                        <div class="col-sm-3" style="width:20%;">
+                            <label class='radio-inline'>
+                                <input type='radio' value='0' name='searchtime' {if $_GPC['searchtime']=='0'}checked{/if}>不查询
+                            </label>
+                            <label class='radio-inline'>
+                                <input type='radio' value='1' name='searchtime' {if $_GPC['searchtime']=='1'}checked{/if}>查询
+                            </label>
+                        </div>
+                        {php echo tpl_form_field_daterange('chesstime', array('starttime'=>date('Y-m-d H:i',$starttime),'endtime'=>date('Y-m-d H:i', $endtime)),true);}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label"></label>
+                    <div class="col-sm-8 col-lg-9 col-xs-12">
+                        <button class="btn btn-default"><i class="fa fa-search"></i> 查询</button>
+                        <input type="hidden" name="token" value="{$_W['token']}"/>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="table-responsive panel-body">
+            <table class="table table-hover">
+                <thead class="navbar-inner">
+                <tr>
+                    <th style="width:5%;">编号</th>
+                    <th style="width:5%;">粉丝昵称</th>
+                    <th style="width:5%;">总步数</th>
+                    <th style="width:15%;">服务器是否正常返回数据</th>
+                    <th style="width:10%;">对弈时间</th>
+                    <th style="width:8%; text-align:right;">查看/删除</th>
+                </tr>
+                </thead>
+                <tbody>
+                {loop $list $chess}
+                <tr>
+                    <td>{$chess['id']}</td>
+                    <td><span class='cut'>{$chess['nickname']}</span></td>
+                    <td>{$chess['movelength']}</td>
+                     <td>{if $chess['status']==1}<span class="label label-success">是</span>{else}
+                        <span  class="label label-danger">否</span>{/if}
+                    </td>
+                     <td>{php echo date('Y-m-d H:i:s',$chess['addtime']);}</td>
+                    <td style="text-align:right;">
+                        <a class="btn btn-default btn-sm" href="{php echo $this->createWebUrl('chessrecord', array('op'=>'post', 'id'=>$chess['id']));}"
+                           title="查看"><i class="fa fa-pencil"></i></a>
+                        <a class="btn btn-default btn-sm" href="{php echo $this->createWebUrl('chessrecord', array('op'=>'delete', 'id'=>$chess['id']));}"
+                           title="删除" onclick="return confirm('此操作不可恢复，确认删除？');return false;"><i class="fa fa-times"></i></a>
+                    </td>
+                </tr>
+                {/loop}
+                </tbody>
+            </table>
+            {$pager}
+        </div>
+    </div>
+</div>
+
+{elseif $operation == 'post'}
+<div class="main">
+    <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
+        <div class="panel panel-default">
+            <div class="panel-heading">走棋信息</div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">粉丝昵称</label>
+                    <div class="col-sm-9">
+                       <p class="form-control-static">{$record['nickname']}</p>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">服务器是否正常返回数据</label>
+                    <div class="col-sm-9">
+                        {if $record['status']==1}<span class="label label-success">是</span>{else}
+                        <span  class="label label-danger">否</span>{/if}
+                    </div>
+                </div>
+
+                 <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">总步数</label>
+                    <div class="col-sm-9">
+                        <p class="form-control-static">{$record['movelength']}</p>
+                    </div>
+                </div>
+
+            <div class="table-responsive panel-body">
+            <table class="table table-hover">
+                <thead class="navbar-inner">
+                <tr>
+                    <th style="width:4%;">步数</th>
+                    <th style="width:50%;">发送信息</th>
+                    <th style="width:25%;">返回信息</th>
+                    <th style="width:7%;">服务器是否正常返回数据</th>
+                    <th style="width:7%;">发送用时</th>
+                    <th style="width:7%;">返回用时</th>
+                </tr>
+                </thead>
+                <tbody>
+                {loop $serverSendRecord $key $chess}
+                <tr>
+                    <td>{$chess[0]}</td>
+                    <td><span class='cut'>{$chess[1]}</span></td>
+                    <td>{if isset($serverReceiveRecord[$key])}{$serverReceiveRecord[$key][1]}{/if}</td>
+                     <td>{if isset($serverReceiveRecord[$key])}<span class="label label-success">是</span>{else}
+                        <span  class="label label-danger">否</span>{/if}
+                    </td>
+                    <td>{if isset($serverSendRecord[$key])}{$serverSendRecord[$key][2]}毫秒{/if}</td>
+                     <td>{if isset($serverReceiveRecord[$key])}{$serverReceiveRecord[$key][2]}毫秒{/if}</td>
+                </tr>
+                {/loop}
+                </tbody>
+            </table>
+        </div>
+
+            </div>
+        </div>
+    </form>
+</div> 
+
+{/if}
+
+{template 'common/footer'}

@@ -1,0 +1,127 @@
+{php include $this->template('header');}
+
+<link href="{$_W['siteroot']}addons/chessroom/template/mobile/style/mui.min.css" rel="stylesheet" />
+<link href="{$_W['siteroot']}addons/chessroom/template/mobile/style/style.css" rel="stylesheet" />
+<script type="text/javascript" charset="utf-8">
+    mui.init();
+</script>
+<body class="bghui">
+<header class="mui-bar mui-bar-nav bgblue jiaoxiaohead">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left "></a>
+    <h1 class="mui-title">{$title}</h1>
+    <a href="{php echo $this->createMobileUrl('search');}"><span class="mui-action-search mui-icon mui-icon-search mui-pull-right"></span></a>
+</header>
+<div class="mui-content padding4">
+    <div id="slider" >
+        <div id="sliderProgressBar" class="mui-slider-progress-bar mui-col-xs-6"></div>
+        <div id="sliderSegmentedControl" class="mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
+            <a class="mui-control-item {if $display=='group'}mui-active{/if}" id='item3mobile'>
+               分组棋谱
+            </a>
+            <a class="mui-control-item {if $display=='nogroup'}mui-active{/if}" id='item2mobile'>
+                未分组棋谱
+            </a>
+        </div>
+        {if $display=='group'}
+        <div class="mui-slider-group">
+            <div id="item1mobile" class="mui-slider-item mui-control-content mui-active">
+                <ul class="mui-table-view">
+                    {loop $tabs $index $tab}
+                        <li class="mui-table-view-cell mui-media">
+                            <img class="mui-media-object mui-pull-left peopoimg" src="{php echo tomedia($tab['thumb']);}">
+                            <div class="mui-pull-right peplckbtn"><a href='{php echo $this->createMobileUrl("search",array("op"=>"allcategary","results"=>"allcategary","tabname"=>$tab["name"]));}'>查看</a></div>
+                            <div class="mui-media-body peplinfo">
+                                {$tab['name']}
+                                <p class='mui-ellipsis'>{$total_tab[$index]}份棋谱</p>
+                                <p class='mui-ellipsis'>最新更新于{php echo date('Y/m/d',$time[$index][0]['createtime']);}</p>
+                            </div>
+                        </li>
+                    {/loop}
+               </ul>
+            </div>
+            </div>
+        {elseif $display=='nogroup'}
+        <div class="panel ">
+          <div class="panel-body">
+                {loop  $contents $item}
+                <div class="content">
+
+                    <div class="row main"  >
+                        <!--<a style="color: #3c3c3c" href="{php echo $item['url']."&file=".$item['filename'];}" class="list-group-item">-->
+                        <a style="color: #3c3c3c" href="{php echo $this->createMobileUrl('detail');}" class="list-group-item">
+                            <div class="col-lg-10 col-xs-10" style="float: left;">
+                                <div class="row">
+
+                                    <div class="col-lg-12 col-xs-12" ><h4 style="font-weight: bold;font-size: 16px;">{$item['title']}</h4></div>
+
+                                </div>
+                                <div class="row img">
+                                    <div class="col-lg-4 col-xs-4"><img src="{$_W['siteroot']}addons/chessroom/template/mobile/images/shuai.jpg" class="img-circle" style="height: 15px;width: 15px;">{$item['redname']}</div>
+                                    <div class="col-lg-4 col-xs-4"><img src="{$_W['siteroot']}addons/chessroom/template/mobile/images/jiang.jpg" class="img-circle" style="height: 15px;width: 15px;">{$item['blackname']}</div>
+                                    <div class="col-lg-4 col-xs-4"><!--<span class="	glyphicon glyphicon-time" aria-hidden="true">--><small style="color: black;">{php echo date('Y/m/d',$item['matchtime']);}</small></span></div>
+
+                                </div>
+                            </div>
+                        </a>
+                        <div class="col-lg-2 col-xs-2" style="margin-top:20px;">
+                                <span class="glyphicon glyphicon-align-justify"
+                                      data-container="body" data-toggle="popover"
+                                      aria-hidden="true" style="float: left;"></span>
+                        </div>
+                    </div>
+                </div>
+                {/loop}
+            </div>
+        </div>
+    <script src="{$_W['siteroot']}addons/chessroom/template/mobile/style/js/bootstrap.min.js" type="text/javascript"></script>
+<style>
+    .panel .panel-body .content{
+        background:#FFFFFF ;
+        padding:0;
+        overflow: hidden;
+
+        border-bottom: 1px solid #D0D0D0;
+        margin-bottom: 3px;
+        line-height: 24px;
+    }
+    .panel .panel-body .content .list-group-item{
+        border: none;
+        padding: 0;
+        margin: 0;
+    }
+    .panel .panel-body {
+
+        background: #F8F8F8;
+        padding: 0;
+        margin: 0;
+    }
+    .panel .panel-body .content .main{
+        height: 75px;
+        padding-top: 10px;
+    }
+    .panel .panel-body .content .main .img{
+        padding-top: 3px;
+    }
+</style>
+        {/if}
+        </div>
+    </div>
+<script>
+    document.getElementById('item2mobile').addEventListener('tap', function() {
+//打开关于页面
+        mui.openWindow({
+            url:"{php echo $this->createMobileUrl('cat',array('op'=>'allcategary','display'=>'nogroup'));}",
+            id:'info'
+        });
+    });
+    document.getElementById('item3mobile').addEventListener('tap', function() {
+//打开关于页面
+        mui.openWindow({
+            url:"{php echo $this->createMobileUrl('cat',array('op'=>'allcategary','display'=>'group'));}",
+            id:'info'
+        });
+    });
+
+
+</script>
+{template '_footer'}

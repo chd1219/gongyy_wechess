@@ -1,0 +1,255 @@
+<!--
+ * 棋手管理
+ * ============================================================================
+ * 版权所有 2015-2016 风影随行，并保留所有权利。
+ * 网站地址: http://www.haoshu888.com
+ * ----------------------------------------------------------------------------
+ * 这不是一个自由软件！不允许对程序代码以任何形式任何目的的再发布，作者将保留
+ * 追究法律责任的权力和最终解释权。
+ * ============================================================================
+-->
+{template 'common/header'}
+
+<ul class="nav nav-tabs">
+    <li {if $op=='display'}class="active"{/if}><a href="{php echo $this->createWebUrl('player');}">棋手列表</a></li>
+    <li {if $op=='post'}class="active"{/if}>
+        <a  href="{php echo $this->createWebUrl('player', array('op'=>'post', 'id'=>$_GPC['id']));}">{if $_GPC['id']>0}编辑{else}添加{/if}棋手</a></li>
+</ul>
+{if $operation == 'display'}
+<style type="text/css">
+    .form-controls {
+        display: inline-block;
+        width: 70px;
+    }
+
+    .cblock {
+        display: block !important;
+    }
+
+    .cnone {
+        display: none !important;
+    }
+</style>
+<div class="main">
+    <div class="panel panel-info">
+        <div class="panel-heading">筛选</div>
+        <div class="panel-body">
+            <form action="./index.php" method="get" class="form-horizontal" role="form">
+                <input type="hidden" name="c" value="site">
+                <input type="hidden" name="a" value="entry">
+                <input type="hidden" name="m" value="gongyy_wechess">
+                <input type="hidden" name="do" value="player">
+                <input type="hidden" name="op" value="display">
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label" style="width:100px;">棋手名称</label>
+                    <div class="col-sm-2 col-lg-3">
+                        <input class="form-control" name="playername" value="{$_GPC['palyername']}">
+                    </div>
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label" style="width:100px;">棋手级别</label>
+                    <div class="col-sm-2 col-lg-3">
+                        <select name="playerlevel" class="form-control">
+                            <option value="">不限</option>
+                            <option value="特级大师" {if $_GPC['playerlevel']=='特级大师'} selected{/if}>特级大师</option>
+                            <option value="国家大师" {if $_GPC['playerlevel']=='国家大师'} selected{/if}>国家大师</option>
+                            <option value="棋协大师" {if $_GPC['playerlevel']=='棋协大师'} selected{/if}>棋协大师</option>
+                            <option value="一级棋士" {if $_GPC['playerlevel']=='一级棋士'} selected{/if}>一级棋士</option>
+                            <option value="二级棋士" {if $_GPC['playerlevel']=='二级棋士'} selected{/if}>二级棋士</option>
+                            <option value="三级棋士" {if $_GPC['playerlevel']=='三级棋士'} selected{/if}>三级棋士</option>
+                            <option value="业余棋手" {if $_GPC['playerlevel']=='业余棋手'} selected{/if}>业余棋手</option>
+                        </select>
+                    </div>
+
+                </div>
+                <div class="form-group">
+
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label" style="width:100px;">棋手类型</label>
+                    <div class="col-sm-2 col-lg-3">
+                        <select name="playertype" class="form-control">
+                            <option value="">不限</option>
+                            <option value="1" {if $_GPC['playertype']==1}selected{/if}>后台添加</option>
+                            <option value="2" {if $_GPC['playertype']==2}selected{/if}>微信添加</option>
+
+                        </select>
+                    </div>
+
+
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label" style="width:100px;">棋手状态</label>
+                    <div class="col-sm-2 col-lg-3">
+                        <select name="status" class="form-control">
+                            <option value="">不限</option>
+                            <option value="1" {if $_GPC['status']==1}selected{/if}>审核通过</option>
+                            <option value="2" {if $_GPC['status']==2}selected{/if}>待审核</option>
+                            <option value="-1" {if $_GPC['status']==-1}selected{/if}>未通过</option>
+                        </select>
+                    </div>
+
+                    <button class="btn btn-default"><i class="fa fa-search"></i> 搜索</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="table-responsive panel-body">
+            <table class="table table-hover">
+                <thead class="navbar-inner">
+                <tr>
+                    <th style="width:5%;">编号</th>
+                    <th style="width:10%;">棋手名称</th>
+                    <th style="width:9%;">棋手级别</th>
+                    <th style="width:10%;">证书</th>
+                    <th style="width:10%;">头像</th>
+
+                    <th style="width:8%;">棋手类型</th>
+                    <th style="width:8%;">状态</th>
+                    <th style="width:13%;">添加时间</th>
+                    <th style="width:8%; text-align:right;">查看/删除</th>
+                </tr>
+                </thead>
+                <tbody>
+                {loop $list $index $player}
+                <tr>
+                    <td>{$player['id']}</td>
+                    <td>{$player['playername']}</td>
+                    <td>{$player['playerlevel']}</td>
+                    <td>{if !empty($player['certificate'])}
+                        {loop $certificates[$index] $certificate}
+                        <img src="{php echo tomedia($certificate);}" height="40" width="40">
+                        {/loop}
+                        {else}
+                        未上传
+                        {/if}
+                    </td>
+                    <td>
+                        {if !empty($player['photo'])}
+                        <img src="{php echo tomedia($player['photo']);}" height="40">
+                        {else}
+                        未上传
+                        {/if}
+
+                    <td>
+                        {if !empty($player['openid'])}
+                        <span class="label label-primary">自行申请</span>
+                        {else}
+                        <span class="label label-default">后台添加</span>
+                        {/if}
+                    </td>
+
+                    <td>{if $player['status']==-1}<span class="label label-default">未通过</span>{elseif
+                        $player['status']==1}<span class="label label-success">审核通过</span>{elseif
+                        $player['status']==2}<span class="label label-danger">待审核</span>{/if}
+                    </td>
+                    <td>{php echo date('Y-m-d H:i',$player['addtime']);}</td>
+                    <td style="text-align:right;">
+                        <a class="btn btn-default btn-sm"
+                           href="{php echo $this->createWebUrl('player', array('op'=>'post', 'id'=>$player['id']));}"
+                           title="修改"><i class="fa fa-pencil"></i></a>
+                        <a class="btn btn-default btn-sm"
+                           href="{php echo $this->createWebUrl('player', array('op'=>'delete', 'id'=>$player['id']));}"
+                           title="删除" onclick="return confirm('此操作不可恢复，确认删除？');return false;"><i
+                                class="fa fa-times"></i></a>
+                    </td>
+                </tr>
+                {/loop}
+                </tbody>
+            </table>
+            {$pager}
+        </div>
+    </div>
+</div>
+
+{elseif $operation == 'post'}
+<div class="main">
+    <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
+        <div class="panel panel-default">
+            <div class="panel-heading">棋手信息</div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">棋手名称</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="playername" class="form-control" value="{$player['playername']}"/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">棋手级别</label>
+                    <div class="col-sm-9">
+                        <select name="playerlevel" class="form-control">
+
+                            <option value="特级大师" {if $player['playerlevel']=='特级大师'} selected{/if}>特级大师</option>
+                            <option value="国家大师" {if $player['playerlevel']=='国家大师'} selected{/if}>国家大师</option>
+                            <option value="棋协大师" {if $player['playerlevel']=='棋协大师'} selected{/if}>棋协大师</option>
+                            <option value="一级棋士" {if $player['playerlevel']=='一级棋士'} selected{/if}>一级棋士</option>
+                            <option value="二级棋士" {if $player['playerlevel']=='二级棋士'} selected{/if}>二级棋士</option>
+                            <option value="三级棋士" {if $player['playerlevel']=='三级棋士'} selected{/if}>三级棋士</option>
+                            <option value="业余棋手" {if $player['playerlevel']=='业余棋手'} selected{/if}>业余棋手</option>
+                        </select>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">棋手QQ</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="qq" class="form-control" value="{$player['qq']}"/>
+                        <span class="help-block">留空将不显示在前台</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">棋手电话</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="phone" class="form-control" value="{$player['phone']}"/>
+                        <span class="help-block">留空将不显示在前台</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">棋手介绍</label>
+                    <div class="col-sm-9">
+                        <textarea style="height:75px;" class="form-control richtext" name="playerdes">{$player['playerdes']}</textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">棋手相片</label>
+                    <div class="col-sm-9">
+                        {php echo tpl_form_field_image('photo', $player['photo']);}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">棋手证书</label>
+                    <div class="col-sm-9">
+                        {php echo tpl_form_field_multi_image('certificate', $player['certificate']);}
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">棋手状态</label>
+                    <div class="col-sm-9">
+                        <p class="form-control-static">
+                            <input type="radio" name="status" value="1" {if $player['status']==1}checked{/if}>
+                            <span class="label label-success" style="vertical-align:text-top;">审核通过</span>
+                            &nbsp;&nbsp;
+                            <input type="radio" name="status" value="2" {if $player['status']==2}checked{/if}>
+                            <span class="label label-danger" style="vertical-align:text-top;">待审核</span>
+                            &nbsp;&nbsp;
+                            <input type="radio" name="status" value="-1" {if $player['status']==-1}checked{/if}>
+                            <span class="label label-default" style="vertical-align:text-top;">审核未通过</span>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="form-group col-sm-12">
+            <input type="submit" name="submit" value="保存" class="btn btn-primary col-lg-1"/>
+            <input type="hidden" name="token" value="{$_W['token']}"/>
+            <input type="hidden" name="id" value="{$id}"/>
+        </div>
+    </form>
+</div>
+
+{/if}
+
+{template 'common/footer'}

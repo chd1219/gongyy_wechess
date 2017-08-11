@@ -1,0 +1,146 @@
+{template 'header'}
+<body>
+<div class="vipcenter">
+    <div class="vipheader">
+        <div class="touxiang"><img src="{$_W['fans']['avatar']}" style="vertical-align: top;" alt="头像"></div>
+
+        <p class="name">{$_W['fans']['nickname']}</p>
+
+    </div>
+    <div class="vipsan">
+        <div><!-- <a href="{php echo $this->createMobileUrl('credit');}"> --><h4>我的积分</h4>
+            <p>{php echo ceil($memberinfo['credit1'])}</p><!-- </a> --></div>
+        <div><a href="{php echo $this->createMobileUrl('self',array('op'=>'my','displaytype'=>'publish'));}"
+                target="self_main"><h4>我的棋谱</h4>
+            <p>{$mypublishsum}</p></a></div>
+        <div><a href="{php echo $this->createMobileUrl('self',array('op'=>'my','displaytype'=>'collect'));}"
+                target="self_main"><h4>我的收藏</h4>
+            <p>{$mycollectsum}</p></a></div>
+        <div><a href="{php echo $this->createMobileUrl('self',array('op'=>'my','displaytype'=>'follow'));}"
+                target="self_main"><h4>我的关注</h4>
+            <p>{$myfollowsum}</p></a></div>
+    </div>
+
+</div>
+
+
+<nav class="mui-bar mui-bar-tab">
+    <a class="mui-tab-item" href="{php echo $this->createMobileUrl('index');}">
+        <span class="mui-icon mui-icon-home"></span>
+        <span class="mui-tab-label">首页</span>
+    </a>
+
+    <a class="mui-tab-item" href="{php echo $this->createMobileUrl('player');}">
+        <span class="mui-icon mui-icon-personadd-filled"></span>
+        <span class="mui-tab-label">棋手</span>
+    </a>
+    <a class="mui-tab-item " href="#center">
+        <span class="mui-icon mui-icon-compose"></span>
+        <span class="mui-tab-label">拆棋</span>
+       
+    </a>
+    <a class="mui-tab-item" href="{php echo $this->createMobileUrl('search');}">
+        <span class="mui-icon mui-icon-search"></span>
+        <span class="mui-tab-label">搜索</span>
+    </a>
+
+    <a class="mui-tab-item mui-active" href="{php echo $this->createMobileUrl('self');}">
+        <span class="mui-icon mui-icon-contact"></span>
+        <span class="mui-tab-label">我的</span>
+    </a>
+</nav>
+
+<div id="center" class="mui-popover mui-bar-popover">
+            <div class="mui-popover-arrow"></div>
+            <ul class="mui-table-view" style="margin:0">
+                <li class="mui-table-view-cell"><a href="{php echo $this->createMobileUrl('publish',array('op'=>'create'));}">创建棋谱</a>
+                </li>
+                <li class="mui-table-view-cell"><a href="{php echo $this->createMobileUrl('publish',array('op'=>'ai'));}">人机对弈</a>
+                </li>
+                <li class="mui-table-view-cell"><a href="{if $this->isvip(mc_openid2uid($_W['openid']))==1}{php echo $this->createMobileUrl('publish',array('op'=>'analyse_vip'));}{else}{php echo $this->createMobileUrl('publish',array('op'=>'analyse'));}{/if}">研究复盘</a>
+                </li>
+            </ul>
+</div>
+
+{php echo register_jssdk(false);}
+
+<script type="text/javascript">
+    wx.ready(function () {
+        var shareData = {
+            title: "{$setting['sitename']}-{$_W['account']['name']}",
+            desc: "{php echo $sharedesc;}",
+            link: "{php echo $shareurl;}",
+            imgUrl: "{php echo $sharelogo;}",
+            trigger: function (res) {
+            },
+            complete: function (res) {
+            },
+            success: function (res) {
+            },
+            cancel: function (res) {
+            },
+            fail: function (res) {
+            }
+        };
+        wx.onMenuShareTimeline(shareData);
+        wx.onMenuShareAppMessage(shareData);
+        wx.onMenuShareQQ(shareData);
+        wx.onMenuShareWeibo(shareData);
+        wx.onMenuShareQZone(shareData);
+
+    });
+</script>
+
+
+<script>
+    mui(".vipcenter").on('tap', 'a', function () {
+
+        mui.openWindow({
+            id: this.href,
+            url: this.href,
+            waiting: {
+                autoShow: true,//自动显示等待框，默认为true
+                title: '正在加载...',//等待对话框上显示的提示内容
+
+            }
+        });
+
+    });
+
+    mui.init({
+        subpages: [{
+            url: '{php echo $this->createMobileUrl('self',array('op'=>'main'));}',
+            id: 'self_main',
+            styles: {
+                {if $setting['isfollow']==1 && !empty($fans) && $fans['follow']==0}
+                top: '232px',
+                 {else}
+                top: '188px',
+                {/if}
+                bottom: '50px'//默认为0px，可不定义；
+            }
+        }]
+    });
+    mui(".mui-bar-tab").on('tap', '.mui-tab-item', function () {
+
+        mui.openWindow({
+            id: this.href,
+            url: this.href,
+            waiting: {
+                autoShow: true,//自动显示等待框，默认为true
+                title: '正在加载...',//等待对话框上显示的提示内容
+
+            }
+        });
+    })
+    {if $setting['isfollow']==1 && !empty($fans) && $fans['follow']==0}
+        $('.follow_topbar').show();
+        $('.vipcenter').css('margin-top','44px');
+    {else}
+        $('.follow_topbar').hide();
+        $('.vipcenter').css('margin-top','0');
+    {/if}
+</script>
+</script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title> 象棋微学堂手机软件 </title>
+	<script type="text/javascript">
+		var phoneWidth = parseInt(window.screen.width);
+		var phoneScale = phoneWidth/640;
+		var ua = navigator.userAgent;
+		if (/Android (\d+\.\d+)/.test(ua)){
+			var version = parseFloat(RegExp.$1);
+			// andriod 2.3
+			if(version>2.3){
+				document.write('<meta name="viewport" content="width=640, minimum-scale = '+phoneScale+', maximum-scale = '+phoneScale+', target-densitydpi=device-dpi">');
+				// andriod 2.3以上
+			}else{
+				document.write('<meta name="viewport" content="width=640, target-densitydpi=device-dpi">');
+			}
+			// 其他系统
+		} else {
+			document.write('<meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>');
+		}
+	</script>
+    <link href="./css/menu.css" rel="stylesheet" type="text/css"> 
+	<script src="libs/jquery-2.1.0.min.js"></script>   
+	<script src="js/settings.js"></script>
+    <script type="application/javascript">
+        var canvas, stage, exportRoot;       
+ 
+        function init() {
+            $("#aiplayBtn").click(function(){
+				var href = baseURL+'aiplay.html';	
+				location.href = href;	
+			});
+            $("#billBtn").click(function(){
+				var href = baseURL+'bill.html';	
+				location.href = href;	
+			});
+            $("#onlineBtn").click(function(){
+				var href = baseURL+'online.html';	
+				location.href = href;	
+			});
+        }
+    </script>
+</head>
+
+<body onload="init()">
+    <canvas id="chess" width="640" height="1023"></canvas>
+	<div id="bg" style="text-align: center">
+		<img src="assets/images/board2.png">
+	</div>
+	<div id="chessBox">
+		<div id="btnBox">			
+			<div id="mode1">
+				<input type="button" id="aiplayBtn">
+				<input type="button" id="billBtn">
+				<input type="button" id="onlineBtn">
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>

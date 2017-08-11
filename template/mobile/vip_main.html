@@ -1,0 +1,75 @@
+<body>
+<style>
+    .mui-btn {
+        font-size: 16px;
+        padding: 8px;
+        margin: 3px;
+    }
+	.info{
+		line-height: 40px;
+		color: #04BE02;
+	}
+</style>
+<div class="mui-content">
+    <form action="{php echo $this->createMobileUrl('credit', array('op'=>'recharge'));}" method="post"
+          class="form-horizontal" onsubmit="return checkSubmit();">
+        <div>
+            <div class="mui-control-content  mui-active">
+                <div class="mui-table-view" style="min-height:200px">
+                    <div class="mui-input-group">
+						<div class="mui-input-row">
+                            <label>当前会员</label>
+                            <span class="info">{$memberInfo['nickname']}</span>
+                        </div>
+
+                        <div class="mui-input-row">
+                            <label>当前积分</label>
+                            <span class="info">{$memberInfo['credit1']}</span>
+                        </div>
+
+                        <div class="mui-input-row">
+                            <label>充值积分</label>
+                            <input type="text" name="credit_number" class="mui-input-clear" placeholder="请输入充值积分数额" onkeyup="payAmount(this.value)">
+                        </div>
+                        <div class="mui-input-row">
+                            <label>应付金额</label>
+                            <span class="info" style="color:red;" id="payamount">0.00 元</span>
+                        </div>
+                    </div>
+                    <div class="demos-content-padded">
+						<input type="hidden" name="token" value="{$_W['token']}"/>
+                        <input type="submit" name="submit" class="weui-btn weui-btn_primary" style="font-size:16px;" value="立即充值"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+function payAmount(credit){
+	var ratio = <?php echo $setting['credit1_ratio']*0.01?>;
+	var payamount = (credit*ratio).toFixed(2);
+	document.getElementById("payamount").innerHTML = payamount+" 元";
+}
+function checkSubmit(){
+	var credit = $("input[name=credit_number]").val();
+	if(credit==''){
+		alert("请输入要充值的积分数额");
+		return false;
+	}
+	if(credit != parseInt(credit)){
+		alert("充值积分必须为正整数");
+		return false;
+	}
+	if(parseInt(credit) <= 0){
+		alert("充值积分必须为正整数");
+		return false;
+	}
+
+	return true;
+	
+}
+</script>
+
+</body>
+</html>

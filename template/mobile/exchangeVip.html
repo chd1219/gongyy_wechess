@@ -1,0 +1,139 @@
+{template 'header'}
+<body>
+<nav class="mui-bar mui-bar-tab">
+    <a class="mui-tab-item " href="{php echo $this->createMobileUrl('index');}">
+        <span class="mui-icon mui-icon-home"></span>
+        <span class="mui-tab-label">首页</span>
+    </a>
+
+    <a class="mui-tab-item" href="{php echo $this->createMobileUrl('player');}">
+        <span class="mui-icon mui-icon-personadd-filled"></span>
+        <span class="mui-tab-label">棋手</span>
+    </a>
+    <a class="mui-tab-item " href="#center">
+        <span class="mui-icon mui-icon-compose"></span>
+        <span class="mui-tab-label">拆棋</span>
+       
+    </a>
+    <a class="mui-tab-item" href="{php echo $this->createMobileUrl('search');}">
+        <span class="mui-icon mui-icon-search"></span>
+        <span class="mui-tab-label">搜索</span>
+    </a>
+
+    <a class="mui-tab-item mui-active" href="{php echo $this->createMobileUrl('self');}">
+        <span class="mui-icon mui-icon-contact"></span>
+        <span class="mui-tab-label">我的</span>
+    </a>
+</nav>
+<div id="center" class="mui-popover mui-bar-popover">
+    <div class="mui-popover-arrow"></div>
+    <ul class="mui-table-view" style="margin:0">
+        <li class="mui-table-view-cell"><a href="{php echo $this->createMobileUrl('publish',array('op'=>'create'));}">创建棋谱</a>
+        </li>
+        <li class="mui-table-view-cell"><a href="{php echo $this->createMobileUrl('publish',array('op'=>'ai'));}">人机对弈</a>
+        </li>
+        <li class="mui-table-view-cell"><a href="{php echo $this->createMobileUrl('publish',array('op'=>'analyse'));}">研究复盘</a>
+        </li>
+    </ul>
+</div>
+<style>
+    .mui-btn {
+        font-size: 16px;
+        padding: 8px;
+        margin: 3px;
+    }
+	.info{
+		line-height: 40px;
+		color: #04BE02;
+	}
+	.vipdesc{
+		font-size: 14px;
+		padding:15px;
+		max-height: 248px;
+		overflow-y: auto;
+	}
+</style>
+<div class="mui-content">
+    <form action="{php echo $this->createMobileUrl('vip', array('op'=>'exchange'));}" method="post"
+          class="form-horizontal" onsubmit="return checkSubmit();">
+        <div>
+            <div class="mui-control-content  mui-active">
+                <div class="mui-table-view" style="min-height:200px">
+                    <div class="mui-input-group">
+						<div class="mui-input-row">
+                            <label>当前会员</label>
+                            <span class="info">{$memberInfo['nickname']}</span>
+                        </div>
+						{if $memberInfo['vip']==1}
+						<div class="mui-input-row">
+                            <label>VIP过期时间</label>
+                            <span class="info">{php echo date('Y-m-d H:i:s',$memberInfo['vip_validity']);}</span>
+                        </div>
+						{/if}
+                        <div class="mui-input-row">
+                            <label>当前积分</label>
+                            <span class="info">{$memberInfo['credit1']}</span>
+                        </div>
+
+                        <div class="mui-input-row">
+                            <label>兑换时长</label>
+                            <select name="viptime">
+								<option value="">请选择...</option>
+								{loop $vip_service $item}
+								<option value="{$item['viptime']}">{$item['viptime']}天VIP - {$item['vipmoney']}积分</option>
+								{/loop}
+							</select>
+                        </div>
+                    </div>
+                    <div class="demos-content-padded">
+						<input type="hidden" name="token" value="{$_W['token']}"/>
+                        <input type="submit" name="submit" class="weui-btn weui-btn_primary" style="font-size:16px;" value="{php echo $memberInfo['vip']==1?'立即续费':'立即开通';}"/>
+                    </div>
+                </div>
+				<div class="mui-table-view" style="min-height:200px">
+                    <div class="mui-input-group">
+						<div class="mui-input-row">
+                            <label><strong>【VIP介绍】</strong></label>
+                        </div>
+						<div class="vipdesc">
+                            {php echo htmlspecialchars_decode($setting['vipdesc']);}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+function checkSubmit(){
+	var viptime = $("select[name=viptime] option:selected").val();
+	if(viptime==''){
+		alert("请选择要兑换VIP的时长");
+		return false;
+	}
+
+	return true;
+	
+}
+mui(".mui-bar-tab").on('tap', '.mui-tab-item', function () {
+
+        mui.openWindow({
+            id: this.href,
+            url: this.href,
+            waiting: {
+                autoShow: true,//自动显示等待框，默认为true
+                title: '正在加载...',//等待对话框上显示的提示内容
+
+            }
+        });
+})
+{if $setting['isfollow']==1 && !empty($fans) && $fans['follow']==0}
+        $('.follow_topbar').show();
+        $('.mui-content').css('top','44px');
+    {else}
+        $('.follow_topbar').hide();
+        $('.mui-content').css('top','0');
+{/if}
+</script>
+</body>
+</html>

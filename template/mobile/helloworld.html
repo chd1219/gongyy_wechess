@@ -1,0 +1,174 @@
+{template 'header'}
+<div class="weui-search-bar" id="searchBar">
+    <form class="weui-search-bar__form">
+        <div class="weui-search-bar__box">
+            <i class="weui-icon-search"></i>
+            <input type="search" class="weui-search-bar__input" style="margin-bottom:0px;" id="searchInput"
+                   placeholder="搜索棋谱名称/棋手" required="">
+            <a href="javascript:" class="weui-icon-clear" id="searchClear"></a>
+        </div>
+        <label class="weui-search-bar__label" id="searchText">
+            <i class="weui-icon-search"></i>
+            <span>搜索</span>
+        </label>
+    </form>
+    <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
+</div>
+<header>
+    <div class="swiper-container" style="margin-top:10px;">
+        <div class="swiper-wrapper">
+            <div class="swiper-slide"><a href="{php echo $this->createMobileUrl('cover');}" class="weui-tabbar__item">
+
+                <div class="weui-tabbar__icon" style="width:36px; height:36px">
+                    <img src="{MODULE_URL}template/mobile/images/古谱.png" alt="">
+                </div>
+                <p class="weui-tabbar__label" style="font-size:14px;">古谱残局</p>
+            </a></div>
+            <div class="swiper-slide"><a href="{php echo $this->createMobileUrl('cover');}" class="weui-tabbar__item">
+
+                <div class="weui-tabbar__icon" style="width:36px; height:36px">
+                    <img src="{MODULE_URL}template/mobile/images/学棋.png" alt="">
+                </div>
+                <p class="weui-tabbar__label" style="font-size:14px;">棋谱学习</p>
+            </a></div>
+            <div class="swiper-slide"><a href="{php echo $this->createMobileUrl('cover');}" class="weui-tabbar__item">
+
+                <div class="weui-tabbar__icon" style="width:36px; height:36px">
+                    <img src="{MODULE_URL}template/mobile/images/杀着.png" alt="">
+                </div>
+                <p class="weui-tabbar__label" style="font-size:14px;">杀法大全</p>
+            </a></div>
+            <div class="swiper-slide"><a href="{php echo $this->createMobileUrl('cover');}" class="weui-tabbar__item">
+
+                <div class="weui-tabbar__icon" style="width:36px; height:36px">
+                    <img src="{MODULE_URL}template/mobile/images/自战.png" alt="">
+                </div>
+                <p class="weui-tabbar__label" style="font-size:14px;">自战对局</p>
+            </a></div>
+            <div class="swiper-slide"><a href="{php echo $this->createMobileUrl('cover');}" class="weui-tabbar__item">
+
+                <div class="weui-tabbar__icon" style="width:36px; height:36px">
+                    <img src="{MODULE_URL}template/mobile/images/赛事.png" alt="">
+                </div>
+                <p class="weui-tabbar__label" style="font-size:14px;">象棋赛事</p>
+            </a></div>
+            <div class="swiper-slide"><a href="{php echo $this->createMobileUrl('cover');}" class="weui-tabbar__item">
+
+                <div class="weui-tabbar__icon" style="width:36px; height:36px">
+                    <img src="{MODULE_URL}template/mobile/images/开局.png" alt="">
+                </div>
+                <p class="weui-tabbar__label" style="font-size:14px;">开局棋谱</p>
+            </a></div>
+            <div class="swiper-slide"><a href="{php echo $this->createMobileUrl('cover');}" class="weui-tabbar__item">
+
+                <div class="weui-tabbar__icon" style="width:36px; height:36px">
+                    <img src="{MODULE_URL}template/mobile/images/中局.png" alt="">
+                </div>
+                <p class="weui-tabbar__label" style="font-size:14px;">中局棋谱</p>
+            </a></div>
+            <div class="swiper-slide"><a href="{php echo $this->createMobileUrl('cover');}" class="weui-tabbar__item">
+
+                <div class="weui-tabbar__icon" style="width:36px; height:36px">
+                    <img src="{MODULE_URL}template/mobile/images/残局.png" alt="">
+                </div>
+                <p class="weui-tabbar__label" style="font-size:14px;">残局棋谱</p>
+            </a></div>
+
+        </div>
+    </div>
+</header>
+<nav class="mui-bar mui-bar-tab">
+    <a class="mui-tab-item mui-active" href="{php echo $this->createMobileUrl('index');}">
+        <span class="mui-icon mui-icon-home"></span>
+        <span class="mui-tab-label">首页</span>
+    </a>
+    <a class="mui-tab-item" href="{php echo $this->createMobileUrl('master');}">
+        <span class="mui-icon mui-icon-person"></span>
+        <span class="mui-tab-label">棋手</span>
+    </a>
+    <a class="mui-tab-item" href="{php echo $this->createMobileUrl('publish');}">
+        <span class="mui-icon mui-icon-compose"></span>
+        <span class="mui-tab-label">发布</span>
+    </a>
+    <a class="mui-tab-item" href="{php echo $this->createMobileUrl('self');}">
+        <span class="mui-icon mui-icon-contact"></span>
+        <span class="mui-tab-label">我的</span>
+    </a>
+</nav>
+<script src="{MODULE_URL}template/mobile/js/mui.js"></script>
+<script>
+    var mySwiper = new Swiper('.swiper-container', {
+        height: 50,
+        width: window.innerWidth,
+        setWrapperSize: true,
+        slidesPerView: 4.5,
+        slidesOffsetAfter: 75,
+        onInit: function (swiper) {
+            $(".swiper-slide").bind("click", function () {
+                $("#demo_index").text($(this).index());
+            });
+        }
+    })
+    mui('body').on('tap', 'a', function () {
+        document.location.href = this.href;
+    });
+</script>
+<script type="text/javascript">
+    wx.ready(function () {
+        var shareData = {
+            title: "{$sharelink['title']} - {$setting['sitename']} - {$_W['account']['name']}",
+            desc: "{$sharelink['desc']}",
+            link: "{php echo $shareurl;}",
+            imgUrl: "{php echo $_W['attachurl'];}{$sharelink['images']}",
+            trigger: function (res) {
+            },
+            complete: function (res) {
+            },
+            success: function (res) {
+            },
+            cancel: function (res) {
+            },
+            fail: function (res) {
+            }
+        };
+        wx.onMenuShareTimeline(shareData);
+        wx.onMenuShareAppMessage(shareData);
+        wx.onMenuShareQQ(shareData);
+        wx.onMenuShareWeibo(shareData);
+        wx.onMenuShareQZone(shareData);
+
+    });
+</script>
+
+
+<script>
+    var mySwiper = new Swiper('.swiper-container', {
+        height: 50,
+        width: window.innerWidth,
+        setWrapperSize: true,
+        slidesPerView: 4.5,
+        slidesOffsetAfter: 75,
+        onInit: function (swiper) {
+            $(".swiper-slide").bind("click", function () {
+                $("#demo_index").text($(this).index());
+            });
+        }
+    })
+    mui('body').on('tap', 'a', function () {
+        document.location.href = this.href;
+    });
+</script>
+<script>
+    mui.init({
+        subpages: [{
+            url: '{php echo $this->createMobileUrl('index');}',
+            id: '{php echo $this->createMobileUrl('index');}',
+            styles: {
+                top: '135px',//mui标题栏默认高度为45px；
+                bottom: '50px'//默认为0px，可不定义；
+            }
+        }]
+    });
+</script>
+</body>
+</html>

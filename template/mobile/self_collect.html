@@ -1,0 +1,174 @@
+{template 'header'}
+<body>
+<div id="refreshContainer" class="mui-content mui-scroll-wrapper">
+    <div class="mui-scroll">
+        <ul class="mui-table-view" style='margin-top:2px;'>
+            {loop $list $index $chess}
+            <li class="mui-table-view-cell mui-media">
+                <div class="mui-slider-right mui-disabled">
+
+                    <a class="mui-btn mui-btn-grey mui-icon mui-icon-trash" chessid="{$chess['id']}"></a>
+                </div>
+                <div class="mui-slider-handle">
+                    <a href="{php echo $this->createMobileUrl('chess',array('file'=>$chess['filename']));}">
+                        <img class="mui-media-object mui-pull-left"
+                             src="{$_W['attachurl']}{php echo $this->getCategoryicoById($uniacid,$chess['categoryid']);}">
+                        <div class="mui-media-body mui-ellipsis">
+                            {if $chess['iszhiding']}<span class="mui-badge mui-badge-primary"
+                                                          style="border-radius:2px;font-size:.8em;padding:3px 3px;">顶</span>{/if}
+                            {if $chess['isjinghua']}<span class="mui-badge mui-badge-success"
+                                                          style="border-radius:2px;font-size:.8em;padding:3px 3px;">精</span>{/if}
+                            {if $chess['ishot']}<span class="mui-badge mui-badge-warning"
+                                                      style="border-radius:2px;font-size:.8em;padding:3px 3px;">火</span>{/if}
+
+                            <span style="color:#000">{$chess['title']}</span>
+                            <ul class="weui-media-box__info" style="padding:5px 0px 0px 0px; margin:5px 5px 5px  0">
+
+                                <li class="weui-media-box__info__meta">{$chess['redname']} VS {$chess['blackname']}</li>
+
+                                <li class="weui-media-box__info__meta  weui-media-box__info__meta_extra"><span
+                                        style="display:block;text-align:right">{php echo $this->timeago($chess['addtime']);}</span>
+                                </li>
+
+                            </ul>
+                        </div>
+                    </a>
+                </div>
+            </li>
+            {/loop}
+
+        </ul>
+    </div>
+</div>
+
+
+<script>
+
+    //从第二页开始刷新
+    pagenumber = 2;
+
+    mui.init({
+        pullRefresh: {
+            container: "#refreshContainer",//下拉刷新容器标识，querySelector能定位的css选择器均可，比如：id、.class等
+            down: {
+                height: 50,//可选,默认50.触发下拉刷新拖动距离,
+                auto: false,//可选,默认false.自动下拉刷新一次
+                contentdown: "下拉刷新",//可选，在下拉可刷新状态时，下拉刷新控件上显示的标题内容
+                contentover: "释放立即刷新",//可选，在释放可刷新状态时，下拉刷新控件上显示的标题内容
+                contentrefresh: "正在刷新...",//可选，正在刷新状态时，下拉刷新控件上显示的标题内容
+                callback: __pulldownfresh //必选，刷新函数，根据具体业务来编写，比如通过ajax从服务器获取新数据；
+            },
+            up: {
+                height: 50,//可选.默认50.触发上拉加载拖动距离
+                auto: false,//可选,默认false.自动上拉加载一次
+                contentrefresh: "正在加载...",//可选，正在加载状态时，上拉加载控件上显示的标题内容
+                contentnomore: '没有更多数据了',//可选，请求完毕若没有更多数据时显示的提醒内容；
+                callback: __pullupfresh //必选，刷新函数，根据具体业务来编写，比如通过ajax从服务器获取新数据；
+            }
+        }
+    });
+
+
+    function __pulldownfresh() {
+        //业务逻辑代码，比如通过ajax从服务器获取新数据；
+        $.post("{php echo $this->createMobileUrl('self',array('op'=>'collect_ajax','keywords'=>$keywords));}", {page: 1}, function (data) {
+            //服务器返回响应，根据响应结果，分析是否登录成功；
+            console.log($.parseJSON(data));
+            pagenumber = 2;
+            $('.mui-table-view').html($.parseJSON(data));
+
+            mui('#refreshContainer').pullRefresh().endPulldownToRefresh();
+            mui('#refreshContainer').pullRefresh().refresh(true);
+        });
+
+    }
+
+    function __pullupfresh() {
+        //业务逻辑代码，比如通过ajax从服务器获取新数据；
+
+
+        $.post("{php echo $this->createMobileUrl('self',array('op'=>'collect_ajax','keywords'=>$keywords));}", {page: pagenumber}, function (data) {
+            //服务器返回响应，根据响应结果，分析是否登录成功；
+            pagenumber += 1;
+            console.log(pagenumber);
+            console.log(data);
+            var apphtml = $.parseJSON(data);
+            if (apphtml) {
+                $('.mui-table-view').append(apphtml);
+                mui('#refreshContainer').pullRefresh().endPullupToRefresh(false);
+            } else {
+                console.log('wanle');
+                mui('#refreshContainer').pullRefresh().endPullupToRefresh(true);
+            }
+
+        });
+
+    }
+
+
+</script>
+
+<script>
+    //侧滑出菜单
+
+
+    (function ($) {
+
+
+
+        //取消收藏棋谱
+        mui(document).on('tap', 'a.mui-btn-grey', function () {
+            var elem = this;
+            var li = elem.parentNode.parentNode;
+            var chessid = this.getAttribute('chessid');
+            console.log(chessid);
+            var btnArray = ['否', '是'];
+            mui.confirm('取消收藏，确认？', '系统提示', btnArray, function (e) {
+                if (e.index == 1) {
+                    $.post("{php echo $this->createMobileUrl('chess',array('op'=>'delete_collect'));}", {chessid: chessid}, function (data) {
+                        if (data == '1') {
+                            mui.toast('取消成功', {duration: 'short', type: 'div'});
+                            //刷新页面
+
+                            __pulldownfresh();
+                        } else {
+                            mui.toast('取消失败', {duration: 'short', type: 'div'});
+                        }
+
+                    })
+
+                } else {
+                    setTimeout(function () {
+                        (function ($) {
+
+                            $.swipeoutClose(li);
+                        })(mui);
+                    }, 0);
+                }
+            })
+
+        })
+
+    })(mui);
+
+
+</script>
+
+<script>
+    mui(".mui-slider-handle").on('tap', 'a', function () {
+
+        mui.openWindow({
+            id: this.href,
+            url: this.href,
+            waiting: {
+                autoShow: true,//自动显示等待框，默认为true
+                title: '正在加载...',//等待对话框上显示的提示内容
+
+            }
+        });
+    })
+$('.follow_topbar').hide();
+</script>
+
+</body>
+</html>

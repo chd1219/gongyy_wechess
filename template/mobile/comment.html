@@ -1,0 +1,515 @@
+{template 'header'}
+<body>
+    <script type="text/javascript">
+        window.level = 0;//评论级别
+        //window.parentid = '';//评论parentid
+        window.prizeparentid = '';//赞的parentid
+        window.pcid = 0;//评论的id
+    </script>
+
+    <div class="mui-content">
+         <header id="header" class="mui-bar mui-bar-nav">
+        <a class="mui-action-back mui-icon mui-icon-back mui-pull-left" ></a>
+        <h5 class="mui-title">{$title}</h5>
+        <a class="mui-icon mui-icon-home mui-pull-right" href="{php echo $this->createMobileUrl('index');}" ></a>
+    </header>
+    <ul class="mui-table-view" style="margin-top: 44px;">
+
+       <li class="mui-table-view-cell mui-media" style="padding-right: 0;">
+            <a href="javascript:;" class="">
+                <img class="mui-media-object mui-pull-left" style="width: 42px;height: 42px;border-radius: 50%" src="{$thumb}">
+                <div class="mui-media-body">
+                    <span class="mui-ellipsis" style="width: 200px;">{$memberinfo['nickname']}</span>
+                    
+                    <span style="position:absolute;top:-3px;right:15px;display:none;color:red;">+1</span>
+                    <span style="position:absolute;top:-3px;right:15px;display:none;color:red;">-1</span>
+                    <span class="mui-icon-extra mui-icon-extra-like " style="float:right; font-size:16px;margin-right: 25px;{if $this->isprized($_W['openid'],$chess1['id'])==1}color:red;"{else}color:#999999;"{/if}  level='0' id="prize_{$chess1['id']}">&ensp;{$chess1['prizesum']}</span>
+                    <p class="mui-ellipsis" style="margin-top: 5px;"><span>上传于{php echo $this->timeago($chess1['addtime']);} </span>| <span class="mui-icon-extra mui-icon-extra-phone" style="font-size:14px;">{$chess1['clicksum']}</span> | <span class="mui-icon-extra mui-icon-extra-share" style="font-size:14px;">{$chess1['sharesum']}</span></p>    
+                </div>
+            </a>
+        </li>
+                             
+    </ul>
+       <!--  <ul class="mui-table-view" style="margin-top:2px;background-color:#efeff4;">
+       <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" style="padding:18px 5px 0 2px;"></a>
+       <li class="mui-table-view-cell mui-media">
+           <a href="javascript:;" class="">
+               <img class="mui-media-object mui-pull-left" style="width: 42px;height: 42px;border-radius: 50%;background-color: #f8f8f8" src="{php echo $this->getUserInfo($chess1['openid'])['headimgurl'];}">
+               <div class="mui-media-body">
+                   {$chess1['nickname']}
+                   <p class="mui-ellipsis" style="margin-top: 5px;">上传于{php echo $this->timeago($chess1['addtime']);} | {$chess1['clicksum']}次浏览</p>
+               </div>
+           </a>
+       </li>
+       </ul> -->
+    </div>
+
+    <div id="refreshContainer" class="mui-content mui-scroll-wrapper" style="top:110px;">
+        <div class="mui-scroll">
+            <ul class="mui-table-view old" style="margin-top:2px;">
+                {loop $list $index $comment}
+                <li class="mui-table-view-cell mui-media">
+                    <!-- <a href="{php echo $this->createMobileUrl('comment', array('op'=>'detail','parentid'=>$comment['id']));}" class="mui-pull-left">  -->
+                    <img class="mui-media-object mui-pull-left"
+                    src="{php echo tomedia($comment['avatar']);}" style="height: 32px;width: 32px;border-radius: 100%;">
+                    <!--  </a> -->
+                    <div class="mui-media-body mui-ellipsis">
+                        <span style="color:#1E5DD6;opacity: 0.7;">{$comment['name']}</span>
+                        <span style="position:absolute;top:-3px;right:15px;display:none;color:red;">+1</span>
+                        <span style="position:absolute;top:-3px;right:15px;display:none;color:red;">-1</span>
+                        <span class="mui-icon-extra mui-icon-extra-like mui-pull-right" id="prize_{$comment['id']}" level="{php echo bcadd($comment['level'],1);}" style="font-size: 1em; {if $this->isprized($openid,$comment['id'],$comment['level']+1)==1}color:red;"{else}color:#999999;"{/if}>&ensp;{$comment['prizesum']}</span>
+                    </div>
+                    <div class="mui-media-body mui-ellipsis-2" style="padding-top: 5px;color: #505050;font-size: 16px;line-height: 23px;">
+                        {$comment['commenttext']}
+                    </div>
+                    <div class="mui-media-body mui-ellipsis">
+
+                        <ul class="weui-media-box__info" style="padding:5px 0px 0px 0px; margin:5px 5px 5px  0">
+                            <li class="weui-media-box__info__meta see" style="display: none;color:#1E5DD6;opacity: 0.4;padding-left:42px;">全文</li>
+                            <li class="weui-media-box__info__meta" style="padding-left:42px;">{php echo date('m-d H:i',$comment['commentdate']);}</li>
+                            <li class="weui-media-box__info__meta  weui-media-box__info__meta_extra" >
+                            {if $this->iscommented($openid,$comment['id'])==1}
+                             <a href="javascript:;" class="open-popup" id="delete_{$comment['id']}" style="background-color:transparent!important;color:#999999" level="{$comment['level']}">删除</a>
+                             {/if}
+                            <a href="javascript:;" class="open-popup" id="comment_{$comment['id']}" level="comment_{$comment['level']}" followsum="comment_{$comment['comment']}" name="comment_{$comment['name']}" style="background-color:transparent!important;color:#999999">{$comment['comment']}回复>   
+                            </a></li> 
+                        </ul>
+                    </div>
+                    </li>
+                {/loop}
+            </ul>
+         </div>
+
+   <!--  <nav id='footer' class="mui-bar mui-bar-tab" style="display: none;padding-bottom: 20px;">
+     <a class="mui-tab-item " href="#" id= "writecomment">
+        <button type="button" class="mui-btn-lg mui-btn-outlined" >说点什么</button>   
+    </a> 
+    
+    <a class="mui-tab-item" href="#" style="text-align: right;">
+        <span class="mui-icon mui-icon-chatbubble" style="top:0;"></span>
+    </a>
+    <a class="mui-tab-item" href="#" style="text-align: right">
+        <span class="mui-icon mui-icon-star" style="top:0;"></span>
+        
+    </a>
+    <a class="mui-tab-item" href="#" style="text-align: right;">
+        <span class="mui-icon mui-icon-redo" style="top:0;"></span>
+        
+    </a>
+    
+</nav>   --> 
+
+
+    <nav class="mui-bar mui-bar-tab footer">
+        <a class="mui-tab-item" href="#" id= "writecomment_{$chessid}">        
+        <div style="width: 70%;margin:10px 20px 10px 50px;height:30px;border:1px solid #666;border-radius: 30px;"><span class="mui-icon mui-icon-compose" style="padding:0px 5px 0 -5px;top:3px;color:red;font-size: 14px;">写评论</span></div>
+        </a>
+     </nav>  
+    </div>
+    <!-- <a class="mui-tab-item" href="#" >
+     
+       
+      <span class="mui-icon iconfont icon-zanyang " level="0" id="prize_{$chessid}" style="font-size: 1.2em; top:10px;" >{$prizesum}  
+        </span>  
+      
+       </ul> 
+    
+        <span class="mui-tab-label" style="margin-right: 5px;">赞</span>
+        <a class="mui-tab-item" href="#" >
+            <span class="mui-icon mui-icon-star" ></span>
+            <span class="mui-tab-label">收藏</span>
+        </a>
+        <a class="mui-tab-item" href="#" >
+            <span class="mui-icon mui-icon-redo" ></span>
+            <span class="mui-tab-label">分享</span>
+        </a> -->
+   
+   
+ 
+        <div id="reply" class="mui-popover mui-popover-bottom mui-popover-action ">
+            <!-- 可选择菜单 -->
+            <form class="mui-input-group" >
+                <div class="row">
+                    <textarea rows=4 id='' level='' class="mui-input-clear" placeholder="优质评论将会被优先展示" style="margin: 0;background-color: #efeff4" ></textarea>
+                </div>
+                <button type="button" id='' class="mui-btn mui-btn-success mui-pull-right" style="margin: 0;margin-top: 5px;">提交</button>
+            </form>
+
+         </div>
+
+<div id="popo" class="weui-popup__container">
+    <div class="weui-popup__overlay"></div>
+    <div class="weui-popup__modal">
+        <header id="header" class="mui-bar mui-bar-nav">
+
+           <h5 class="mui-title">回复</h5>
+           <a class="mui-icon mui-icon-closeempty close-popup mui-pull-right" href="#" style="font-size: 2em;"></a>
+       </header>
+       <div class="mui-content" >
+            <ul class="mui-table-view" style="margin-top:2px;background-color: #efeff4">
+                <li class="mui-table-view-cell mui-media">
+                    <a href="javascript:;" class="">
+                        <img class="mui-media-object mui-pull-left" style="width: 42px;height: 42px;border-radius: 50%;" src="{php echo $this->getUserInfo($chess1['openid'])['headimgurl'];}">
+                        <div class="mui-media-body">
+                            {$chess1['nickname']}
+                            <p class="mui-ellipsis" style="margin-top: 5px;">上传于{php echo $this->timeago($chess1['addtime']);} | {$chess1['clicksum']}次浏览</p>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    <div id="refreshContainer1" class=" mui-scroll-wrapper" style="bottom: 50px;top:110px;">
+        <div class="mui-scroll">
+            <div class="weui-panel__hd" style="display: none;">热门评论</div>
+            <ul class="mui-table-view hot" style="margin-top:2px">    
+            </ul>
+            <div class="weui-panel__hd">全部评论</div>
+            <ul class="mui-table-view all" style="margin-top:2px">    
+            </ul>
+        </div>
+    </div>
+       
+       
+
+    <nav class="mui-bar mui-bar-tab footer-reply" >
+        <a class="mui-tab-item pop_comment" href="#" id= "">
+            <div style="width: 70%;margin:10px 20px 10px 50px;height:30px;border:1px solid #666;border-radius: 30px;"><span class="mui-icon mui-icon-compose" style="padding:0px 5px 0 -5px;top:3px;color:red;font-size: 14px;">写评论</span></div>
+        </a>
+        <!-- <a class="mui-tab-item" href="#" >
+        
+        <span class="mui-pull-right ">{$prizeusersum} </span>
+            <span class="mui-icon iconfont icon-zanyang user_prize" level="1" style="font-size: 1em;top:10px;" ></span>
+            <span style="position:absolute;top:-3px;right:15px;display:none;color:red;">+1</span>
+            <span class="mui-tab-label">赞</span>
+        </a>
+         -->
+    </nav>   
+
+    <script type="text/javascript">
+        mui('.mui-scroll-wrapper').scroll({
+            deceleration: 0.0005
+        //flick 减速系数，系数越大，滚动速度越慢，滚动距离越小，默认值0.0006
+    });
+        seeall();
+        function seeall(){
+            $(".mui-ellipsis-2").map(function(){
+                if ($(this).context.offsetHeight < $(this).context.scrollHeight) {
+                    $(this).next().children().find('.see').show();
+                    $(this).next().children().find('.see').next().css('padding-left','0');
+                    $(this).next().children().on('tap', '.see', function(event) {
+                        $(this).next().css('padding-left','42px');
+                        $(this).parents().prev('.mui-ellipsis-2').css("-webkit-line-clamp", "100");
+                        $(this).css('display','none');
+                    });
+
+                }
+            });
+
+        }
+            /**
+             * [对用户评论的再评论]
+             * @param  {[type]} ) { parentid [description]
+             * @return {[type]}   [description]
+             */
+             mui('#popo').on('tap', "a[id^='comment_']", function () { 
+                var id=$(this).attr('id').substr(8);
+                var name = $(this).attr('name').substr(8);
+                 $('textarea').attr('id',id);
+                $('textarea').attr('level',2);
+                $('textarea').attr('placeholder','回复 '+name+':');
+                //$('.mui-btn-success').attr('id','submit'+String(parentid));
+                mui('#reply').popover('toggle');
+                $('textarea').focus();
+            });
+            /**
+             * [对用户评论的评论]
+             * @param  {[type]} ) { parentid [description]
+             * @return {[type]}   [description]
+             */
+             mui("#popo").on('tap', '.pop_comment', function () {
+                $(this).addClass('mui-active');
+                 var id=$(this).attr('id');
+                 $('textarea').attr('id',id);
+                $('textarea').attr('level',1);
+                mui('#reply').popover('toggle'); 
+                $('textarea').focus();
+            });
+
+             //赞扬,当关闭的时候，prizelevel变为1
+            mui("#popo").on('tap', '.close-popup', function () {
+                //prizelevel = 1;
+                $.closePopup();
+            });
+        </script>
+
+    </div>
+</div>
+
+<script>
+mui("body").on('tap', 'a.mui-icon-home', function () {
+
+               mui.openWindow({
+                id: this.href,
+                url: this.href,
+                waiting: {
+                    autoShow: true,//自动显示等待框，默认为true
+                    title: '正在加载...',//等待对话框上显示的提示内容
+
+                }
+            });
+})
+ mui('#refreshContainer').on('tap', "a[id^='comment_']", function () { 
+    var parentid=$(this).attr('id').substr(8);
+    var followsum = $(this).attr('followsum').substr(8);
+    var level = $(this).attr('level').substr(8);
+    var name = $(this).attr('name').substr(8);
+    pcid = parentid;
+        if (followsum == 0) {
+            if(level==2){
+                level =2;
+            }else{
+                level = parseInt(level)+1;
+            }
+            $('textarea').attr('placeholder','回复 '+name+':');
+            $('textarea').attr('id', parentid);
+            $('textarea').attr('level', level);
+            mui('#reply').popover('toggle');
+            $('textarea').focus();
+        }else{
+            $('textarea').attr('id', parentid);
+            $('textarea').attr('level', level);
+            mui.post("{php echo $this->createMobileUrl('comment',array('op'=>'ajax_user','chessid'=>$chessid));}", {parentid: parentid}, function(data, textStatus, xhr){
+            var data =  eval('(' + data + ')');
+            if(data.hot !=''){
+             $('.hot').prev().show();
+             $('.hot').html(data.hot); 
+            }else{
+                $('.hot').html(''); 
+            }
+            console.log(data.all);
+            $('.all').html(data.all);
+            seeall();
+    });
+    //prizelevel = 2;
+    $('.pop_comment').attr('id',parentid);
+    $('.pop_comment').attr('level',1);
+    $('.user_prize').attr('id','prize_'+String(parentid));
+    $('.user_prize').attr('level',1);
+    $('.writecomment').hide();
+    $("#popo").popup();
+}
+   
+   
+    //console.log(level);
+    //console.log($('textarea').attr('id'));
+})
+ //赞
+
+ mui(document).on('tap', "span[id^='prize_']", function () { 
+    var $this = $(this);
+    var commentid=$(this).attr('id').substr(6);
+    var prizelevel = $(this).attr('level');
+    var plevel = 0;
+    if(prizelevel==0){
+         var id = {$chessid};
+     }
+    else
+         var id = commentid;
+    
+         mui.post("{php echo $this->createMobileUrl('comment',array('op'=>'prize','chessid'=>$chessid));}", {id:id,level:prizelevel}, function(data, textStatus, xhr) {
+            
+            var data =  eval('(' + data + ')');
+             if(data.type==1){
+                console.log($this);
+         $this.html('&ensp;'+String(data.prizesum));
+         $this.prev().css('display','inline');
+         $this.prev().fadeOut(1000);
+         $this.css('color','#999999');
+        
+             }
+            if(data.type==0){
+                console.log($this);
+         $this.html(String('&ensp;'+String(data.prizesum)));
+         $this.prev().prev().css('display','inline');
+         $this.prev().prev().fadeOut(1000);
+         $this.css('color','red');
+        
+             }
+         });
+
+ })
+
+ /*$(".mui-ellipsis-2").map(function(){
+        //console.log($(this));
+        if ($(this).context.offsetHeight < $(this).context.scrollHeight) {
+            $(this).next().children().find('.see').show();
+            $(this).next().children().on('tap', '.see', function(event) {
+                $(this).parents().prev('.mui-ellipsis-2').css("-webkit-line-clamp", "100");
+                $(this).css('display','none');
+            });
+
+        }
+    });
+*/
+            /**
+             * [对棋谱的评论]
+             * @param  {[type]} ) { parentid [description]
+             * @return {[type]}   [description]
+             */
+             mui("#refreshContainer").on('tap', "a[id^='writecomment_']", function () {
+                   $(this).addClass('mui-active');
+                    var id = $(this).attr('id').substr(13);
+                    $('textarea').attr('id', id);
+                    $('textarea').attr('level', 0);
+                    $('textarea').attr('placeholder','优质评论将会被优先展示');
+                    mui('#reply').popover('toggle');
+                    $('textarea').focus();
+            });
+    //评论提交主体
+    mui(document).on('tap','.mui-btn-success',function(){
+       var commenttext = $('textarea').val();
+       var id = $('textarea').attr('id');
+        var level = $('textarea').attr('level');
+       mui.post("{php echo $this->createMobileUrl('comment',array('op'=>'add','chessid'=>$chessid));}", {commentid:id,commenttext: commenttext,level:level,pcid:pcid}, function(data, textStatus, xhr) {
+            console.log(id);
+        if(data!=''){
+            var data =  eval('(' + data + ')');
+            if(data.level == 0){
+                $('.old').prepend(data.html); 
+
+            }
+            else{
+                $('.all').prepend(data.html); 
+                $("a[id='comment_"+String(id)+"']").attr('followsum','comment_'+String(data.commentsum));
+                $("a[id='comment_"+String(id)+"']").text(String(data.commentsum)+"回复>");
+            }
+           
+            seeall();
+            mui('#reply').popover('toggle');
+            mui('body').scroll().scrollTo(0,0,100);
+            mui.toast('评论成功');
+
+        }
+        else{
+            console.log(data);
+            mui.alert("评论内容不能为空！");
+        }
+
+    });
+   })
+
+    //删除评论
+    mui(document).on('tap', "a[id^='delete_']", function () { 
+    var $this = $(this);
+    var deletecommentid=$(this).attr('id').substr(7);
+    var deletelevel = $(this).attr('level');
+    //console.log(commentid);
+    console.log(deletecommentid);
+    mui.confirm("确定要删除您的评论和回复吗？", "删除评论", ["确定","取消"], function (e) {
+        if(e.index==0){
+            mui.post("{php echo $this->createMobileUrl('comment',array('op'=>'delete','chessid'=>$chessid));}", {deleteid:deletecommentid,level:deletelevel}, function(data, textStatus, xhr) {
+                $this.parents('.mui-table-view-cell').has('#delete_'+String(deletecommentid)).css('display','none');
+               mui.toast("删除成功！");
+           });
+        }
+                });
+ 
+
+ })
+
+
+    pagenumber = 2;
+
+    mui.init({
+        swipeBack: false,
+
+        pullRefresh: {
+            container: "#refreshContainer",//下拉刷新容器标识，querySelector能定位的css选择器均可，比如：id、.class等
+            down: {
+                height: 50,//可选,默认50.触发下拉刷新拖动距离,
+                auto: false,//可选,默认false.自动下拉刷新一次
+                contentdown: "下拉刷新",//可选，在下拉可刷新状态时，下拉刷新控件上显示的标题内容
+                contentover: "释放立即刷新",//可选，在释放可刷新状态时，下拉刷新控件上显示的标题内容
+                contentrefresh: "正在刷新...",//可选，正在刷新状态时，下拉刷新控件上显示的标题内容
+                callback: __pulldownfresh //必选，刷新函数，根据具体业务来编写，比如通过ajax从服务器获取新数据；
+            },
+            up: {
+                height: 50,//可选.默认50.触发上拉加载拖动距离
+                auto: false,//可选,默认false.自动上拉加载一次
+                contentrefresh: "正在加载...",//可选，正在加载状态时，上拉加载控件上显示的标题内容
+                contentnomore: '没有更多数据了',//可选，请求完毕若没有更多数据时显示的提醒内容；
+                callback: __pullupfresh //必选，刷新函数，根据具体业务来编写，比如通过ajax从服务器获取新数据；
+            }
+        },
+        gestureConfig:{
+            swipe:false, //启用右滑功能
+            },
+        setStyle:{
+            popGesture:'none',
+        }
+    });
+    function __pulldownfresh() {
+        //业务逻辑代码，比如通过ajax从服务器获取新数据；
+        $.post("{php echo $this->createMobileUrl('comment',array('op'=>'ajax','chessid'=>$chessid));}", {page: 1}, function (data) {
+            //服务器返回响应，根据响应结果，分析是否登录成功；
+            pagenumber = 2;
+            $('.old').html($.parseJSON(data));
+            seeall();
+            mui('#refreshContainer').pullRefresh().endPulldownToRefresh();
+            mui('#refreshContainer').pullRefresh().refresh(true);
+        });
+
+    }
+
+    function __pullupfresh() {
+        //业务逻辑代码，比如通过ajax从服务器获取新数据；
+
+        $.post("{php echo $this->createMobileUrl('comment',array('op'=>'ajax','chessid'=>$chessid));}", {page: pagenumber}, function (data) {
+            //服务器返回响应，根据响应结果，分析是否登录成功；
+            pagenumber += 1;
+            var apphtml = $.parseJSON(data);
+            if (apphtml) {
+                $('.old').append(apphtml);
+                seeall();
+                mui('#refreshContainer').pullRefresh().endPullupToRefresh(false);
+            } else { 
+                mui('#refreshContainer').pullRefresh().endPullupToRefresh(true);
+            }
+        });
+    }
+    {if $setting['isfollow']==1 && !empty($fans) && $fans['follow']==0}
+        $('.follow_topbar').show();
+        $('.mui-content').css('margin-top','46px');
+        //$('').css('margin-top','46px');
+        $('#popo').css('top','44px');
+        $('#popo').find('.mui-content').css('margin-top','0');
+        $('.footer-reply').css('bottom','44px');
+    {else}
+        $('.follow_topbar').hide();
+        $('.mui-content').css('margin-top','2px');
+        $('#popo').css('margin-top','0');
+    {/if}
+    console.log(window.history.state);
+        window.addEventListener("swiperight",function(){
+           /*if (window.history.state != null && window.history.state.url != "") {
+                    history.back();
+mui.back();
+                }*/
+                mui.back();
+       });
+       var state = {
+                title: 'chess',
+                url:'#'
+        };
+        console.log(window.history.state);
+          /* window.history.pushState(state, 'chess', state.url);
+        window.addEventListener("popstate",function(e){
+           console.log(e);
+           mui.toast('test');
+             mui.back();
+       });*/
+         
+</script>
+
+</body>
+</html>

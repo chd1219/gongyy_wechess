@@ -1,0 +1,254 @@
+html,
+body {
+	margin: 0px;
+	padding: 0px;
+	background: url(http://image.golinksworld.com/res/share/bg.jpg) no-repeat;
+	background-size: 100%;
+	}
+.wgo-comments-content{
+	margin-bottom: 40px;
+}
+
+.wgo-player-control {
+	position: fixed;
+	bottom: 0;
+	width: 100%;
+	z-index: 999;
+}
+
+#liveroom-info {
+	width: 100%;
+	max-width: 640px;
+	margin: 0 auto;
+	background-color: #FFFFFF;
+}
+
+.wgo-control-wrapper {
+	background: #f5f5f4;
+	width: 100%;
+	max-width: 640px;
+}
+
+.wgo-ctrlgroup {
+	width: 100%;
+	padding: 0 1%;
+	
+}
+.wgo-ctrlgroup-control{
+	max-width:640px;
+	margin :0px auto;
+}
+.wgo-comments-content p{
+	font-size: 0.75rem;
+	color: #4C4C4C;
+}
+.wgo-control-wrapper:after{
+	width: 100%;
+	max-width: 640px;
+	content: "";
+	height: 0.5px;
+	background:rgb(188,188,188);
+	position: absolute;
+	transform: scaleY(0.5);
+	top: 5px;
+}
+button.wgo-button {
+	padding: 0;
+	width: 14%;
+	margin: 0px;
+}
+
+.wgo-button::before {
+	font-family: "iconfont";
+	font-size: 32px;
+	display: inline-block;
+}
+
+.wgo-button-first::before {
+	content: '\e615';
+}
+
+.wgo-button-multiprev::before {
+	content: '\e619';
+}
+
+.wgo-button-previous::before {
+	content: '\e616';
+}
+
+.wgo-button-marks::before {
+	content: '\e614';
+}
+
+.wgo-button-next::before {
+	content: '\e612';
+}
+
+.wgo-button-multinext::before {
+	content: '\e618';
+}
+
+.wgo-button-last::before {
+	content: '\e613';
+	font-size: 24px;
+}
+
+p {
+	margin: 0px;
+	padding: 0px;
+}
+
+.liveroom-info {
+	width: 100%;
+}
+
+.livename {
+	color: #4C4C4C;
+	background-color: #F5F5F5;
+	font-size: 0.65rem;
+	padding: 3px 0px;
+	position: relative;
+}
+.livename:after{
+	width: 100%;
+	max-width: 640px;
+	content: "";
+	height: 1px;
+	background:rgb(188,188,188);
+	position: absolute;
+	transform: scaleY(0.5);
+	-webkit-transform: scaleY(0.5);
+	bottom: 0px;
+	left: 0;
+}
+
+/*用户明细*/
+
+.online-player {
+	width: 100%;
+	padding: 0;
+	font-size: 0;
+}
+
+.online-player span {
+	display: inline-block;
+	text-align: center;
+	font-size: 0.7rem;
+	padding: 0.3rem;
+	width: 20%;
+}
+
+.online-player span.result {
+	color: #0062CC;
+	width: 55%;
+}
+
+.online-player .info_container {
+	position: relative;
+	display: inline-block;
+	width: 20rem;
+	margin: 0 auto;
+	padding: 0 0.5rem;
+}
+
+.info_container .player_info {
+	display: inline-block;
+	width: 8rem;
+	height: 3rem;
+	line-height: 3rem;
+	position: relative;
+}
+
+.player_info.iconfont {
+	display: inherit;
+	width: 3rem;
+	text-align: center;
+	position: relative;
+	vertical-align: top;
+	font-size: 2rem;
+	color: #5F646D;
+}
+
+.player_info img {
+	display: inline-block;
+	margin: 0;
+	padding: 0;
+	vertical-align: top;
+	margin-top: 0.1rem;
+	width: 2.25rem;
+	height: 2.25rem;
+	border: 1px solid #7A736C;
+	border-radius: 100%;
+	background: url(../images/head.jpg);
+}
+
+.player_info .info_con {
+	display: inline-block;
+	width: 5.5rem;
+	font-size: 0.7rem;
+	margin-left: 0.25rem;
+}
+
+.info_con p {
+	line-height: 1rem;
+	height: 1rem;
+	margin: 0;
+	padding: 0;
+}
+
+.info_con .achieve {
+	color: #408BE1;
+}
+
+.info_con .username {
+	color: #000000;
+	font-size: 0.75rem;
+}
+
+.info_con .komi {
+	font-size: 0.65rem;
+}
+
+.info_con .support {
+	position: absolute;
+	top: 0;
+	height: 1rem;
+	line-height: 1rem;
+	right: 3px;
+	font-size: 0.65rem;
+	background: transparent;
+	padding: 0;
+	width: auto;
+}
+
+.online-player .chess {
+	position: absolute;
+	display: block;
+	width: 0.7rem;
+	height: 0.7rem;
+	border: 1px solid #BCBCBC;
+	border-radius: 100%;
+	top: 1.75rem;
+	left: 1.35rem;
+	z-index: 20;
+}
+
+.online-player .black .chess {
+	background: #000000;
+}
+
+.online-player .white .chess {
+	background: #FFFFFF;
+}
+
+.icon-support .active {
+	color: red;
+}
+
+.icon-zhibo {
+	margin: 0px 10px;
+}
+
+.icon-shouzanhover {
+	color: #4C4C4C;
+}

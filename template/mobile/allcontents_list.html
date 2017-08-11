@@ -1,0 +1,85 @@
+{template 'header'}
+<link rel="stylesheet" type="text/css" href="{$_W['siteroot']}addons/chessroom/images/css/base.css?{TIMESTAMP}"
+      xmlns="http://www.w3.org/1999/html">
+<link rel="stylesheet" type="text/css" href="{$_W['siteroot']}addons/chessroom/images/css/index.css?{TIMESTAMP}">
+<link rel="stylesheet" type="text/css" href="{$_W['siteroot']}addons/chessroom/images/css/jquery-sinaEmotion-2.1.0.min.css" />
+<script type="text/javascript" src="{$_W['siteroot']}addons/chessroom/images/js/jquery-sinaEmotion-2.1.0.min.js"></script>
+<style>
+    .panel .panel-body{
+        background: #F8F8F8;
+        padding: 0;
+    }
+    .panel-body .content{
+        background:#FFFFFF ;
+        padding:5px;
+        padding-left: 15px;
+        border-bottom: 1px solid #D0D0D0;
+        margin-bottom: 3px;
+        line-height: 20px;
+    }
+
+</style>
+
+
+<!--<div class="panel panel-default detail ">-->
+
+<div class="panel panel-default">
+    <div class="panel-heading" style="text-align:center;background:#5897FB;">
+        <a href='javascript:history.go(-1)'><span class="glyphicon  glyphicon-chevron-left " aria-hidden="true" style="float:left;"></span></a> <span style="color: #FEFFFF;font-size: large;" >所有棋谱</span><span class="glyphicon glyphicon-search " aria-hidden="true" style="float:right;"></span>
+    </div>
+    <div class="panel-heading">
+        <p class="panel-title" style="font-size: 13px;">最新棋谱于{$createtime}发布</p>
+    </div>
+    {if empty($contents)}
+    <h2 align="center">没有棋谱</h2></br>
+    <h2 align="center">  <a href="http://westudy.chinaxueyun.com/match/"><span color="#FF0004" >点此发布</span></a></h2>
+
+    {else}
+    <div class="panel-body">
+        {loop $contents $item}
+        <a style="color: #3c3c3c" href="{php echo $item['url']."&file=".$item['filename'];}" >
+            <div class="content">
+
+                <div class="row">
+                    <div class="col-lg-12 col-xs-12" ><span style='font-family: "Microsoft YaHei UI", "微软雅黑", "宋体"'>{$item['title']}</span></div>
+
+                </div>
+                <div class="row">
+                    <div class="col-lg-6 col-xs-6"><img src="{$_W['siteroot']}addons/chessroom/template/mobile/images/shuai.jpg" class="img-circle" style="height: 15px;width: 15px;"><small>{$item['redname']}</small></div>
+                    <div class="col-lg-6 col-xs-6"><img src="{$_W['siteroot']}addons/chessroom/template/mobile/images/jiang.jpg" class="img-circle" style="height: 15px;width: 15px;"><small>{$item['blackname']}</small></div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6 col-xs-6"><span class="	glyphicon glyphicon-time" aria-hidden="true"><small style="color: black;">{php echo date('Y-m-d',$item['matchtime']);}</small></div>
+                    <div class="col-lg-6 col-xs-6"><span class="glyphicon glyphicon-circle-arrow-up" aria-hidden="true"><span style="color: red"> {$item['result']}</span></div>
+                </div>
+            </div>
+        </a>
+        {/loop}
+    </div>
+    {/if}
+</div>
+
+<script>
+    sharedata = {
+        title: "{$user['nickname']}",
+        desc: "{$content['description']}",
+        link: "{php echo $_W['siteroot'].$this->createMobileUrl('user', array('uid'=>$uid));}",
+        imgUrl: "{$user['avatar']}",
+        success: function(){
+            alert("分享成功");
+        }
+    };
+
+</script>
+
+
+
+
+
+<!--<div id="mcover" onclick="$(this).hide()"><img src="./resource/images/guide.png"></div>-->
+
+
+
+
+
+{php include $this->template('_footer');}

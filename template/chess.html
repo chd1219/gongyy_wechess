@@ -1,0 +1,312 @@
+<!--
+ * 棋谱管理
+ * ============================================================================
+ * 版权所有 2015-2016 风影随行，并保留所有权利。
+ * 网站地址: http://www.haoshu888.com
+ * ----------------------------------------------------------------------------
+ * 这不是一个自由软件！不允许对程序代码以任何形式任何目的的再发布，作者将保留
+ * 追究法律责任的权力和最终解释权。
+ * ============================================================================
+-->
+{template 'common/header'}
+
+<ul class="nav nav-tabs">
+    <li {if $op=='display'}class="active"{/if}><a href="{php echo $this->createWebUrl('chess');}">棋谱列表</a></li>
+    <li {if $op=='post'}class="active"{/if}><a  href="{php echo $this->createWebUrl('chess', array('op'=>'post', 'id'=>$_GPC['id']));}">{if $_GPC['id']>0}编辑{else}添加{/if}棋谱</a>
+    </li>
+</ul>
+{if $operation == 'display'}
+<style type="text/css">
+    .form-controls {
+        display: inline-block;
+        width: 70px;
+    }
+
+    .cblock {
+        display: block !important;
+    }
+
+    .cnone {
+        display: none !important;
+    }
+
+    .cut {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+</style>
+<div class="main">
+    <div class="panel panel-info">
+        <div class="panel-heading">筛选</div>
+        <div class="panel-body">
+            <form action="./index.php" method="get" class="form-horizontal" role="form">
+                <input type="hidden" name="c" value="site">
+                <input type="hidden" name="a" value="entry">
+                <input type="hidden" name="m" value="gongyy_wechess">
+                <input type="hidden" name="do" value="chess">
+                <input type="hidden" name="op" value="display">
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">棋谱分类</label>
+                    <div class="col-sm-8 col-lg-9 col-xs-12">
+                        <select name="categoryid" class="form-control">
+                            <option value="">不限</option>
+                            {loop $categories $index $cat}
+                            <option value="{$cat['id']}" {if $_GPC['categoryid']==$cat['id']}selected{/if}> {$cat['name']}</option>
+                            {/loop}
+                            <option value="0" {if $_GPC['categoryid']==-1}selected{/if}>其它</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">棋谱标题</label>
+                    <div class="col-sm-8 col-lg-9 col-xs-12">
+                        <input type="text" class="form-control" name="title" value="{$_GPC['title']}" placeholder="棋谱标题"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">棋手名字</label>
+                    <div class="col-sm-8 col-lg-9 col-xs-12">
+                        <input type="text" class="form-control" name="playername" value="{$_GPC['playername']}" placeholder="棋手名字"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">棋谱类型</label>
+                    <div class="col-sm-8 col-lg-9 col-xs-12">
+
+                        <input type="checkbox" name="iszhiding" value="1" {if $_GPC['iszhiding']==1}checked{/if}>是否置顶&nbsp;&nbsp;
+                        <input type="checkbox" name="isjinghua" value="1" {if $_GPC['isjinghua']==1}checked{/if}>是否精华&nbsp;&nbsp;
+                        <input type="checkbox" name="ishot" value="1" {if $_GPC['ishot']==1}checked{/if}>是否热门
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">审核状态</label>
+                    <div class="col-sm-8 col-lg-9 col-xs-12">
+                        <select name="status" class="form-control">
+                            <option value="">不限</option>
+                            <option value="1" {if $_GPC['status']==1}selected{/if}>审核通过</option>
+                            <option value="2" {if $_GPC['status']==2}selected{/if}>待审核</option>
+                            <option value="-1" {if $_GPC['status']==-1}selected{/if}>未通过</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">对弈时间</label>
+                    <div class="col-sm-7 col-lg-9 col-xs-12">
+                        <div class="col-sm-3" style="width:20%;">
+                            <label class='radio-inline'>
+                                <input type='radio' value='0' name='searchtime' {if $_GPC['searchtime']=='0'}checked{/if}>不搜索
+                            </label>
+                            <label class='radio-inline'>
+                                <input type='radio' value='1' name='searchtime' {if $_GPC['searchtime']=='1'}checked{/if}>搜索
+                            </label>
+                        </div>
+                        {php echo tpl_form_field_daterange('chesstime', array('starttime'=>date('Y-m-d H:i',$starttime),'endtime'=>date('Y-m-d H:i', $endtime)),true);}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label"></label>
+                    <div class="col-sm-8 col-lg-9 col-xs-12">
+                        <button class="btn btn-default"><i class="fa fa-search"></i> 搜索</button>
+                        &nbsp;&nbsp;&nbsp;
+                        <button class="btn btn-success" name="upchess" value="1"><i class="fa fa-refresh"></i> 更新棋谱
+                        </button>
+                        <input type="hidden" name="token" value="{$_W['token']}"/>
+                    </div>
+                </div>
+
+
+            </form>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="table-responsive panel-body">
+            <table class="table table-hover">
+                <thead class="navbar-inner">
+                <tr>
+                    <th style="width:5%;">编号</th>
+                    <th style="width:25%;">棋谱名称</th>
+                    <th style="width:8%;">红方棋手</th>
+                    <th style="width:8%;">黑方棋手</th>
+                    <th style="width:10%;">对弈时间</th>
+
+                    <th style="width:8%;">是否置顶</th>
+                    <th style="width:8%;">是否精华</th>
+                    <th style="width:8%;">是否热门</th>
+                    <th style="width:13%;">发布时间</th>
+                    <th style="width:9%;">审核状态</th>
+                    <th style="width:8%; text-align:right;">查看/删除</th>
+                </tr>
+                </thead>
+                <tbody>
+                {loop $list $chess}
+                <tr>
+                    <td>{$chess['id']}</td>
+                    <td><span class='cut'>{$chess['title']}</span></td>
+                    <td>{$chess['redname']}</td>
+                    <td>{$chess['blackname']}</td>
+                    <td>{php echo date('Y-m-d',$chess['chesstime']);}</td>
+                    <td>{if $chess['iszhiding']==1}<span class="label label-success">置顶</span>{else}
+                        <span class="label label-danger">非置顶</span>{/if}
+                    </td>
+                    <td>{if $chess['isjinghua']==1}<span class="label label-success">精华</span>{else}
+                        <span  class="label label-danger">非精华</span>{/if}
+                    </td>
+                    <td>{if $chess['ishot']==1}<span class="label label-success">置顶</span>{else}
+                        <span  class="label label-danger">未热门</span>{/if}
+                    </td>
+                    <td>{php echo date('Y-m-d H:i',$chess['addtime']);}</td>
+
+                    <td>{if $chess['status']==-1}<span class="label label-default">未通过</span>
+                        {elseif $chess['status']==1}<span class="label label-success">审核通过</span>{elseif $chess['status']==2}<span class="label label-danger">待审核</span>{/if}
+                    </td>
+
+                    <td style="text-align:right;">
+                        <a class="btn btn-default btn-sm" href="{php echo $this->createWebUrl('chess', array('op'=>'post', 'id'=>$chess['id']));}"
+                           title="修改"><i class="fa fa-pencil"></i></a>
+                        <a class="btn btn-default btn-sm" href="{php echo $this->createWebUrl('chess', array('op'=>'delete', 'id'=>$chess['id']));}"
+                           title="删除" onclick="return confirm('此操作不可恢复，确认删除？');return false;"><i class="fa fa-times"></i></a>
+                    </td>
+                </tr>
+                {/loop}
+                </tbody>
+            </table>
+            {$pager}
+        </div>
+    </div>
+</div>
+
+{elseif $operation == 'post'}
+<div class="main">
+    <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
+        <div class="panel panel-default">
+            <div class="panel-heading">棋谱信息</div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">棋谱分类</label>
+                    <div class="col-sm-9">
+                        <select name="categoryid" class="form-control">
+
+                            {loop $categories $index $cat}
+                            <option value="{$cat['id']}" {if $chess['categoryid']==$cat['id']}selected{/if}>{$cat['name']}</option>
+                            {/loop}
+                            <option value="0" {if $chess['categoryid']==-1}selected{/if}>其它</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">棋谱名称</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="title" class="form-control" value="{$chess['title']}"/>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">红方棋手</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="redname" class="form-control" value="{$chess['redname']}"/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">黑房棋手</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="blackname" class="form-control" value="{$chess['blackname']}"/>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">棋谱介绍</label>
+                    <div class="col-sm-9">
+                        <textarea style="height:75px;" class="form-control richtext" name="comment">{$chess['comment']}</textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">比赛日期</label>
+                    <div class="col-sm-9">
+
+                        {php echo tpl_form_field_date('chesstime',date('Y-m-d', $chess['chesstime']));}
+
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">是否置顶</label>
+                    <div class="col-sm-9">
+                        <p class="form-control-static">
+                            <input type="radio" name="iszhiding" value="1" {if $chess['iszhiding']==1}checked{/if}>
+                            <span class="label label-success" style="vertical-align:text-top;">置顶</span>
+                            &nbsp;&nbsp;
+                            <input type="radio" name="iszhiding" value="0" {if $chess['iszhiding']==0}checked{/if}>
+                            <span class="label label-danger" style="vertical-align:text-top;">非置顶</span>
+                            &nbsp;&nbsp;
+
+                        </p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">是否精华</label>
+                    <div class="col-sm-9">
+                        <p class="form-control-static">
+                            <input type="radio" name="isjinghua" value="1" {if $chess['isjinghua']==1}checked{/if}>
+                            <span class="label label-success" style="vertical-align:text-top;">精华</span>
+                            &nbsp;&nbsp;
+                            <input type="radio" name="isjinghua" value="0" {if $chess['isjinghua']==0}checked{/if}>
+                            <span class="label label-danger" style="vertical-align:text-top;">非精华</span>
+                            &nbsp;&nbsp;
+
+                        </p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">是否热门</label>
+                    <div class="col-sm-9">
+                        <p class="form-control-static">
+                            <input type="radio" name="ishot" value="1" {if $chess['ishot']==1}checked{/if}>
+                            <span class="label label-success" style="vertical-align:text-top;">热门</span>
+                            &nbsp;&nbsp;
+                            <input type="radio" name="ishot" value="0" {if $chess['ishot']==0}checked{/if}>
+                            <span class="label label-danger" style="vertical-align:text-top;">非热门</span>
+                            &nbsp;&nbsp;
+
+                        </p>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">棋谱状态</label>
+                    <div class="col-sm-9">
+                        <p class="form-control-static">
+                            <input type="radio" name="status" value="1" {if $chess['status']==1}checked{/if}>
+                            <span class="label label-success" style="vertical-align:text-top;">审核通过</span>
+                            &nbsp;&nbsp;
+                            <input type="radio" name="status" value="2" {if $chess['status']==2}checked{/if}>
+                            <span class="label label-danger" style="vertical-align:text-top;">待审核</span>
+                            &nbsp;&nbsp;
+                            <input type="radio" name="status" value="-1" {if $chess['status']==-1}checked{/if}>
+                            <span class="label label-default" style="vertical-align:text-top;">审核未通过</span>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="form-group col-sm-12">
+            <input type="submit" name="submit" value="保存" class="btn btn-primary col-lg-1"/>
+            <input type="hidden" name="token" value="{$_W['token']}"/>
+            <input type="hidden" name="id" value="{$id}"/>
+        </div>
+    </form>
+</div>
+
+{/if}
+
+{template 'common/footer'}

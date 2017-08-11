@@ -1,0 +1,252 @@
+<!--
+ * 棋谱管理
+ * ============================================================================
+ * 版权所有 2015-2016 风影随行，并保留所有权利。
+ * 网站地址: http://www.haoshu888.com
+ * ----------------------------------------------------------------------------
+ * 这不是一个自由软件！不允许对程序代码以任何形式任何目的的再发布，作者将保留
+ * 追究法律责任的权力和最终解释权。
+ * ============================================================================
+-->
+{template 'common/header'}
+
+<ul class="nav nav-tabs">
+    <li {if $op=='display'}class="active"{/if}><a href="{php echo $this->createWebUrl('feedback');}">用户反馈列表</a></li>
+    <!--  <li {if $op=='post'}class="active"{/if}><a href="{php echo $this->createWebUrl('chess', array('op'=>'post', 'id'=>$_GPC['id']));}">{if $_GPC['id']>0}编辑{else}添加{/if}棋谱</a></li>-->
+</ul>
+{if $operation == 'display'}
+<style type="text/css">
+    .form-controls {
+        display: inline-block;
+        width: 70px;
+    }
+
+    .cblock {
+        display: block !important;
+    }
+
+    .cnone {
+        display: none !important;
+    }
+
+    .cut {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+</style>
+<div class="main">
+    <div class="panel panel-info">
+        <div class="panel-heading">筛选</div>
+        <div class="panel-body">
+            <form action="./index.php" method="get" class="form-horizontal" role="form">
+                <input type="hidden" name="c" value="site">
+                <input type="hidden" name="a" value="entry">
+                <input type="hidden" name="m" value="gongyy_wechess">
+                <input type="hidden" name="do" value="feedback">
+                <input type="hidden" name="op" value="display">
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">是否解决</label>
+                    <div class="col-sm-8 col-lg-9 col-xs-12">
+
+                        <input type="radio" name="issolved" value=1 {if $issolved==1}checked{/if}>已解决&nbsp;&nbsp;
+                        <input type="radio" name="issolved" value=0 {if $issolved==0}checked{/if}>未解决&nbsp;&nbsp;
+                        <input type="radio" name="issolved" value="" {if $issolved==''}checked{/if}>不限
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">反馈时间</label>
+                    <div class="col-sm-8 col-lg-9 col-xs-12">
+                        <div class="btn-group">
+                            <a href="{php echo filter_url('createtime:0');}"
+                               class="btn {if $_GPC['createtime'] == 0}btn-primary{else}btn-default{/if}">不限</a>
+                            <a href="{php echo filter_url('createtime:3');}"
+                               class="btn {if $_GPC['createtime'] == 3}btn-primary{else}btn-default{/if}">三天内</a>
+                            <a href="{php echo filter_url('createtime:7');}"
+                               class="btn {if $_GPC['createtime'] == 7}btn-primary{else}btn-default{/if}">一周内</a>
+                            <a href="{php echo filter_url('createtime:30');}"
+                               class="btn {if $_GPC['createtime'] == 30}btn-primary{else}btn-default{/if}">一月内</a>
+                            <a href="{php echo filter_url('createtime:90');}"
+                               class="btn {if $_GPC['createtime'] == 90}btn-primary{else}btn-default{/if}">三月内</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">标题</label>
+                    <div class="col-sm-8 col-lg-3 col-xs-12">
+                        <input class="form-control" name="title" id="" type="text"
+                               value="{$_GPC['title']}">
+                    </div>
+                    <div class="pull-left col-xs-12 col-sm-2 col-lg-2">
+                        <button class="btn btn-default">
+                            <i class="fa fa-search"></i> 搜索
+                        </button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="table-responsive panel-body">
+            <table class="table table-hover">
+                <thead class="navbar-inner">
+                <tr>
+                    <th style="width:5%;">编号</th>
+                    <th style="width:6%;">反馈人昵称</th>
+                    <th style="width:6%;">反馈人uid</th>
+                    <th style="width:10%;">反馈时间</th>
+                    <th style="width:25%;">问题意见</th>
+                    <th style="width:20%;">图片</th>
+                    <th style="width:5%;">应用评分</th>
+                    <th style="width:6%;">QQ/邮箱</th>
+                    <th style="width:6%;">是否解决</th>
+                    <th style="width:6%;">解决人</th>
+                    <th style="width:10%;">解决时间</th>
+                    <th style="width:20%;">解决描述</th>
+
+                    <th style="width:8%; text-align:right;">查看/删除</th>
+                </tr>
+                </thead>
+                <tbody>
+                {loop $list $index $chess}
+                <tr>
+                    <td>{$chess['id']}</td>
+                    <td><span class='cut'>{$chess['nickname']}</span></td>
+                    <td>{$chess['uid']}</td>
+                    <td>{php echo date('Y-m-d',$chess['createtime']);}</td>
+                    <td>{$chess['description']}</td>
+
+                    <td>
+                        {loop $photos[$index] $photo}
+                        <img src="{php echo tomedia($photo);}" style="height: 40px;width: 40px;">
+                        {/loop}
+                    </td>
+
+                    <td>{$chess['score']}</td>
+                    <td>{$chess['contact']}</td>
+
+                    <td>{if $chess['issolved']==0}<span class="label label-default">未解决</span>{elseif
+                        $chess['issolved']==1}<span class="label label-success">已解决</span>{/if}
+                    </td>
+                    <td>{$chess['solvedname']}</td>
+                    <td>{php echo date('Y-m-d',$chess['solvedtime']);}</td>
+                    <td>{$chess['record']}</td>
+                    <td style="text-align:right;">
+                        <a class="btn btn-default btn-sm"
+                           href="{php echo $this->createWebUrl('feedback', array('op'=>'post', 'id'=>$chess['id']));}"
+                           title="修改"><i class="fa fa-pencil"></i></a>
+                        <a class="btn btn-default btn-sm"
+                           href="{php echo $this->createWebUrl('feedback', array('op'=>'delete', 'id'=>$chess['id']));}"
+                           title="删除" onclick="return confirm('此操作不可恢复，确认删除？');return false;"><i
+                                class="fa fa-times"></i></a>
+                    </td>
+                </tr>
+                {/loop}
+                </tbody>
+            </table>
+            {$pager}
+        </div>
+    </div>
+</div>
+
+{elseif $operation == 'post'}
+<div class="main">
+    <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
+        <div class="panel panel-default">
+            <div class="panel-heading">反馈信息</div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">反馈人</label>
+                    <div class="col-sm-9">
+                        <div class="col-sm-9">
+                            {$chess['nickname']}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">反馈时间</label>
+                    <div class="col-sm-9">
+                        <div class="col-sm-9">
+                            {$chess['createtime']}
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">反馈描述</label>
+                    <div class="col-sm-9">
+                        <div class="col-sm-9">
+                            {$chess['description']}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">图片描述</label>
+                    <div class="col-sm-9">
+                        <div class="col-sm-9">
+                            {loop $chess['photo'] $photo}
+                            <img src="{php echo tomedia($photo);}">
+                            {/loop}
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">应用评分</label>
+                    <div class="col-sm-9">
+                        <div class="col-sm-9">
+                            {$chess['score']}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">是否解决</label>
+                    <div class="col-sm-9">
+                        <p class="form-control-static">
+                            <input type="radio" name="issolved" value="1" {if $chess['issolved']==1}checked{/if}>
+                            <span class="label label-success" style="vertical-align:text-top;">解决</span>
+                            &nbsp;&nbsp;
+                            <input type="radio" name="issolved" value="0" {if $chess['issolved']==0}checked{/if}>
+                            <span class="label label-danger" style="vertical-align:text-top;">未解决</span>
+                            &nbsp;&nbsp;
+                        </p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">问题解决人</label>
+                    <div class="col-sm-9">
+                        <div class="col-sm-9">
+                            <input type="text" name="solvedname" class="form-control" value="{$chess['solvedname']}"/>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">问题解决描述</label>
+                    <div class="col-sm-9">
+                        <textarea style="height:75px;" class="form-control richtext"
+                                  name="record">{$chess['record']}</textarea>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="form-group col-sm-12">
+            <input type="submit" name="submit" value="保存" class="btn btn-primary col-lg-1"/>
+            <input type="hidden" name="token" value="{$_W['token']}"/>
+            <input type="hidden" name="id" value="{$id}"/>
+        </div>
+    </form>
+</div>
+
+{/if}
+
+{template 'common/footer'}

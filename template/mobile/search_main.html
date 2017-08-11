@@ -1,0 +1,157 @@
+{template 'header'}
+<body>
+<style>
+    .mui-btn {
+        font-size: 16px;
+        padding: 8px;
+        margin: 3px;
+    }
+</style>
+<div class="mui-content">
+    <form id="myform" action="{php echo $this->createMobileUrl('search',array('op'=>'search'));}" method="post"
+          class="form-horizontal" role="form" target="_self">
+
+
+        <div style="padding: 10px 10px;">
+            <div id="segmentedControl"
+                 class="mui-segmented-control mui-segmented-control-inverted mui-segmented-control-primary">
+                <a class="mui-control-item" href="#item1">
+                    全部分类
+                </a>
+                <a class="mui-control-item  mui-active" href="#item2">
+                    高级搜索
+                </a>
+                <a class="mui-control-item" href="#item3">
+                    筛选排序
+                </a>
+            </div>
+        </div>
+        <div>
+            <div id="item1" class="mui-control-content">
+                <ul class="mui-table-view mui-table-view-radio">
+                    <li class="mui-table-view-cell mui-selected" categoryid="">
+                        <a class="mui-navigate-right">
+                            不限
+                        </a>
+                    </li>
+                    {loop $categories $index $cat}
+                    <li class="mui-table-view-cell" categoryid="{$cat['id']}">
+                        <a class="mui-navigate-right">
+                            {$cat['name']}
+                        </a>
+                    </li>
+                    {/loop}
+                    <li class="mui-table-view-cell" categoryid="-1">
+                        <a class="mui-navigate-right">
+                            其他
+                        </a>
+                    </li>
+
+                </ul>
+                <input type="hidden" name="categoryid" value="">
+            </div>
+
+
+            <div id="item2" class="mui-control-content  mui-active">
+                <div class="mui-table-view" style="min-height:200px">
+
+                    <div class="mui-input-group">
+
+                        <div class="mui-input-row">
+                            <label>标题</label>
+                            <input type="text" name="title" class="mui-input-clear" placeholder="请输入标题关键词">
+                        </div>
+
+                        <div class="mui-input-row">
+                            <label>红方</label>
+                            <input type="text" name="redname" class="mui-input-clear" placeholder="红方棋手名字">
+                        </div>
+                        <div class="mui-input-row">
+                            <label>黑方</label>
+                            <input type="text" name="blackname" class="mui-input-clear" placeholder="黑方棋手名字">
+                        </div>
+
+
+                    </div>
+
+                    <div class="demos-content-padded">
+                        <a class="weui-btn weui-btn_primary" href="javascript:checksubmit()" id="showTooltips">确定</a>
+                    </div>
+
+                </div>
+            </div>
+            <div id="item3" class="mui-control-content">
+
+                <ul class="mui-table-view">
+
+                    <li class="mui-table-view-cell">
+                        <span>按发布时间排列</span>
+                        <input type="hidden" name="orderbyaddtime" value=''>
+
+                        <div class="mui-switch mui-switch-mini mui-active ">
+                            <div class="mui-switch-handle"></div>
+                        </div>
+                    </li>
+
+                    <li class="mui-table-view-cell">
+                        <span>按对弈时间排列</span>
+                        <input type="hidden" name="orderbychesstime" value='1'>
+                        <div class="mui-switch mui-switch-mini">
+                            <div class="mui-switch-handle"></div>
+                        </div>
+                    </li>
+
+                    <li class="mui-table-view-cell">
+                        <span>按点击人数排列</span>
+                        <input type="hidden" name="orderbyclicksum" value=''>
+                        <div class="mui-switch mui-switch-mini">
+                            <div class="mui-switch-handle"></div>
+                        </div>
+                    </li>
+
+                    <li class="mui-table-view-cell">
+                        <span>按收藏人数排列</span>
+                        <input type="hidden" name="orderbycollectsum" value=''>
+                        <div class="mui-switch mui-switch-mini">
+                            <div class="mui-switch-handle"></div>
+                        </div>
+                    </li>
+
+                    <li class="mui-table-view-cell">
+                        <span>按分享人数排列</span>
+                        <input type="hidden" name="orderbysharesum" value=''>
+                        <div class="mui-switch mui-switch-mini">
+                            <div class="mui-switch-handle"></div>
+                        </div>
+                    </li>
+
+
+                </ul>
+
+            </div>
+        </div>
+    </form>
+
+</div>
+
+<script>
+
+    function checksubmit() {
+        $('#myform').submit();
+    }
+
+    mui('.demos-content-padded').on('tap', 'a', function () {
+        document.location.href = this.href;
+    });
+
+    document.querySelector('.mui-table-view.mui-table-view-radio').addEventListener('selected', function (e) {
+        var categoryid = e.detail.el.getAttribute('categoryid');
+        $("input[name='categoryid']").val(categoryid);
+    });
+
+$('.follow_topbar').hide();
+</script>
+
+
+</body>
+</html>

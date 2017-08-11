@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{if !empty($title)}{$title} - {/if}{$setting['sitename']} - {$_W['uniaccount']['name']}</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="description" content="{$setting['description']}">
+    <link rel="shortcut icon" href="{$_W['siteroot']}attachment/images/global/wechat.jpg">
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/lib/weui.min.css">
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/css/jquery-weui.css">
+
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/css/mui.css">
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/css/extraico.css">
+    <link href="{$_W['siteroot']}app/resource/css/common.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/lib/picker/css/mui.picker.all.css">
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/lib/picker/css/mui.dtpicker.css">
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/css/common.css">
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/css/header.css">
+    <script type="text/javascript" src="{MODULE_URL}template/mobile/lib/flexible/flexible_new.js"></script>
+    <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script src="{MODULE_URL}template/mobile/lib/jquery-2.1.4.js"></script>
+    <script type="text/javascript" src="{MODULE_URL}template/mobile/js/zepto.js"></script>
+
+
+    <script src="{MODULE_URL}template/mobile/js/jquery-weui.js"></script>
+    <script src="{MODULE_URL}template/mobile/js/swiper.js"></script>
+    <script src="{MODULE_URL}template/mobile/js/mui.js"></script>
+    <script src="{MODULE_URL}template/mobile/lib/fastclick.js"></script>
+    <script src="{MODULE_URL}template/mobile/lib/picker/js/mui.picker.all.js"></script>
+
+    <style>
+        .mui-bar-popover {
+            height:auto;
+            width: 30%;
+            text-align: center;
+        }
+    </style>
+
+
+</head>
+<body>
+    <div class="follow_topbar" style="display: none;">
+        <div class="headimg"><img src="{$_W['attachurl']}{$setting['qrcode']}"></div>
+        <div class="info">
+            <div class="i">{$_W['account']['name']}</div>
+            <div class="i">关注公众号，享海量课程</div>
+        </div>
+        <div class="sub" onclick="location.href='{php echo $this->createMobileUrl('follow');}'">立即关注</div>
+    </div>
+</body>

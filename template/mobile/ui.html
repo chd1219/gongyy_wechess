@@ -1,0 +1,38 @@
+{template '_header'}
+<header class="demos-header mytop">
+
+    <div class="weui-flex">
+        <div class="weui-flex__item"><img src="{$_W['fans']['avatar']}" class="touxiang">
+
+        </div>
+    </div>
+
+
+    <div class="weui-flex">
+        <div class="weui-flex__item">
+            <p>{$_W['fans']['nickname']}</p>
+
+        </div>
+    </div>
+
+</header>
+
+
+<ul class="mui-table-view">
+    <li class="mui-table-view-cell">
+        <a class="mui-navigate-right" href="{php echo $this->createMobileUrl('mychess');}">我的棋谱</a>
+    </li>
+    <li class="mui-table-view-cell">
+        <a class="mui-navigate-right" href="{php echo $this->createMobileUrl('mycollect');}">收藏棋谱</a>
+
+    </li>
+    <li class="mui-table-view-cell">
+        <a class="mui-navigate-right" href="{php echo $this->createMobileUrl('mymaster');}">收藏棋手</a>
+    </li>
+</ul>
+
+
+<script src="{MODULE_URL}template/mobile/js/mui.js"></script>
+
+</body>
+</html>
