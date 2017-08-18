@@ -1,231 +1,253 @@
-var ws = null;
-var wstest = null;
-function initWebsocket(){
-    var wsImpl = window.WebSocket || window.MozWebSocket;
-    // create a new websocket and connect
-    window.ws = new wsImpl('ws://118.190.46.210:9011/');
-    // when data is comming from the server, this metod is called
-    ws.onmessage = function (evt) {
-        //play.ParseMsg(evt.data);    
-    }
-    // when the connection is established, this method is called
-    ws.onopen = function () {
-        heartCheck.start();
-    }
-    // when the connection is closed, this method is called
-    ws.onclose = function () {
-        //showFloatTip("服务断开，请重试！");
-        ws = null;
-    }       
-    // when the connection is error, this method is called
-    ws.onerror = function () {
-        //showFloatTip("服务断开，请重试！");
-    }   
-}
-function initTestWebsocket(url){
-	var wsImpl = window.WebSocket || window.MozWebSocket;
-	window.wstest = new wsImpl(url);
-	wstest.onmessage = function (evt) {
-		e = evt.data;
-		result = e;
-		if (isJSON(e)){
-			var obj = JSON.parse(e); //由JSON字符串转换为JSON对象
-			ParseMsg(obj); 
-		}		   
+var myws = null;
+var mywstest = null;
+var timeout = 0;
+var interval = 0;
+var waitServer = !1;
+var msg = "";
+var depthinfolist = [];
+var cloudinfolist = [];
+var MyWebsocket = function (url, bRec) {  
+	this.url = url;
+	var brec = bRec;
+	var ws = null;	
+	this.initWebsocket = function(){
+		var wsImpl = window.WebSocket || window.MozWebSocket;
+		ws = new ReconnectingWebSocket(this.url);
+		ws.onmessage = function (evt) {
+			if(brec){
+				e = evt.data;
+				result = e;
+				if (isJSON(e)){
+					var obj = JSON.parse(e); //由JSON字符串转换为JSON对象
+					ParseMsg(obj); 
+				}	
+			}			
+		}
+		ws.onopen = function () {
+		}
+		ws.onclose = function () {
+		}		
+	
+		ws.onerror = function () {
+		}	
 	}
-	wstest.onopen = function () {
-
-	}
-	wstest.onclose = function () {
- 		console.log("wstest服务断开，请重试！");
- 		wstest = null;
-	}		
-
-	wstest.onerror = function () {
-		//console.log("wstest服务断开，请重试！");
+    this.Send = function (e) {      	
+    	this.mysend(e);
+		if(e.match("position")){
+			waitServer = !0;
+			msg = e;
+			computelist = [];
+			depthinfolist = [];
+			cleanComputerDetail();
+		}else if (e.match("queryall")){
+			chessdblist = [];
+			cloudinfolist = [];
+			cleanChessdbDetail();	
+		}
+    }  
+	this.mysend = function (e) {  
+		if(ws){
+    		if(e.match("position") || e.match("queryall")){
+				var a = {};
+				a.type = 1;
+				a.isOffensive = isOffensive;
+				a.isanalyse = isanalyse;
+				b_autoset != 0 ? a.b_autoset = 1 : a.b_autoset = 0;
+				r_autoset != 0 ? a.r_autoset = 1 : a.r_autoset = 0;
+				a.index = movesIndex;
+				a.isVerticalReverse = isVerticalReverse;
+				a.command = e;
+				var o = JSON.stringify(a);
+				ws.send(o);
+			}	
+			else{
+				ws.send(e);
+			}	
+    	}        
 	}	
+	this.Return = function () {  
+		timeout = 0;
+		waitServer = !1;
+	}
+}; 
+function CheckReturn() {
+	if(waitServer){
+		timeout++;		
+		if(timeout%10 == 9){
+			console.log(timeout);
+			console.log("服务器无返回,将重发");	
+			myws.mysend(msg);
+		}		
+	}	
+}
+function sendMessage(e){
+	myws.Send(e);
+//	mywstest.Send(e);
+}
+var depthinfo = function(d){
+	var e = d.split(" ");
+	this.depth = (e[2] / 32).toFixed(2),
+	this.seldepth = e[4],
+	this.multipv = e[6],		
+	this.nodes = e[10],
+	this.nps = e[12],
+	this.tbhits = e[14],
+	this.time = e[16] / 1000;
+	this.score = parseInt(e[8]);
+	this.pv = [];
+	for (var pvseek = 17; pvseek < e.length; pvseek++) {
+		if (e[pvseek] == "pv") {
+			for (var i=pvseek+1;i<e.length; i++) {
+				this.pv[i-pvseek-1] = e[i];
+			}
+			break;
+		}
+	}
+}
+var cloudinfo = function(d){
+	var e = d.split(",");
+	this.move = e[0],
+	this.score = parseInt(e[1]),	
+	this.rank = e[2],
+	this.note = e[3];
+}
+function DealQueryall(obj) {
+	var e = (obj.result).split("|");				
+	if (e[0].match("stalemate") || e[0].match("checkmate")) {
+		showFloatTip("绝杀！");
+		//回调返回函数
+		myws.Return();
+		return;
+	}				
+	if (e[0].match("unknown") || e[0].match("invalid board")){
+		return;			
+	}
+	var tmpStr = new String();		
+	for (i=0;i<e.length && i<10;i++) {	
+		var info = new cloudinfo(e[i]);
+		cloudinfolist.push(info);
+		var tempmap = comm.arr2Clone(play.map);		
+		a = info.move.split("");			
+		n = play.transformat(a);	
+		var move = comm.createMove(tempmap,n[0],n[1],n[2],n[3]);
+		tmpStr += "<tr><td>"+ move +"</td><td>"+ info.rank +"</td><td>"+ info.score +"</td><td>"+ info.note +"</td></tr>";
+	}	
+	if(document.getElementById("chessdbDetailTbody")){ 
+		document.getElementById("chessdbDetailTbody").innerHTML = tmpStr;
+	}
+}
+function DealPosition(obj) {
+	d = obj.result;
+	if(d.match("bestmove ")){
+		var e = d.split("bestmove "); 
+		var move = e[1];
+		if(move.match("null") || move.match("none")){
+			play.my == 1 ? play.onGameEnd(-1) : play.onGameEnd(1);
+			bill.my = -bill.my;
+			play.my = -play.my;			
+			return;
+		}
+		
+		if(!isanalyse){
+			//对比引擎和云库结果，取分数最大的走法
+			var max = 0;
+			for (var i=0;i<cloudinfolist.length && i<1;i++) {
+				var info = cloudinfolist[i];
+				if (1 == movesIndex%2) {
+					info.score = -info.score;
+				}	
+				if(max < info.score){
+					max = info.score;
+					move = info.move;
+				}			
+			}
+			for (var i=0;i<depthinfolist.length && i<1;i++) {
+				var info = depthinfolist[depthinfolist.length-1-i];
+				if(max < info.score){
+					max = info.score;
+					move = info.pv[0];
+				}				
+			}
+			var o = move.split(""); 
+			var aiPace = [];
+			aiPace = play.transformat(o);
+			play.aiPace = aiPace;
+			setTimeout((function(){play.serverAIPlay();}),200);
+		}		
+		//回调返回函数
+		myws.Return();
+	}		
+	else if (d.length > 16){
+		var info = new depthinfo(d);
+		depthinfolist.push(info);
+		if (isOffensive == movesIndex%2) {
+			info.score = -info.score;
+		}				
+		var tempmap = comm.arr2Clone(play.map);
+		var a = [];
+		var tmpStr = "";
+		bill.cleanLine();
+		for (j = 0; j < info.pv.length && j<4; j++) {
+			if (info.pv[j]) {
+				a = info.pv[j].split("");					
+				var o = play.transformat(a);					
+				computelist.push(o);
+				var move = comm.createMove(tempmap, o[0], o[1], o[2], o[3]);
+				tmpStr = tmpStr + move + " ";
+				//走法提示
+				if (isVerticalReverse) {
+					o[0] = 8-o[0];
+					o[1] = 9-o[1];
+					o[2] = 8-o[2];
+					o[3] = 9-o[3];
+				}
+				if (isanalyse && j<2) {
+					bill.drawLine2(o,j+1);
+				}
+			}				
+		}				
+		if(document.getElementById("computerDetailTbody")){ 
+			tmpStr = "<tr><td>" + info.depth + "</td><td>" + info.score + "</td><td>" + tmpStr + "</td></tr>";
+			document.getElementById("computerDetailTbody").innerHTML = tmpStr + document.getElementById("computerDetailTbody").innerHTML;
+		} 		
+	}		
 }
 function ParseMsg(obj) {
 	if(Number(obj.index) != movesIndex) return;
 	switch(obj.commandtype){
 		case "queryall":
-			var e = (obj.result).split("|");
-			cleanChessdbDetail();		
-			if (e[0].match("stalemate") || e[0].match("checkmate")) {
-				showFloatTip("绝杀！");
-				return;
-			}				
-			if (e[0].match("unknown") || e[0].match("invalid board")){
-				return;			
-			}
-			var tmpStr = new String();	
-			chessdblist = [];
-			for (i=0;i<e.length && i<10;i++) {	
-				var tempmap = comm.arr2Clone(play.map);
-				var o = e[i].split(",");
-				a = o[0].split("");			
-				n = play.transformat(a);	
-				chessdblist.push(n);
-				p = comm.createMove(tempmap,n[0],n[1],n[2],n[3]);
-				tmpStr += "<tr style=\"height:40px;\"><td>"+ p +"</td><td>"+ o[2] +"</td><td>"+ o[1] +"</td><td><input type=\"Button\" onclick='play.onmdownchessdblist(\""+i+"\")' value=\"立即出招\"></td></tr>";
-			}	
-			if(document.getElementById("chessdbDetailTbody")){ 
-				document.getElementById("chessdbDetailTbody").innerHTML = tmpStr;
-			}
+			DealQueryall(obj);
 			break;
 		case "position":
-			d = obj.result;
-			if(d.match("bestmove ")){
-				var e = d.split("bestmove "); 
-				
-				if(e[1].match("null") || e[1].match("none")){
-					play.my == 1 ? play.onGameEnd(-1) : play.onGameEnd(1);
-					bill.my = -bill.my;
-					play.my = -play.my;			
-					return;
-				}
-				var o = e[1].split(""); 
-				var a = [];
-				a = play.transformat(o);			
-				play.aiPace = a;		
-				if(!isanalyse){
-					setTimeout((function(){play.serverAIPlay();}),200);
-				}					
-			}		
-			else if (d.length > 16){
-				var e = d.split(" ");
-				var depth = e[2],
-				seldepth = e[4],
-				multipv = e[6],		
-				nodes = e[10],
-				nps = e[12],
-				tbhits = e[14],
-				time = e[16] / 1000;
-				score = e[8];
-				if (isOffensive == movesIndex%2) {
-					score = -score;
-				}		
-		
-				var tempmap = comm.arr2Clone(play.map);
-				if (depth == 2) {
-					computelist = [];
-					cleanComputerDetail();
-				}
-		
-				if (depth > 1) {
-					var pv = [],
-					a = [];
-		
-					var tmpStr = new String();
-					var setting = new String();
-					for (var pvseek = 17; pvseek < e.length; pvseek++) {
-						if (e[pvseek] == "pv")
-							break;
-					}
-					bill.cleanLine();
-					for (j = 0; (j + pvseek) < e.length && j<4; j++) {
-						i = j + pvseek + 1;
-						if (e[i]) {
-							a = e[i].split("");					
-							o = play.transformat(a);					
-							computelist.push(o);
-							pv[j] = comm.createMove(tempmap, o[0], o[1], o[2], o[3]);
-							tmpStr = tmpStr + pv[j] + " ";
-							//走法提示
-							if (isVerticalReverse) {
-								o[0] = 8-o[0];
-								o[1] = 9-o[1];
-								o[2] = 8-o[2];
-								o[3] = 9-o[3];
-							}
-							if (isanalyse) {
-								if (j==0) {
-									bill.drawLine2(o,1);
-								}
-								if (j==1) {
-									bill.drawLine2(o,2);
-								}
-							}
-						}				
-					}
-					setting = "<td> </td>";
-					tmpStr = "<tr><td>" + (depth / 32).toFixed(2) + "</td><td>" + score + "</td><td>" + tmpStr + "</td>" + setting + "</tr>";
-					if(document.getElementById("computerDetailTbody")){ 
-						document.getElementById("computerDetailTbody").innerHTML = tmpStr + document.getElementById("computerDetailTbody").innerHTML;
-					} 			
-				}
-				//console.log(d);
-				play.aiPace = null;	
-			}		 
+			DealPosition(obj);
 			break;
 		default:
 			break;
-	}
-	
-}
-function wetestSend(e){
-	if(e.match("position") || e.match("queryall")){
-		var a = {};
-		a.type = 1;
-		a.isOffensive = isOffensive;
-		a.isanalyse = isanalyse;
-		b_autoset != 0 ? a.b_autoset = 1 : a.b_autoset = 0;
-		r_autoset != 0 ? a.r_autoset = 1 : a.r_autoset = 0;
-		a.index = movesIndex;
-		a.isVerticalReverse = isVerticalReverse;
-		a.command = e;
-		var o = JSON.stringify(a);
-		wstest.send(o);
-	}	
-	else{
-		wstest.send(e);
 	}	
 }
-function sendMessage(e){
-	if(wstest) {
-		wetestSend(e);
-	}	
-	else{
-		initTestWebsocket('ws://120.55.37.210:9001/');
-		setTimeout(function () {
-			wetestSend(e);
-		},1000);
-	}
-	
-	if(ws) {
-		if(e.match("position") || e.match("queryall")){
-			var a = {};
-			a.type = 1;
-			a.isOffensive = isOffensive;
-			a.isanalyse = isanalyse;
-			b_autoset != 0 ? a.b_autoset = 1 : a.b_autoset = 0;
-			r_autoset != 0 ? a.r_autoset = 1 : a.r_autoset = 0;
-			a.index = movesIndex;
-			a.isVerticalReverse = isVerticalReverse;
-			a.command = e;
-			var o = JSON.stringify(a);
-			ws.send(o);
-		}	
-		else{
-			ws.send(e);
-		}	
-	}
-}
+
 function loadConfig() {
     comm.initChess(comm.initMap);
 	bill.create();	
-    //initWebsocket();
-    //initTestWebsocket('ws://118.190.46.210:9001/');
-    initTestWebsocket('ws://120.55.37.210:9001/');
+    //初始化
+    myws = new MyWebsocket('ws://120.55.37.210:9001/',!0);
+    myws.initWebsocket();
+    
+    interval = setInterval(this.CheckReturn, 1000);	
+//  mywstest = new MyWebsocket('ws://118.190.46.210:9011/',false);
+//  mywstest.initWebsocket();
 }
+
 function initLayer(e) {
     initCanvas(e);
     onload(),
     loadConfig()    
 }
+
 function analyse() {
     isanalyse ?  (showFloatTip("关闭分析模式"), isanalyse = 0 , bill.cleanLine()) : (checkautoplay());
 }
+
 function checkautoplay (){
     showFloatTip("开启分析模式");
     isanalyse = 1;
@@ -245,6 +267,7 @@ function checkautoplay (){
     }
     bill.replayBtnUpdate();
 }
+
 onload = function() {
     comm.dot = {
         dots: []

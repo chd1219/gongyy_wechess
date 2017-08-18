@@ -1,86 +1,79 @@
-var ws = null;
-var wstest = null;
-var curcomputer = '';
-var curpower = '';
-var ischange = 0;
-var mydepth = 0;
-function initWebsocket(url){
-	var wsImpl = window.WebSocket || window.MozWebSocket;
-	window.ws = new ReconnectingWebSocket(url);
-	ws.onmessage = function (evt) {
-		//ParseMsg(evt.data);	
-	}
-	ws.onopen = function () {
-	}
-	ws.onclose = function () {
-	}		
-
-	ws.onerror = function () {
-	}	
-}
-function initTestWebsocket(url){
-	var wsImpl = window.WebSocket || window.MozWebSocket;
-	window.wstest = new ReconnectingWebSocket(url);
-	wstest.onmessage = function (evt) {
-		e = evt.data;
-		result = e;
-		if (isJSON(e)){
-			var obj = JSON.parse(e); //由JSON字符串转换为JSON对象
-			ParseMsg(obj); 
+var myws = null;
+var mywstest = null;
+var timeout = 0;
+var interval = 0;
+var waitServer = !1;
+var msg = "";
+var MyWebsocket = function (url, bRec) {  
+	this.url = url;
+	var brec = bRec;
+	var ws = null;
+	this.initWebsocket = function(){
+		var wsImpl = window.WebSocket || window.MozWebSocket;
+		ws = new ReconnectingWebSocket(this.url);
+		ws.onmessage = function (evt) {
+			if(brec){
+				e = evt.data;
+				result = e;
+				if (isJSON(e)){
+					var obj = JSON.parse(e); //由JSON字符串转换为JSON对象
+					ParseMsg(obj); 
+				}	
+			}			
+		}
+		ws.onopen = function () {
+		}
+		ws.onclose = function () {
+		}		
+	
+		ws.onerror = function () {
 		}	
 	}
-	wstest.onopen = function () {
-
+    this.Send = function (e) {  
+    	msg = e;
+    	this.mysend(e);
+		waitServer = !0;		
+    }  
+	this.mysend = function (e) {  
+		if(ws){
+    		setTimeout(function () {
+				if(e.match("position")){
+					var a = {};
+					a.type = 0;
+					a.computer = computer;
+					a.power = power;
+					a.index = movesIndex;
+					a.isVerticalReverse = isVerticalReverse;
+					a.command = e;
+					var o = JSON.stringify(a);
+					ws.send(o);
+				}	
+				else{
+					ws.send(e);
+				}
+			}, 1000);	
+    	}        
 	}
-	wstest.onclose = function () {
- 		console.log("wstest服务断开，请重试！");
-	}		
-
-	wstest.onerror = function () {
-		console.log("wstest服务断开，请重试！");
+	this.Return = function () {  
+		timeout = 0;
+		waitServer = !1;
+	}
+}; 
+function CheckReturn() {
+	if(waitServer){
+		timeout++;
+		console.log(timeout);
+		if(timeout%10 == 9){
+			console.log("服务器无返回,将重发");	
+			myws.mysend(msg);
+		}		
 	}	
 }
-
 function sendMessage(e){
-	if(wstest) {
-		setTimeout(function () {
-			if(e.match("position")){
-				var a = {};
-				a.type = 0;
-				a.computer = computer;
-				a.power = power;
-				a.index = movesIndex;
-				a.isVerticalReverse = isVerticalReverse;
-				a.command = e;
-				var o = JSON.stringify(a);
-				wstest.send(o);
-			}	
-			else{
-				wstest.send(e);
-			}
-		}, 1000);	
-	}
-	
-	if(ws) {
-		setTimeout(function () {
-			if(e.match("position")){
-				var a = {};
-				a.type = 0;
-				a.computer = computer;
-				a.power = power;
-				a.index = movesIndex;
-				a.isVerticalReverse = isVerticalReverse;
-				a.command = e;
-				var o = JSON.stringify(a);
-				ws.send(o);
-			}	
-			else{
-				ws.send(e);
-			}
-		}, 1000);
-	}
-	
+	myws.Send(e);
+//	mywstest.Send(e);
 }
+
 function ParseMsg(obj) {
 	if(!waitServerPlay) return;
 	
@@ -128,7 +121,9 @@ function ParseMsg(obj) {
 				play.aiPace = a;		
 				if(!isanalyse){
 					setTimeout((function(){play.serverAIPlay();}),200);
-				}					
+				}		
+				//回调返回函数
+				myws.Return();
 			}		
 			else if (d.length > 16){
 				var e = d.split(" ");
@@ -150,7 +145,7 @@ function ParseMsg(obj) {
 					cleanComputerDetail();
 				}
 		
-				if (depth <= mydepth) {
+				if (depth > 0) {
 					var pv = [],
 					a = [];
 		
@@ -200,6 +195,7 @@ function ParseMsg(obj) {
 			break;
 	}	
 }
+
 function loadConfig() {
 	comm.initChess(comm.emptyMap);
 	setEnable("prevBtn", !1);
@@ -216,13 +212,24 @@ function loadConfig() {
 	movesIndex = 0
     //方便用户设置
     mui('#delete').popover('toggle');
+    
+    //初始化
+    myws = new MyWebsocket('ws://120.55.37.210:9001/',!0);
+    myws.initWebsocket();
+    
+    interval = setInterval(CheckReturn, 1000);	
+    
+//  mywstest = new MyWebsocket('ws://118.190.46.210:9011/',false);
+//  mywstest.initWebsocket();
 }
+
 function initLayer(e) {
     initCanvas(e);
     onload(),
     loadConfig();
     bill.replayBtnUpdate();
 }
+
 onload = function() {
     comm.dot = {
         dots: []
@@ -246,85 +253,61 @@ onload = function() {
 	$("#clearBtn").on('tap',bill.cleanBroad),				
 	$("#saveBtn").on('tap',bill.save);		
 };
+
 function Setting() {
-	if (curpower != power) {
-		if (ws) {
-			ws.close();
+	switch (power){
+		case 'level-0':
+		{
+			showFloatTip("六级棋士");
+			break;
 		}
-		var url;
-		switch (power){
-			case 'level-0':
-			{
-				url = 'ws://121.43.37.233:9100/';
-				mydepth = 3;
-				showFloatTip("六级棋士");
-				break;
-			}
-			case 'level-1':
-			{
-				url = 'ws://121.43.37.233:9101/';
-				mydepth = 6;
-				showFloatTip("五级棋士");
-				break;
-			}
-			case 'level-2':
-			{
-				url = 'ws://121.43.37.233:9102/';
-				mydepth = 9;
-				showFloatTip("四级棋士");
-				break;
-			}
-			case 'level-3':
-			{
-				url = 'ws://121.43.37.233:9103/';
-				mydepth = 12;
-				showFloatTip("三级棋士");
-				break;
-			}
-			case 'level-4':
-			{
-				url = 'ws://121.43.37.233:9104/';
-				mydepth = 15;
-				showFloatTip("二级棋士");
-				break;
-			}
-			case 'level-5':
-			{
-				url = 'ws://121.43.37.233:9105/';
-				mydepth = 16;
-				showFloatTip("一级棋士");
-				break;
-			}
-			case 'level-6':
-			{
-				url = 'ws://121.43.37.233:9106/';
-				mydepth = 17;
-				showFloatTip("棋协大师");				
-				break;
-			}
+		case 'level-1':
+		{
+			showFloatTip("五级棋士");
+			break;
 		}
-		//initTestWebsocket('ws://118.190.46.210:9001/');	
-		initTestWebsocket('ws://120.55.37.210:9001/');
-		showLevel(power);
-		//initWebsocket('ws://118.190.46.210:9011/');		
-	    ischange = 1;
-	    curpower = power;
-	    
-		if (computer == 'red') {
-			bill.my = -1;
-    		bill.reverse();
-    		play.map = bill.map;
-    		play.rAIPlay();
-    		$("#black").hide();		
-	    }
-	    else {
-	    	bill.my = 1;
-	    	$("#red").hide();		
-	    }
-	    curcomputer = computer;
+		case 'level-2':
+		{
+			showFloatTip("四级棋士");
+			break;
+		}
+		case 'level-3':
+		{
+			showFloatTip("三级棋士");
+			break;
+		}
+		case 'level-4':
+		{
+			showFloatTip("二级棋士");
+			break;
+		}
+		case 'level-5':
+		{
+			showFloatTip("一级棋士");
+			break;
+		}
+		case 'level-6':
+		{
+			showFloatTip("棋协大师");				
+			break;
+		}
+	}
 	
-	    $("#restartli").show();		
-	}    
+	showLevel(power);
+    
+	if (computer == 'red') {
+		bill.my = -1;
+		bill.reverse();
+		play.map = bill.map;
+		play.rAIPlay();
+		$("#black").hide();		
+    }
+    else {
+    	bill.my = 1;
+    	$("#red").hide();		
+    }
+
+	$("#restartli").show();		   
 }
 
 function showLevel(e){
