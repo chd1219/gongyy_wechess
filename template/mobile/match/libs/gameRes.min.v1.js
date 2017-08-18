@@ -11,6 +11,9 @@ function(t, s, i, e) {
     (t.Board = function() {
         this.initialize(s.Board)
     }).prototype = n = new i.Bitmap,
+    (t.VerticalReverseBoard = function() {
+        this.initialize(s.VerticalReverseBoard)
+    }).prototype = n = new i.Bitmap,
     n.nominalBounds = new i.Rectangle(0, 0, 640, 723),
     (t.Bitmap10 = function() {
         this.spriteSheet = e.chess_slim_atlas_,

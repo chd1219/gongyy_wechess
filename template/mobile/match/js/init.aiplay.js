@@ -9,12 +9,6 @@ function initWebsocket(url){
 	window.ws = new ReconnectingWebSocket(url);
 	ws.onmessage = function (evt) {
 		ParseMsg(evt.data);	
-		/*if(evt.data.match("bestmove ")){
-			var date = new Date();
-			t2 = date.getTime();
-			serverReceiveRecord[movesIndex] = [movesIndex,evt.data,t2-t1-1000];
-			bill.record();
-		}*/
 	}
 	ws.onopen = function () {
 	}
@@ -69,14 +63,6 @@ function sendMessage(e){
 	setTimeout(function () {
 		ws.send(e)
 	}, 1000);
-	n=0;
-	var date = new Date();
-	t1 = date.getTime();
-	serverSendRecord[movesIndex] = new Array();
-	serverReceiveRecord[movesIndex] = new Array();
-	serverSendRecord[movesIndex] = [movesIndex,e,n];
-	bill.record();
-	checkreturn(e);
 	if(!wstest) return;
 	setTimeout(function () {
 		if(e.match("position")){
@@ -113,26 +99,6 @@ function sendMessage(e){
 	}, 1000);
 	
 }
-
-function checkreturn(e){
-	if (n<3){
-		setTimeout(function(){
-			if(serverSendRecord[serverSendRecord.length-1].length>serverReceiveRecord[serverSendRecord.length-1].length){
-				ws.send(e);
-				n = n+1;
-				if(typeof(serverSendRecord[movesIndex])!='undefined'){
-					serverSendRecord[movesIndex] = [movesIndex,e,n*10000];
-				}
-				bill.record();
-				checkreturn(e);
-			}	
-		},10000);
-	}else{
-		alert("服务器超时重连！");
-		location.reload();
-	}
-}
-
 function ParseMsg(d) {
 	if(!waitServerPlay) return;
 	
@@ -204,61 +170,27 @@ function ParseMsg(d) {
 	}		 
 }
 function loadConfig() {
-	if(!chessdata){
-		comm.initChess(comm.emptyMap);
-		setEnable("prevBtn", !1);
-		setEnable("nextBtn", !1);
-		setEnable("firstBtn", !1);
-		setEnable("endBtn", !1);
+	comm.initChess(comm.emptyMap);
+	setEnable("prevBtn", !1);
+	setEnable("nextBtn", !1);
+	setEnable("firstBtn", !1);
+	setEnable("endBtn", !1);
 
-		bill.pace = [];
-		bill.resizeCanvas();
-		createbroad = !1;
-		comm.init();
-		bill.init(3, bill.map, !0);
-		play.map = bill.map;
-		movesIndex = 0;
-		mui('#delete').popover('toggle');
-		bill.replayBtnUpdate();
-		if(window.Storage && window.localStorage && window.localStorage instanceof Storage){
-                setInterval("setStorageData()",3000);
-          }	
-	}else{
-		var btn = ['是', '否'];
-		mui.confirm("定位到上次退出的位置?","系统提示：",btn,function(e) {
-			if(e.index == 0){
-				mode = 5;
-				showFloatTip("已为您定位到上次退出的位置");
-				__getChessData(chessdata);
-  				Setting();
-			}else{
-				localStorage.removeItem("chessdata");
-				comm.initChess(comm.emptyMap);
-				setEnable("prevBtn", !1);
-				setEnable("nextBtn", !1);
-				setEnable("firstBtn", !1);
-				setEnable("endBtn", !1);
-				bill.pace = [];
-				bill.resizeCanvas();
-				createbroad = !1;
-				comm.init();
-				bill.init(3, bill.map, !0);
-				play.map = bill.map;
-				movesIndex = 0;
-				mui('#delete').popover('toggle');
-			}
-			if(window.Storage && window.localStorage && window.localStorage instanceof Storage){
-                setInterval("setStorageData()",3000);
-            }
-			bill.replayBtnUpdate();
-		})
-		
-	}
+	bill.pace = [];
+	bill.resizeCanvas();
+	createbroad = !1;
+	comm.init();
+	bill.init(3, bill.map, !0);
+	play.map = bill.map;
+	movesIndex = 0
+    //方便用户设置
+    mui('#delete').popover('toggle');
 }
 function initLayer(e) {
     initCanvas(e);
     onload(),
     loadConfig();
+    bill.replayBtnUpdate();
 }
 onload = function() {
     comm.dot = {
@@ -293,48 +225,48 @@ function Setting() {
 			case 'level-0':
 			{
 				url = 'ws://121.43.37.233:9100/';
-				!chessdata?showFloatTip("六级棋士"):1;
+				showFloatTip("六级棋士");
 				break;
 			}
 			case 'level-1':
 			{
 				url = 'ws://121.43.37.233:9101/';
-				!chessdata?showFloatTip("五级棋士"):1;
+				showFloatTip("五级棋士");
 				break;
 			}
 			case 'level-2':
 			{
 				url = 'ws://121.43.37.233:9102/';
-				!chessdata?showFloatTip("四级棋士"):1;
+				showFloatTip("四级棋士");
 				break;
 			}
 			case 'level-3':
 			{
 				url = 'ws://121.43.37.233:9103/';
-				!chessdata?showFloatTip("三级棋士"):1;
+				showFloatTip("三级棋士");
 				break;
 			}
 			case 'level-4':
 			{
 				url = 'ws://121.43.37.233:9104/';
-				!chessdata?showFloatTip("二级棋士"):1;
+				showFloatTip("二级棋士");
 				break;
 			}
 			case 'level-5':
 			{
 				url = 'ws://121.43.37.233:9105/';
-				!chessdata?showFloatTip("一级棋士"):1;
+				showFloatTip("一级棋士");
 				break;
 			}
 			case 'level-6':
 			{
 				url = 'ws://121.43.37.233:9106/';
-				!chessdata?showFloatTip("棋协大师"):1;
-				initTestWebsocket('ws://118.190.46.210:9001/');
+				showFloatTip("棋协大师");				
 				break;
 			}
 		}
-		initTestWebsocket('ws://118.190.46.210:9001/');	
+		//initTestWebsocket('ws://118.190.46.210:9001/');	
+		initTestWebsocket('ws://120.55.37.210:9001/');
 		showLevel(power);
 		initWebsocket(url);		
 	    ischange = 1;
@@ -344,12 +276,11 @@ function Setting() {
 			bill.my = -1;
     		bill.reverse();
     		play.map = bill.map;
-    		if (movesIndex % 2 == 0){play.rAIPlay();}
+    		play.rAIPlay();
     		$("#black").hide();		
 	    }
 	    else {
 	    	bill.my = 1;
-	    	if (movesIndex % 2 == 1){play.bAIPlay();}
 	    	$("#red").hide();		
 	    }
 	    curcomputer = computer;
@@ -365,32 +296,4 @@ function showLevel(e){
 			$("#"+level).hide();	
 		} 
 	}
-}
-
-var __getChessData = function(e) {
-	serverData = e;
-	if(serverData.BillType){
-		comm.initChess(comm.emptyMap);
-		bill.resizeCanvas();
-		createbroad = !1;
-		comm.init();
-		bill.init(3, comm.parseMap(serverData.map), !0);
-		play.map = bill.map;
-		var moves = comm.parseMovesEx(serverData.moves);
-		id = moves.length,currentId = moves.length,movesIndex = moves.length;
-		comm.parseNote(serverData.notes);
-		setEnable("nextBtn", !1);
-		setEnable("endBtn", !1);
-		setEnable("firstBtn", !1);
-		power = serverData.power;
-		computer = serverData.computer;
-		redtime = serverData.redtime;
-		blacktime = serverData.blacktime;
-		bill.cMap = comm.initMap; 
-		play.my=parseInt(serverData.pmy);
-		voicemode = parseInt(serverData.voicemode);
-		computer=='black'?($('#black').addClass('mui-active'),$("input:radio[value='black']").attr('checked','true')):($('#red').addClass('mui-active'),$("input:radio[value='red']").attr('checked','true'),bill.reverseMoves());
-		$("input:radio[value='"+power+"']").attr('checked','true');
-		voicemode?$('#soundTog').addClass('mui-active'):$('#soundTog').removeClass('mui-active');
-	}        
 }

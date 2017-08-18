@@ -10,19 +10,6 @@ Array.prototype.remove = function(val) {
         this.splice(index, 1);
     }
 };
-function parsemap(e) {
-    var dd = comm.emptyMap1;
-    for (var q = e,
-       oo = {},
-       n = 0; n < q.length; n++) {
-        var t = q[n],
-    s = comm.id2name[t.cid],
-    r = "";
-    void 0 == oo[s] ? (oo[s] = 0, r = s + oo[s]) : (oo[s]++, r = s + oo[s]),
-    dd[comm.reverseY(t.y - 1)][t.x - 1] = r
-}
-return dd
-}  
 function popupDiv(div_id) { 
 	// 获取传入的DIV      
 	var $div_obj = $("#" + div_id);      
@@ -501,18 +488,6 @@ comm.emptyMap = [
 	[, , , , , , , , ""], 
 	[, , , , , , , , ""]
  ];
-  comm.emptyMap1 = [
-    [, , , , , , , , ""], 
-    [, , , , , , , , ""],
-    [, , , , , , , , ""], 
-    [, , , , , , , , ""], 
-    [, , , , , , , , ""], 
-    [, , , , , , , , ""], 
-    [, , , , , , , , ""], 
-    [, , , , , , , , ""], 
-    [, , , , , , , , ""], 
-    [, , , , , , , , ""]
-    ];
 comm.initMap = [
 	["C0", "M0", "X0", "S0", "J0", "S1", "X1", "M1", "C1"], 
 	[, , , , , , , , ""], 
@@ -1348,6 +1323,7 @@ function isJSON(str) {
                 }
 
             } catch(e) {
+                console.log(e);
                 return false;
             }
         }

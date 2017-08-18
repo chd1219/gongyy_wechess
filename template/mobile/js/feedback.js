@@ -16,11 +16,11 @@
         imageList: document.getElementById('image-list'),
         submitBtn: document.getElementById('submit')
     };
-   
+    var url = "http://westudy.chinaxueyun.com/app/index.php?i=5&c=entry&op=feedback&do=self&m=chessroom";
     feedback.files = [];
     feedback.uploader = null;
     feedback.deviceInfo = null;
-  /*  mui.plusReady(function () {
+    mui.plusReady(function () {
         //设备信息，无需修改
         feedback.deviceInfo = {
             appid: plus.runtime.appid,
@@ -33,7 +33,7 @@
             os: mui.os.version,
             net: '' + plus.networkinfo.getCurrentType()
         }
-    });*/
+    });
     /**
      *提交成功之后，恢复表单项
      */
@@ -134,7 +134,6 @@
      feedback.imageList.appendChild(placeholder);
      };
      feedback.newPlaceholder();*/
-    url='';
     feedback.submitBtn.addEventListener('tap', function (event) {
         if (feedback.question.value == '' ||
             (feedback.contact.value != '' &&

@@ -3,7 +3,7 @@ var wstest = null;
 function initWebsocket(){
     var wsImpl = window.WebSocket || window.MozWebSocket;
     // create a new websocket and connect
-    window.ws = new ReconnectingWebSocket('ws://114.55.174.231:9001/');
+    window.ws = new wsImpl('ws://118.190.46.210:9011/');
     // when data is comming from the server, this metod is called
     ws.onmessage = function (evt) {
         //play.ParseMsg(evt.data);    
@@ -15,6 +15,7 @@ function initWebsocket(){
     // when the connection is closed, this method is called
     ws.onclose = function () {
         //showFloatTip("服务断开，请重试！");
+        ws = null;
     }       
     // when the connection is error, this method is called
     ws.onerror = function () {
@@ -23,7 +24,7 @@ function initWebsocket(){
 }
 function initTestWebsocket(url){
 	var wsImpl = window.WebSocket || window.MozWebSocket;
-	window.wstest = new ReconnectingWebSocket(url);
+	window.wstest = new wsImpl(url);
 	wstest.onmessage = function (evt) {
 		e = evt.data;
 		result = e;
@@ -37,10 +38,11 @@ function initTestWebsocket(url){
 	}
 	wstest.onclose = function () {
  		console.log("wstest服务断开，请重试！");
+ 		wstest = null;
 	}		
 
 	wstest.onerror = function () {
-		console.log("wstest服务断开，请重试！");
+		//console.log("wstest服务断开，请重试！");
 	}	
 }
 function ParseMsg(obj) {
@@ -161,12 +163,36 @@ function ParseMsg(obj) {
 	}
 	
 }
+function wetestSend(e){
+	if(e.match("position") || e.match("queryall")){
+		var a = {};
+		a.type = 1;
+		a.isOffensive = isOffensive;
+		a.isanalyse = isanalyse;
+		b_autoset != 0 ? a.b_autoset = 1 : a.b_autoset = 0;
+		r_autoset != 0 ? a.r_autoset = 1 : a.r_autoset = 0;
+		a.index = movesIndex;
+		a.isVerticalReverse = isVerticalReverse;
+		a.command = e;
+		var o = JSON.stringify(a);
+		wstest.send(o);
+	}	
+	else{
+		wstest.send(e);
+	}	
+}
 function sendMessage(e){
-	if(ws) {
-		ws.send(e);		
-	}
-
 	if(wstest) {
+		wetestSend(e);
+	}	
+	else{
+		initTestWebsocket('ws://120.55.37.210:9001/');
+		setTimeout(function () {
+			wetestSend(e);
+		},1000);
+	}
+	
+	if(ws) {
 		if(e.match("position") || e.match("queryall")){
 			var a = {};
 			a.type = 1;
@@ -178,17 +204,17 @@ function sendMessage(e){
 			a.isVerticalReverse = isVerticalReverse;
 			a.command = e;
 			var o = JSON.stringify(a);
-			wstest.send(o);
+			ws.send(o);
 		}	
 		else{
-			wstest.send(e);
+			ws.send(e);
 		}	
-	}	
+	}
 }
 function loadConfig() {
     comm.initChess(comm.initMap);
 	bill.create();	
-    initWebsocket();
+    //initWebsocket();
     //initTestWebsocket('ws://118.190.46.210:9001/');
     initTestWebsocket('ws://120.55.37.210:9001/');
 }

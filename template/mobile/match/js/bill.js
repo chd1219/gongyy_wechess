@@ -1,130 +1,3 @@
-function setStorageData(){
-	if(!createbroad){
-		//isVerticalReverse ? sendmap = comm.arrReverse(bill.map) : sendmap = bill.map;
-		var $BillType =1;
-		var $map = comm.getMap6Server(bill.map);
-		var $cMap = comm.getMap6Server(bill.cMap);
-		var $moves = bill.getMoves6ServerEx();
-		var $notes = bill.getNotes2Server();
-		var $maplist = $map.split(' ');
-		var $cMaplist = $cMap.split(' ');
-		var $noteslist = $notes.split(' ');
-		var $moveslist = $moves.split(' ');
-		var $chessdata = '';
-		$chessdata += '{"BillType":1'; 
-		$chessdata += ',"map":[';
-		for (var $index=1;$index<$maplist.length;$index+=3){
-			$chessdata += '{"cid":';
-			$chessdata += $maplist[$index];
-			$chessdata += ',"x":';
-			$chessdata += $maplist[$index+1];
-			$chessdata += ',"y":';
-			$chessdata += $maplist[$index+2];
-			if($index == $maplist.length-3)
-				$chessdata += '}';
-			else
-				$chessdata += '},';
-		}
-		$chessdata += '],"cMap":[';
-		for (var $index=1;$index<$cMaplist.length;$index+=3){
-			$chessdata += '{"cid":';
-			$chessdata += $cMaplist[$index];
-			$chessdata += ',"x":';
-			$chessdata += $cMaplist[$index+1];
-			$chessdata += ',"y":';
-			$chessdata += $cMaplist[$index+2];
-			if($index == $cMaplist.length-3)
-				$chessdata += '}';
-			else
-				$chessdata += '},';
-		}
-
-		if($BillType){
-
-			if($moveslist.length >0){
-				$chessdata += '],"moves":[';
-				for (var $index=1;$index<$moveslist.length;$index+=4){
-					$chessdata += '{"step":"';          
-					$chessdata += $moveslist[$index];
-					$chessdata += '","id":';
-					$chessdata += $moveslist[$index+1];
-					$chessdata += ',"perid":';
-					$chessdata += $moveslist[$index+2];
-					$chessdata += ',"index":';
-					$chessdata += $moveslist[$index+3];
-
-					if($index == $moveslist.length-4)
-						$chessdata += '}';
-					else
-						$chessdata += '},';
-				}       
-			}       
-		}
-		else{
-			if($moveslist.length >0){
-				$chessdata += '],"moves":[';
-				for (var $index=1;$index<$moveslist.length;$index+=4){
-					$chessdata += '{"src":';            
-					$chessdata += '{"x":';
-					$chessdata += $moveslist[$index];
-					$chessdata += ',"y":';
-					$chessdata += $moveslist[$index+1];
-					$chessdata += '},"dst":';
-					$chessdata += '{"x":';
-					$chessdata += $moveslist[$index+2];
-					$chessdata += ',"y":';
-					$chessdata += $moveslist[$index+3];
-					if($index == $moveslist.length-4)
-						$chessdata += '}}';
-					else
-						$chessdata += '}},';
-				}       
-			}       
-		}
-		if($noteslist.length >0){
-			$chessdata += '],"notes":[';
-			for (var $index=1;$index<$noteslist.length;$index+=2){
-				$chessdata += '{"id":';                 
-				$chessdata += $noteslist[$index];
-				$chessdata += ',"note":"';
-				$chessdata += $noteslist[$index+1];
-				$chessdata += '"';
-				if($index == $noteslist.length-2)
-					$chessdata += '}';
-				else
-					$chessdata += '},';
-			}       
-		}
-		$chessdata += '],"isanalyse":"';
-		$chessdata += isanalyse;
-		$chessdata += '","b_autoset":"';
-		$chessdata += b_autoset;
-		$chessdata += '","id":"';
-		$chessdata += id;
-		if(typeof(preid) != "undefined"){$chessdata += '","preid":"';$chessdata += preid;}
-		if(typeof(nextid) != "undefined"){$chessdata += '","nextid":"';$chessdata += nextid;}
-		$chessdata += '","isOffensive":';
-		$chessdata += isOffensive;
-		$chessdata += ',"bmy":"';
-		$chessdata += bill.my;
-		$chessdata += '","voicemode":"';
-		$chessdata +=voicemode;
-		$chessdata += '","pmy":"';
-		$chessdata += play.my;
-		$chessdata += '","isVerticalReverse":"';
-		$chessdata +=isVerticalReverse;
-		$chessdata += '","currentId":"';
-		$chessdata += currentId;
-		$chessdata += '","r_autoset":"';
-		$chessdata += r_autoset;
-		$chessdata += '"}';
-		
-		localStoragedata = $chessdata;
-		var storage=window.localStorage;
-		storage.setItem("analysedata",localStoragedata);
-	}
-	
-}
 var bill = bill || {};
 var isanalyse = isanalyse || 0;
 var boutside = -1.1;
@@ -202,7 +75,6 @@ bill.offensive = function () {
 	bill.replayBtnUpdate();
 },
 bill.editboard = function () {
-	localStorage.removeItem("analysedata");
 	bill.cleanLine();
 	if (isanalyse) {
 		isanalyse = 0;
@@ -355,7 +227,6 @@ bill.regret = function () {
 
 },
 bill.send = function (e) {
-	localStorage.removeItem("analysedata");
 	var a = {};
 	a.map = bill.moves4Server,
 	a.moves = bill.getMoves4Server();

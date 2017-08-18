@@ -296,6 +296,7 @@ play.ParseMsg = function(d) {
 		}
 	}	
 	else if(d.match("rank:")) {
+		//var e = (d.substr(8,d.length-8)).split("|");	
 		var e = d.split("|");	
 		cleanChessdbDetail();		
 		if (e[0].match("stalemate") || e[0].match("checkmate")) {

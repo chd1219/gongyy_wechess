@@ -1,102 +1,3 @@
-function setStorageData(){
-    isVerticalReverse ? sendmap = comm.arrReverse(bill.map) : sendmap = bill.map;
-    var $BillType =1;
-    var $map = comm.getMap6Server(sendmap);
-    var $moves = bill.getMoves6ServerEx();
-    var $notes = bill.getNotes2Server();
-    var $maplist = $map.split(' ');
-    var $noteslist = $notes.split(' ');
-    var $moveslist = $moves.split(' ');
-    var $chessdata = '';
-    $chessdata += '{"BillType":1'; 
-    $chessdata += ',"map":[';
-    for (var $index=1;$index<$maplist.length;$index+=3){
-        $chessdata += '{"cid":';
-        $chessdata += $maplist[$index];
-        $chessdata += ',"x":';
-        $chessdata += $maplist[$index+1];
-        $chessdata += ',"y":';
-        $chessdata += $maplist[$index+2];
-        if($index == $maplist.length-3)
-            $chessdata += '}';
-        else
-            $chessdata += '},';
-    }
-
-    if($BillType){
-
-        if($moveslist.length >0){
-            $chessdata += '],"moves":[';
-            for (var $index=1;$index<$moveslist.length;$index+=4){
-                $chessdata += '{"step":"';          
-                $chessdata += $moveslist[$index];
-                $chessdata += '","id":';
-                $chessdata += $moveslist[$index+1];
-                $chessdata += ',"perid":';
-                $chessdata += $moveslist[$index+2];
-                $chessdata += ',"index":';
-                $chessdata += $moveslist[$index+3];
-
-                if($index == $moveslist.length-4)
-                    $chessdata += '}';
-                else
-                    $chessdata += '},';
-            }       
-        }       
-    }
-    else{
-        if(count($moveslist.length) >0){
-            $chessdata += '],"moves":[';
-            for (var $index=1;$index<$moveslist.length;$index+=4){
-                $chessdata += '{"src":';            
-                $chessdata += '{"x":';
-                $chessdata += $moveslist[$index];
-                $chessdata += ',"y":';
-                $chessdata += $moveslist[$index+1];
-                $chessdata += '},"dst":';
-                $chessdata += '{"x":';
-                $chessdata += $moveslist[$index+2];
-                $chessdata += ',"y":';
-                $chessdata += $moveslist[$index+3];
-                if($index == $moveslist.length-4)
-                    $chessdata += '}}';
-                else
-                    $chessdata += '}},';
-            }       
-        }       
-    }
-    if($noteslist.length >0){
-        $chessdata += '],"notes":[';
-        for (var $index=1;$index<$noteslist.length;$index+=2){
-            $chessdata += '{"id":';                 
-            $chessdata += $noteslist[$index];
-            $chessdata += ',"note":"';
-            $chessdata += $noteslist[$index+1];
-            $chessdata += '"';
-            if($index == $noteslist.length-2)
-                $chessdata += '}';
-            else
-                $chessdata += '},';
-        }       
-    }
-        $chessdata += '],"power":"';
-        $chessdata += power;
-         $chessdata += '","voicemode":"';
-        $chessdata +=voicemode;
-        $chessdata += '","computer":"';
-        $chessdata += computer;
-         $chessdata += '","redtime":"';
-        $chessdata += redtime;
-         $chessdata += '","blacktime":"';
-        $chessdata += blacktime;
-        $chessdata += '","pmy":"';
-        $chessdata += play.my;
-        $chessdata += '"}';   
-   
-    localStoragedata = $chessdata;
-    var storage=window.localStorage;
-    storage.setItem("chessdata",localStoragedata);
-}
 var bill = bill || {};
 var isanalyse = isanalyse || 0;
 var boutside = -1.1;
@@ -208,17 +109,13 @@ bill.regret = function () {
 		moves.length--;
 		id--;
 	}
-	if(moves.length>0){
-		preId = bill.paceEx[moves.length-1][0][2];
-		currentId = bill.paceEx[moves.length-1][0][1];
-	}
-	
+	preId = bill.paceEx[moves.length-1][0][2];
+	currentId = bill.paceEx[moves.length-1][0][1];
 		
 	bill.replayBtnUpdate();
 
 },
 bill.send = function (e) {
-	localStorage.removeItem("chessdata");
 	var a = {};
 	a.map = bill.moves4Server,
 	a.moves = bill.getMoves4Server();
@@ -266,29 +163,6 @@ bill.send = function (e) {
 			alert(status);
 		}
 	})
-},
-bill.record = function(){
-    //if(serverSendRecord.length=serverReceiveRecord.length){
-        var _json = {
-            "serverReceiveRecord": serverReceiveRecord,
-            "serverSendRecord": serverSendRecord,
-            'movesIndex' :movesIndex,
-        };
-    $.ajax({
-        type: "POST",
-        url: chessrecordURL,
-        dataType: "text",
-        data: _json,
-        success: function (response, status, xhr) {
-            //window.parent.location.href = replayURL + "&file=" + comm.filename;
-            console.log(response);
-        },
-        error: function (response, status, xhr) {
-            //alert(status);
-        }
-    })
-   //}
-    
 },
 bill.clickCanvas = function (e) {
 	if (mode != 5)

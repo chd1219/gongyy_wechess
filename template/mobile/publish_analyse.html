@@ -61,7 +61,7 @@
             loader.loadFile({src: CDN_PATH + "js/play.js"});
             loader.loadFile({src: CDN_PATH + "js/bill.js"});
             loader.loadFile({src: CDN_PATH + "js/comm.js"});
-            loader.loadFile({src: CDN_PATH + "js/init.analyse.js"});
+            loader.loadFile({src: CDN_PATH + "js/init.analyse.20170806.js"});
             loader.loadFile({
                 src: CDN_PATH + "assets/images/chess_slim_atlas_.json",
                 type: "spritesheet",
@@ -110,11 +110,11 @@
                     $('#AIThink').css('top', '5%');
                 }
             }
-            if(window.Storage && window.localStorage && window.localStorage instanceof Storage){
-                setInterval("setStorageData()",3000);
-            }else{
-
-            }
+//          if(window.Storage && window.localStorage && window.localStorage instanceof Storage){
+//              setInterval("setStorageData()",3000);
+//          }else{
+//
+//          }
         }
 
         var fileTotal = 17;
