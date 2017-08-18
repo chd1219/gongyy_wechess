@@ -68,17 +68,12 @@ function hideDiv(div_id) {
 	}, 
 	"slow");  	
 }    
-var heartCheck = {
-    timeout: 10000,//15ms
-    timeoutObj: null,
-    reset: function(){
-        clearTimeout(this.timeoutObj);
-　　　　 this.start();
-    },
-    start: function(){
-        this.timeoutObj = setTimeout(function(){
-            ws.send("HeartBeat", "beat");
-        }, this.timeout)
+function ReverseCase(ch){
+    if( ch >= 'A' && ch <= 'Z' ) {
+    	return ch.toLowerCase();
+    }
+    if( ch >= 'a' && ch <= 'z' ) {
+    	return ch.toUpperCase();
     }
 }
 function addChess(e) {
@@ -179,12 +174,14 @@ function moreBtn() {
     window.location = "index.html"
 }
 function cleanComputerDetail() {
-	if (mode == 5 && document.getElementById("computerDetailTbody"))
-        document.getElementById("computerDetailTbody").innerHTML = "";
+	if (mode == 5 && document.getElementById("computerDetailTbody")) {
+		document.getElementById("computerDetailTbody").innerHTML = "";
+	}        
 }
 function cleanChessdbDetail() {
-	if (mode == 5 && document.getElementById("chessdbDetailTbody"))
-        document.getElementById("chessdbDetailTbody").innerHTML = "";
+	if (mode == 5 && document.getElementById("chessdbDetailTbody")) {
+		document.getElementById("chessdbDetailTbody").innerHTML = "";
+	}        
 }
 function cleanChess() {
     for (var e = 0; e < play.map.length; e++) for (var a = 0; a < play.map[e].length; a++) {
@@ -476,6 +473,7 @@ var canRestart = !1;
 var lastTime = 0,
 commTipsImg;
 var Dots = {};
+comm.notes = [],
 comm.emptyMap = [
 	[, , , , , , , , ""], 
 	[, , , , , , , , ""],
@@ -487,7 +485,7 @@ comm.emptyMap = [
 	[, , , , , , , , ""], 
 	[, , , , , , , , ""], 
 	[, , , , , , , , ""]
- ];
+ ]
 comm.initMap = [
 	["C0", "M0", "X0", "S0", "J0", "S1", "X1", "M1", "C1"], 
 	[, , , , , , , , ""], 
@@ -499,7 +497,7 @@ comm.initMap = [
 	[, "p0", , , , , , "p1",""], 
 	[, , , , , , , , ""], 
 	["c0", "m0", "x0", "s0", "j0", "s1", "x1", "m1", "c1"]
-],
+]
 comm["class"] = comm["class"] || {};
 comm["class"].Man = function(e, a, m) {
     this.pater = e.slice(0, 1);
@@ -549,17 +547,17 @@ comm["class"].Man = function(e, a, m) {
         var e = e || play.map;
         return comm.bylaw[o.bl](parseInt(this.x), parseInt(this.y), e, this.my)
     }
-},
+}
 comm.showDots = function() {
     for (var e = 0; e < comm.dot.dots.length; e++) {
         var a = comm.dot.dots[e].join(""),
         m = comm.Dots[a];
         m.visible = !0
     }
-},
+}
 comm.hideDots = function() {
     for (var e in comm.Dots) comm.Dots[e].visible = !1
-},
+}
 comm.init = function(e) {
     comm.width = canvas.width,
     comm.height = canvas.height,
@@ -571,15 +569,14 @@ comm.init = function(e) {
 	}else{
 		comm.pointStartX = 22;
    		comm.pointStartY = 22;
-	}
-	
-},
+	}	
+}
 comm.id2name = {
 	16 : "J", 17 : "S", 18 : "X", 19 : "M", 20 : "C", 21 : "P", 22 : "Z", 8 : "j", 9 : "s", 10 : "x", 11 : "m", 12 : "c", 13 : "p", 14 : "z"
-},
+}
 comm.name2id = {
 	J: 16, S: 17, X: 18, M: 19, C: 20, P: 21, Z: 22, j: 8, s: 9, x: 10, m: 11, c: 12, p: 13, z: 14
-},
+}
 comm.parseMap = function(e) {
     for (var a = e,
     m = comm.emptyMap.concat(), o = {},
@@ -591,8 +588,7 @@ comm.parseMap = function(e) {
         m[comm.reverseY(t.y - 1)][t.x - 1] = r
     }
     return m
-},
-comm.notes = [],
+}
 comm.parseNote = function(e) {
     for (var a = e,
     n = 0; n < a.length; n++) {
@@ -600,7 +596,7 @@ comm.parseNote = function(e) {
 		bill.notes.length = t,
 		bill.notes[t-1] = a[n].note;        
     }	
-},
+}
 comm.parseMoves = function(e) {
     for (var a = e,
     m = 0; m < a.length; m++) a[m].src.x = a[m].src.x - 1,
@@ -614,7 +610,7 @@ comm.parseMoves = function(e) {
     delete a[m].cid,
     delete a[m].order;
     return a
-},
+}
 comm.parseMovesEx = function(e) {
     for (var a = [],m = 0; m < e.length; m++) {
 		if(a[e[m].index]){
@@ -627,7 +623,7 @@ comm.parseMovesEx = function(e) {
 	}
 	bill.paceEx = a;
     return a
-},
+}
 comm.initChess = function(e, a) {
     play.isPlay = !0;
     var e = e || comm.initMap;
@@ -640,7 +636,7 @@ comm.initChess = function(e, a) {
     initPane(),
     initLight(),
     showBtns();
-};
+}
 comm.initChessEx = function(e, a) {
     play.isPlay = !0;
     var e = e || comm.initMap;
@@ -653,38 +649,37 @@ comm.initChessEx = function(e, a) {
     initPane(),
     initLight(),
     showBtns()
-};
+}
 comm.restart = function() {
 	popupDiv('restartdialog');		
-		$("#restartdialog").on('click', '.btn_dialog_cancle', function () {          
-					hideDiv('restartdialog');    
-                }).on('click', '.btn_dialog_ok', function () {                    
-					hideDiv('restartdialog');    
-					hideResult(), 
-					cleanChess(),
-					setEnable("regretBtn", !0), 
-					play.isPlay = !0, 
-					play.init(play.depth, play.nowMap), 
-					canRestart = !1, 					
-					requestServerStart()
-                });		
-	
-},
+	$("#restartdialog").on('click', '.btn_dialog_cancle', function () {          
+				hideDiv('restartdialog');    
+            }).on('click', '.btn_dialog_ok', function () {                    
+				hideDiv('restartdialog');    
+				hideResult(), 
+				cleanChess(),
+				setEnable("regretBtn", !0), 
+				play.isPlay = !0, 
+				play.init(play.depth, play.nowMap), 
+				canRestart = !1, 					
+				requestServerStart()
+            });			
+}
 comm.soundplay = function(e) {
 	voicemode ? createjs.Sound.play(e) : !1;
-},
+}
 comm.replayNext = function() {
     clearInterval(movesInterval),
     movesTipsShow && (movesIndex = 0, comm.replayTipHide(), movesTipsShow = !1),
     replayMovesStep()
-},
+}
 comm.replayPrev = function() {
     if (clearInterval(movesInterval), cleanChess(), moves = fullMoves.concat(), play.init(3, fullMap), movesIndex > 0) {
         movesIndex--;
         for (var e = 0; movesIndex > e; e++) play.stepPlay(moves[e].src, moves[e].dst, !0)
     }
     comm.replayBtnUpdate()
-},
+}
 comm.replayBtnUpdate = function() {
     0 >= movesIndex ? (setEnable("prevBtn", !1), setEnable("replayBtn", !1)) : (setEnable("prevBtn", !0), setEnable("replayBtn", !0)),
     movesIndex >= moves.length ? setEnable("nextBtn", !1) : setEnable("nextBtn", !0),
@@ -696,10 +691,10 @@ comm.replayBtnUpdate = function() {
 	}else{
 		$("#noteInfo").hide()
 	}
-},
+}
 comm.clickCanvas = function(e) {
     movesTipsShow && (comm.replayMoves(), comm.replayTipHide(), movesTipsShow = !1)
-},
+}
 comm.replayTipHide = function() {
     function e() {
         a.parent.removeChild(a)
@@ -712,7 +707,7 @@ comm.replayTipHide = function() {
         },
         1e3).call(e)
     }
-},
+}
 comm.replayMoves = function() {
     clearInterval(movesInterval),
     cleanChess(),
@@ -721,21 +716,21 @@ comm.replayMoves = function() {
     movesIndex = 0,
     replayMovesStep(),
     movesInterval = setInterval(replayMovesStep, 1500)
-},
+}
 comm.reverseY = function(e) {
     return 9 - e
-},
+}
 comm.key2cid = function(e) {
     var a = comm.name2id[e.split("")[0]];
     return a
-},
+}
 comm.toServerPos = function(e, a) {
     var m = {
         x: parseInt(e) + 1,
         y: 10 - parseInt(a)
     };
     return m
-},
+}
 comm.getMap6Server = function(e) {
 	var map6server = "";
     for (var a = 10,
@@ -751,7 +746,7 @@ comm.getMap6Server = function(e) {
         a--
     }
     return map6server
-},
+}
 comm.getMap4Server = function(e) {
     map4server = [];
     for (var a = 10,
@@ -770,7 +765,7 @@ comm.getMap4Server = function(e) {
         a--
     }
     return map4server
-},
+}
 comm.getMoves4Server = function() {
     for (var e = [], a = 0; a < play.pace.length; a++) {
         var m = play.pace[a].split(""),
@@ -787,7 +782,7 @@ comm.getMoves4Server = function() {
         e[a] = o
     }
     return e
-},
+}
 comm.getMoves6Server = function() {	
 	var e = "",o = "";
     for (var a = 0; a < play.pace.length; a++) {
@@ -796,20 +791,20 @@ comm.getMoves6Server = function() {
         e += o;
     }
     return e
-},
+}
 comm.onGameEnd = function(e) {
     if (1 == e) {
         comm.isWin = 1;
     } else comm.isWin = 0;
     canRestart = !0
-};
+}
 comm.showSendBtn = function() {
     console.log("showSendBtn"),
     $("#sendBtn").show()
-},
+}
 comm.onload = function() {
     
-};
+}
 comm.showPane = function(e, a, m, o) {
     comm.box1.visible = !0,
     comm.box1.x = comm.spaceX * e + comm.pointStartX + 3 + parseInt(e / 3),
@@ -817,11 +812,11 @@ comm.showPane = function(e, a, m, o) {
     comm.box2.visible = !0,
     comm.box2.x = comm.spaceX * m + comm.pointStartX + 3 + parseInt(m / 3),
     comm.box2.y = comm.spaceY * o + comm.pointStartY + 4 + parseInt(o / 3)
-},
+}
 comm.hidePane = function() {
     comm.box1.visible = !1,
     comm.box2.visible = !1
-},
+}
 comm.createMans = function(e) {
     for (var a = 0; a < e.length; a++) for (var m = 0; m < e[a].length; m++) {
         var o = e[a][m];
@@ -829,7 +824,7 @@ comm.createMans = function(e) {
 			comm.createMan(a, m, o);
         }
     }
-},
+}
 comm.createMan = function(a, m, o) {
 	var n = new comm["class"].Man(o);
 	n.x = m,
@@ -838,7 +833,7 @@ comm.createMan = function(a, m, o) {
 	var t = addChess(n.pater);
 	n.chess = t,
 	n.move()
-},
+}
 comm.send = function(e) {
 	var a = {};
 	a.map = comm.moves4Server,
@@ -887,18 +882,18 @@ comm.send = function(e) {
 			alert(status);
 		}
 	})
-},
+}
 comm.arr2Clone = function(e) {
     for (var a = [], m = 0; m < e.length; m++) a[m] = e[m].slice();
     return a
-},
+}
 comm.arrReverse = function(e) {
     for (var a = [], m = 0; m < e.length; m++) a[m] = e[e.length-1-m].slice().reverse();
     return a
-},
+}
 comm.keys = {
 	c0: "c", c1: "c", m0: "m", m1: "m", x0: "x", x1: "x", s0: "s", s1: "s", j0: "j", p0: "p", p1: "p", z0: "z", z1: "z", z2: "z", z3: "z", z4: "z", z5: "z", C0: "c", C1: "C", M0: "M", M1: "M", X0: "X", X1: "X", S0: "S", S1: "S", J0: "J", P0: "P", P1: "P", Z0: "Z", Z1: "Z", Z2: "Z", Z3: "Z", Z4: "Z", Z5: "Z"
-	},
+	}
 comm.bylaw = {},
 comm.bylaw.c = function(e, a, m, o) {
     for (var n = [], t = e - 1; t >= 0; t--) {
@@ -930,7 +925,7 @@ comm.bylaw.c = function(e, a, m, o) {
         n.push([e, t])
     }
     return n
-},
+}
 comm.bylaw.m = function(e, a, m, o) {
     var n = [];
     return ! (a - 2 >= 0 && 8 >= e + 1) || play.map[a - 1][e] || comm.mans[m[a - 2][e + 1]] && comm.mans[m[a - 2][e + 1]].my == o || n.push([e + 1, a - 2]),
@@ -942,15 +937,15 @@ comm.bylaw.m = function(e, a, m, o) {
     !(a - 1 >= 0 && e - 2 >= 0) || play.map[a][e - 1] || comm.mans[m[a - 1][e - 2]] && comm.mans[m[a - 1][e - 2]].my == o || n.push([e - 2, a - 1]),
     !(a - 2 >= 0 && e - 1 >= 0) || play.map[a - 1][e] || comm.mans[m[a - 2][e - 1]] && comm.mans[m[a - 2][e - 1]].my == o || n.push([e - 1, a - 2]),
     n
-},
+}
 comm.bylaw.x = function(e, a, m, o) {
     var n = [];
     return ((isVerticalReverse == 0 && 1 === o) || (isVerticalReverse == 1 && -1 === o)) ? (!(9 >= a + 2 && 8 >= e + 2) || play.map[a + 1][e + 1] || comm.mans[m[a + 2][e + 2]] && comm.mans[m[a + 2][e + 2]].my == o || n.push([e + 2, a + 2]), !(9 >= a + 2 && e - 2 >= 0) || play.map[a + 1][e - 1] || comm.mans[m[a + 2][e - 2]] && comm.mans[m[a + 2][e - 2]].my == o || n.push([e - 2, a + 2]), !(a - 2 >= 5 && 8 >= e + 2) || play.map[a - 1][e + 1] || comm.mans[m[a - 2][e + 2]] && comm.mans[m[a - 2][e + 2]].my == o || n.push([e + 2, a - 2]), !(a - 2 >= 5 && e - 2 >= 0) || play.map[a - 1][e - 1] || comm.mans[m[a - 2][e - 2]] && comm.mans[m[a - 2][e - 2]].my == o || n.push([e - 2, a - 2])) : (!(4 >= a + 2 && 8 >= e + 2) || play.map[a + 1][e + 1] || comm.mans[m[a + 2][e + 2]] && comm.mans[m[a + 2][e + 2]].my == o || n.push([e + 2, a + 2]), !(4 >= a + 2 && e - 2 >= 0) || play.map[a + 1][e - 1] || comm.mans[m[a + 2][e - 2]] && comm.mans[m[a + 2][e - 2]].my == o || n.push([e - 2, a + 2]), !(a - 2 >= 0 && 8 >= e + 2) || play.map[a - 1][e + 1] || comm.mans[m[a - 2][e + 2]] && comm.mans[m[a - 2][e + 2]].my == o || n.push([e + 2, a - 2]), !(a - 2 >= 0 && e - 2 >= 0) || play.map[a - 1][e - 1] || comm.mans[m[a - 2][e - 2]] && comm.mans[m[a - 2][e - 2]].my == o || n.push([e - 2, a - 2])),n 
-},
+}
 comm.bylaw.s = function(e, a, m, o) {
     var n = [];
     return ((isVerticalReverse == 0 && 1 === o) || (isVerticalReverse == 1 && -1 === o)) ? (9 >= a + 1 && 5 >= e + 1 && (!comm.mans[m[a + 1][e + 1]] || comm.mans[m[a + 1][e + 1]].my != o) && n.push([e + 1, a + 1]), 9 >= a + 1 && e - 1 >= 3 && (!comm.mans[m[a + 1][e - 1]] || comm.mans[m[a + 1][e - 1]].my != o) && n.push([e - 1, a + 1]), a - 1 >= 7 && 5 >= e + 1 && (!comm.mans[m[a - 1][e + 1]] || comm.mans[m[a - 1][e + 1]].my != o) && n.push([e + 1, a - 1]), a - 1 >= 7 && e - 1 >= 3 && (!comm.mans[m[a - 1][e - 1]] || comm.mans[m[a - 1][e - 1]].my != o) && n.push([e - 1, a - 1])) : (2 >= a + 1 && 5 >= e + 1 && (!comm.mans[m[a + 1][e + 1]] || comm.mans[m[a + 1][e + 1]].my != o) && n.push([e + 1, a + 1]), 2 >= a + 1 && e - 1 >= 3 && (!comm.mans[m[a + 1][e - 1]] || comm.mans[m[a + 1][e - 1]].my != o) && n.push([e - 1, a + 1]), a - 1 >= 0 && 5 >= e + 1 && (!comm.mans[m[a - 1][e + 1]] || comm.mans[m[a - 1][e + 1]].my != o) && n.push([e + 1, a - 1]), a - 1 >= 0 && e - 1 >= 3 && (!comm.mans[m[a - 1][e - 1]] || comm.mans[m[a - 1][e - 1]].my != o) && n.push([e - 1, a - 1])), n
-},
+}
 comm.bylaw.j = function(e, a, m, o) {
     var n = [],
     t = function(e, a) {
@@ -961,7 +956,7 @@ comm.bylaw.j = function(e, a, m, o) {
         return ! 0
     } ();
      return ((isVerticalReverse == 0 && 1 === o) || (isVerticalReverse == 1 && -1 === o)) ? (9 >= a + 1 && (!comm.mans[m[a + 1][e]] || comm.mans[m[a + 1][e]].my != o) && n.push([e, a + 1]), a - 1 >= 7 && (!comm.mans[m[a - 1][e]] || comm.mans[m[a - 1][e]].my != o) && n.push([e, a - 1]), comm.mans.j0.x == comm.mans.J0.x && t && n.push([comm.mans.J0.x, comm.mans.J0.y])) : (2 >= a + 1 && (!comm.mans[m[a + 1][e]] || comm.mans[m[a + 1][e]].my != o) && n.push([e, a + 1]), a - 1 >= 0 && (!comm.mans[m[a - 1][e]] || comm.mans[m[a - 1][e]].my != o) && n.push([e, a - 1]), comm.mans.j0.x == comm.mans.J0.x && t && n.push([comm.mans.j0.x, comm.mans.j0.y])), 5 >= e + 1 && (!comm.mans[m[a][e + 1]] || comm.mans[m[a][e + 1]].my != o) && n.push([e + 1, a]),e - 1 >= 3 && (!comm.mans[m[a][e - 1]] || comm.mans[m[a][e - 1]].my != o) && n.push([e - 1, a]), n
-},
+}
 comm.bylaw.p = function(e, a, m, o) {
     for (var n = [], t = 0, s = e - 1; s >= 0; s--) {
         if (m[a][s]) {
@@ -1011,11 +1006,11 @@ comm.bylaw.p = function(e, a, m, o) {
         0 == t && n.push([e, s])
     }
     return n
-},
+}
 comm.bylaw.z = function(e, a, m, o) {
     var n = [];
     return ((isVerticalReverse == 0 && 1 === o) || (isVerticalReverse == 1 && -1 === o)) ? ( a - 1 >= 0 && (!comm.mans[m[a - 1][e]] || comm.mans[m[a - 1][e]].my != o) && n.push([e, a - 1]), 8 >= e + 1 && 4 >= a && (!comm.mans[m[a][e + 1]] || comm.mans[m[a][e + 1]].my != o) && n.push([e + 1, a]), e - 1 >= 0 && 4 >= a && (!comm.mans[m[a][e - 1]] || comm.mans[m[a][e - 1]].my != o) && n.push([e - 1, a]) ) : ( 9 >= a + 1 && (!comm.mans[m[a + 1][e]] || comm.mans[m[a + 1][e]].my != o) && n.push([e, a + 1]), 8 >= e + 1 && a >= 5 && (!comm.mans[m[a][e + 1]] || comm.mans[m[a][e + 1]].my != o) && n.push([e + 1, a]), e - 1 >= 0 && a >= 5 && (!comm.mans[m[a][e - 1]] || comm.mans[m[a][e - 1]].my != o) && n.push([e - 1, a]) ), n	
-},
+}
 comm.value = {
     c: [[206, 208, 207, 213, 214, 213, 207, 208, 206], [206, 212, 209, 216, 233, 216, 209, 212, 206], [206, 208, 207, 214, 216, 214, 207, 208, 206], [206, 213, 213, 216, 216, 216, 213, 213, 206], [208, 211, 211, 214, 215, 214, 211, 211, 208], [208, 212, 212, 214, 215, 214, 212, 212, 208], [204, 209, 204, 212, 214, 212, 204, 209, 204], [198, 208, 204, 212, 212, 212, 204, 208, 198], [200, 208, 206, 212, 200, 212, 206, 208, 200], [194, 206, 204, 212, 200, 212, 204, 206, 194]],
     m: [[90, 90, 90, 96, 90, 96, 90, 90, 90], [90, 96, 103, 97, 94, 97, 103, 96, 90], [92, 98, 99, 103, 99, 103, 99, 98, 92], [93, 108, 100, 107, 100, 107, 100, 108, 93], [90, 100, 99, 103, 104, 103, 99, 100, 90], [90, 98, 101, 102, 103, 102, 101, 98, 90], [92, 94, 98, 95, 98, 95, 98, 94, 92], [93, 92, 94, 95, 92, 95, 94, 92, 93], [85, 90, 92, 93, 78, 93, 92, 90, 85], [88, 85, 90, 88, 90, 88, 90, 85, 88]],
@@ -1059,220 +1054,112 @@ comm.getTips = function(e) {
     return o.addChild(m),
     o.addChild(e),
     o
-};
+}
 //把坐标生成着法
+comm.createRedMove = function(man,x,y,newX,newY,flag) {
+	var h="";
+	var mumTo=["一","二","三","四","五","六","七","八","九","十"];    
+    newX=8-newX;
+    h+= mumTo[8-x];
+    if (newY > y) {
+        flag ? h+= "退" : h+= "进" ;
+        if (man.pater == "m" || man.pater == "s" || man.pater == "x"){
+            h+= mumTo[newX];
+        }else {
+            h+= mumTo[newY - y -1];
+        }
+    }else if (newY < y) {
+        flag ? h+= "进" : h+= "退";
+        if (man.pater == "m" || man.pater == "s" || man.pater == "x"){
+            h+= mumTo[newX];
+        }else {
+            h+= mumTo[y - newY -1];
+        }
+    }else {
+        h+= "平";
+        h+= mumTo[newX];
+    }
+    return h;
+}
+comm.createBlackMove = function(man,x,y,newX,newY,flag) {
+	var h="";
+	var mumTo=["１","２","３","４","５","６","７","８","９","10"];
+    h+= mumTo[x];
+    if (newY > y) {
+        flag ? h+= "进" : h+= "退";
+        if (man.pater == "M" || man.pater == "S" || man.pater == "X"){
+            h+= mumTo[newX];
+        }else {
+            h+= mumTo[newY-y-1];
+        }
+    }else if (newY < y) {
+    	flag ? h+= "退" : h+= "进" ;
+        if (man.pater == "M" || man.pater == "S" || man.pater == "X"){
+            h+= mumTo[newX];
+        }else {
+            h+= mumTo[y-newY-1];
+        }
+    }else {
+        h+= "平";
+        h+= mumTo[newX];
+    }
+    return h;
+}
 comm.createMove = function (map,x,y,newX,newY){
-    var h="";   
-    var man;    
-    if (!isVerticalReverse) {
-        if(typeof(map[y][x])=='undefined'){
-            return h;
-        }
-        man = comm.mans[map[y][x]];
-        h+= man.text;
-        map[newY][newX] = map[y][x];
-        delete map[y][x];
-        if (man.my===1){
-            var mumTo=["一","二","三","四","五","六","七","八","九","十"];    
-            newX=8-newX;
-            h+= mumTo[8-x];
-            if (newY > y) {
-                h+= "退";
-                if (man.pater == "m" || man.pater == "s" || man.pater == "x"){
-                    h+= mumTo[newX];
-                }else {
-                    h+= mumTo[newY - y -1];
-                }
-            }else if (newY < y) {
-                h+= "进";
-                if (man.pater == "m" || man.pater == "s" || man.pater == "x"){
-                    h+= mumTo[newX];
-                }else {
-                    h+= mumTo[y - newY -1];
-                }
-            }else {
-                h+= "平";
-                h+= mumTo[newX];
-            }
-        }else{
-            var mumTo=["１","２","３","４","５","６","７","８","９","10"];
-            h+= mumTo[x];
-            if (newY > y) {
-                h+= "进";
-                if (man.pater == "M" || man.pater == "S" || man.pater == "X"){
-                    h+= mumTo[newX];
-                }else {
-                    h+= mumTo[newY - y-1];
-                }
-            }else if (newY < y) {
-                h+= "退";
-                if (man.pater == "M" || man.pater == "S" || man.pater == "X"){
-                    h+= mumTo[newX];
-                }else {
-                    h+= mumTo[y - newY-1];
-                }
-            }else {
-                h+= "平";
-                h+= mumTo[newX];
-            }
-        }       
+	try {
+		var h="";   
+	    var man;    
+	    if (!isVerticalReverse) {
+	        man = comm.mans[map[y][x]];
+	        h+= man.text;
+	        map[newY][newX] = map[y][x];
+	        delete map[y][x];
+	        if (man.my===1){
+	            h += comm.createRedMove(man,x,y,newX,newY,!0);
+	        }else{
+	            h += comm.createBlackMove(man,x,y,newX,newY,!0);
+	        }       
+	    }
+	    else {
+	        man = comm.mans[map[9-y][8-x]];
+	        h+= man.text;
+	        map[9-newY][8-newX] = map[9-y][8-x];
+	        delete map[9-y][8-x];
+	        if (man.my===-1){
+	            h += comm.createBlackMove(man,x,y,newX,newY,!0);
+	        }else{
+	        	h += comm.createRedMove(man,x,y,newX,newY,!0);
+	        }       
+	    }    
+	}
+    catch(e){
+    	console.log(e);
     }
-    else {
-        if(typeof(map[9-y][8-x])=='undefined'){
-            return h;
-        }
-        man = comm.mans[map[9-y][8-x]];
-        h+= man.text;
-        map[9-newY][8-newX] = map[9-y][8-x];
-        delete map[9-y][8-x];
-        if (man.my===-1){
-            var mumTo=["１","２","３","４","５","６","７","８","９","10"];               
-            h+= mumTo[x];
-            if (newY > y) {
-                h+= "进";
-                if (man.pater == "M" || man.pater == "S" || man.pater == "X"){
-                    h+= mumTo[newX];
-                }else {
-                    h+= mumTo[newY - y -1];
-                }
-            }else if (newY < y) {
-                h+= "退";
-                if (man.pater == "M" || man.pater == "S" || man.pater == "X"){
-                    h+= mumTo[newX];
-                }else {
-                    h+= mumTo[y - newY -1];
-                }
-            }else {
-                h+= "平";
-                h+= mumTo[newX];
-            }
-        }else{
-        	var mumTo=["一","二","三","四","五","六","七","八","九","十"];             
-            newX=8-newX;
-            h+= mumTo[8-x];
-            if (newY > y) {
-                h+= "退";
-                if (man.pater == "m" || man.pater == "s" || man.pater == "x"){
-                    h+= mumTo[newX];
-                }else {
-                    h+= mumTo[newY - y -1];
-                }
-            }else if (newY < y) {
-                h+= "进";
-                if (man.pater == "m" || man.pater == "s" || man.pater == "x"){
-                    h+= mumTo[newX];
-                }else {
-                    h+= mumTo[y - newY -1];
-                }
-            }else {
-                h+= "平";
-                h+= mumTo[newX];
-            }
-        }       
-    }
-    
     return h;
 }
 comm.createMove1 = function (man,x,y,newX,newY){
-    var h="";   
-    if (!isVerticalReverse) {
-        h+= man.text;
-        if (man.my===1){
-            var mumTo=["一","二","三","四","五","六","七","八","九","十"];    
-            newX=8-newX;
-            h+= mumTo[8-x];
-            if (newY > y) {
-                h+= "退";
-                if (man.pater == "m" || man.pater == "s" || man.pater == "x"){
-                    h+= mumTo[newX];
-                }else {
-                    h+= mumTo[newY - y -1];
-                }
-            }else if (newY < y) {
-                h+= "进";
-                if (man.pater == "m" || man.pater == "s" || man.pater == "x"){
-                    h+= mumTo[newX];
-                }else {
-                    h+= mumTo[y - newY -1];
-                }
-            }else {
-                h+= "平";
-                h+= mumTo[newX];
-            }
-        }else{
-            var mumTo=["１","２","３","４","５","６","７","８","９","10"];
-            h+= mumTo[x];
-            if (newY > y) {
-                h+= "进";
-                if (man.pater == "M" || man.pater == "S" || man.pater == "X"){
-                    h+= mumTo[newX];
-                }else {
-                    h+= mumTo[newY - y-1];
-                }
-            }else if (newY < y) {
-                h+= "退";
-                if (man.pater == "M" || man.pater == "S" || man.pater == "X"){
-                    h+= mumTo[newX];
-                }else {
-                    h+= mumTo[y - newY-1];
-                }
-            }else {
-                h+= "平";
-                h+= mumTo[newX];
-            }
-        }       
-    }
-    else {
-        h+= man.text;
-        if (man.my===-1){
-            var mumTo=["１","２","３","４","５","６","７","８","９","10"];               
-            h+= mumTo[x];
-            if (newY > y) {
-                h+= "进";
-                if (man.pater == "M" || man.pater == "S" || man.pater == "X"){
-                    h+= mumTo[newX];
-                }else {
-                    h+= mumTo[newY - y -1];
-                }
-            }else if (newY < y) {
-                h+= "退";
-                if (man.pater == "M" || man.pater == "S" || man.pater == "X"){
-                    h+= mumTo[newX];
-                }else {
-                    h+= mumTo[y - newY -1];
-                }
-            }else {
-                h+= "平";
-                h+= mumTo[newX];
-            }
-        }else{
-        	var mumTo=["一","二","三","四","五","六","七","八","九","十"];             
-            newX=8-newX;
-            h+= mumTo[8-x];
-            if (newY > y) {
-                h+= "退";
-                if (man.pater == "m" || man.pater == "s" || man.pater == "x"){
-                    h+= mumTo[newX];
-                }else {
-                    h+= mumTo[newY - y -1];
-                }
-            }else if (newY < y) {
-                h+= "进";
-                if (man.pater == "m" || man.pater == "s" || man.pater == "x"){
-                    h+= mumTo[newX];
-                }else {
-                    h+= mumTo[y - newY -1];
-                }
-            }else {
-                h+= "平";
-                h+= mumTo[newX];
-            }
-        }       
-    }
-    
+	try{
+		var h="";   
+	    h+= man.text;
+	    if (!isVerticalReverse) {
+	        if (man.my===1){
+	            h += comm.createRedMove(man,x,y,newX,newY,!1);
+	        }else{
+	            h += comm.createBlackMove(man,x,y,newX,newY,!1);
+	        }          
+	    }
+	    else {        
+	        if (man.my===-1){
+	            h += comm.createBlackMove(man,x,y,newX,newY,!1);
+	        }else{
+	        	h += comm.createRedMove(man,x,y,newX,newY,!1);
+	        }      
+	    }
+	}catch(e){
+		console.log(e);
+	}     
     return h;
 }
-
 function VerifyFEN(s) {
 	s = s.replace(/[\r\n]/, '');
 	s = s.replace(/%20/, ' ');
@@ -1313,19 +1200,19 @@ function VerifyFEN(s) {
 	return (1);
 }
 function isJSON(str) {
-        if (typeof str == 'string') {
-            try {
-                var obj=JSON.parse(str);
-                if(str.indexOf('{')>-1){
-                    return true;
-                }else{
-                    return false;
-                }
-
-            } catch(e) {
-                console.log(e);
+    if (typeof str == 'string') {
+        try {
+            var obj=JSON.parse(str);
+            if(str.indexOf('{')>-1){
+                return true;
+            }else{
                 return false;
             }
+
+        } catch(e) {
+            console.log(e);
+            return false;
         }
-        return false;
+    }
+    return false;
 }

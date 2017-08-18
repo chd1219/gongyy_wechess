@@ -24,8 +24,7 @@ var MyWebsocket = function (url, bRec) {
 		ws.onopen = function () {
 		}
 		ws.onclose = function () {
-		}		
-	
+		}			
 		ws.onerror = function () {
 		}	
 	}
@@ -71,125 +70,126 @@ function CheckReturn() {
 }
 function sendMessage(e){
 	myws.Send(e);
-//	mywstest.Send(e);
 }
+function DealQueryall(obj) {
+	var e = (obj.result).split("|");
+	cleanChessdbDetail();		
+	if (e[0].match("stalemate") || e[0].match("checkmate")) {
+		showFloatTip("绝杀！");
+		return;
+	}				
+	if (e[0].match("unknown") || e[0].match("invalid board")){
+		return;			
+	}
+	var tmpStr = new String();	
+	chessdblist = [];
+	for (i=0;i<e.length && i<10;i++) {	
+		var tempmap = comm.arr2Clone(play.map);
+		var o = e[i].split(",");
+		a = o[0].split("");			
+		n = play.transformat(a);	
+		chessdblist.push(n);
+		p = comm.createMove(tempmap,n[0],n[1],n[2],n[3]);
+		tmpStr += "<tr style=\"height:40px;\"><td>"+ p +"</td><td>"+ o[2] +"</td><td>"+ o[1] +"</td><td><input type=\"Button\" onclick='play.onmdownchessdblist(\""+i+"\")' value=\"立即出招\"></td></tr>";
+	}	
+	if(document.getElementById("chessdbDetailTbody")){ 
+		document.getElementById("chessdbDetailTbody").innerHTML = tmpStr;
+	}
+}
+function DealPosition(obj) {
+	d = obj.result;
+	if(d.match("bestmove ")){
+		var e = d.split("bestmove "); 
+		//回调返回函数
+		myws.Return();
+		if(e[1].match("null") || e[1].match("none")){
+			play.my == 1 ? play.onGameEnd(-1) : play.onGameEnd(1);
+			bill.my = -bill.my;
+			play.my = -play.my;			
+			return;
+		}
+		var o = e[1].split(""); 
+		var a = [];
+		a = play.transformat(o);			
+		play.aiPace = a;		
+		if(!isanalyse){
+			setTimeout((function(){play.serverAIPlay();}),200);
+		}		
+	}		
+	else if (d.length > 16){
+		var e = d.split(" ");
+		var depth = e[2],
+		seldepth = e[4],
+		multipv = e[6],		
+		nodes = e[10],
+		nps = e[12],
+		tbhits = e[14],
+		time = e[16] / 1000;
+		score = e[8];
+		if (isOffensive == movesIndex%2) {
+			score = -score;
+		}		
 
+		var tempmap = comm.arr2Clone(play.map);
+		if (depth == 1) {
+			computelist = [];
+			cleanComputerDetail();
+		}
+
+		if (depth > 0) {
+			var pv = [],
+			a = [];
+
+			var tmpStr = new String();
+			var setting = new String();
+			for (var pvseek = 17; pvseek < e.length; pvseek++) {
+				if (e[pvseek] == "pv")
+					break;
+			}
+			bill.cleanLine();
+			for (j = 0; (j + pvseek) < e.length && j<4; j++) {
+				i = j + pvseek + 1;
+				if (e[i]) {
+					a = e[i].split("");					
+					o = play.transformat(a);					
+					computelist.push(o);
+					pv[j] = comm.createMove(tempmap, o[0], o[1], o[2], o[3]);
+					tmpStr = tmpStr + pv[j] + " ";
+					//走法提示
+					if (isVerticalReverse) {
+						o[0] = 8-o[0];
+						o[1] = 9-o[1];
+						o[2] = 8-o[2];
+						o[3] = 9-o[3];
+					}
+					if (isanalyse) {
+						if (j==0) {
+							bill.drawLine2(o,1);
+						}
+						if (j==1) {
+							bill.drawLine2(o,2);
+						}
+					}
+				}				
+			}
+			setting = "<td> </td>";
+			tmpStr = "<tr><td>" + (depth / 32).toFixed(2) + "</td><td>" + score + "</td><td>" + tmpStr + "</td>" + setting + "</tr>";
+			if(document.getElementById("computerDetailTbody")){ 
+				document.getElementById("computerDetailTbody").innerHTML = tmpStr + document.getElementById("computerDetailTbody").innerHTML;
+			} 			
+		}
+	}
+}
 function ParseMsg(obj) {
 	if(!waitServerPlay) return;
 	
 	if(Number(obj.index) != movesIndex) return;
 	switch(obj.commandtype){
 		case "queryall":
-			var e = (obj.result).split("|");
-			cleanChessdbDetail();		
-			if (e[0].match("stalemate") || e[0].match("checkmate")) {
-				showFloatTip("绝杀！");
-				return;
-			}				
-			if (e[0].match("unknown") || e[0].match("invalid board")){
-				return;			
-			}
-			var tmpStr = new String();	
-			chessdblist = [];
-			for (i=0;i<e.length && i<10;i++) {	
-				var tempmap = comm.arr2Clone(play.map);
-				var o = e[i].split(",");
-				a = o[0].split("");			
-				n = play.transformat(a);	
-				chessdblist.push(n);
-				p = comm.createMove(tempmap,n[0],n[1],n[2],n[3]);
-				tmpStr += "<tr style=\"height:40px;\"><td>"+ p +"</td><td>"+ o[2] +"</td><td>"+ o[1] +"</td><td><input type=\"Button\" onclick='play.onmdownchessdblist(\""+i+"\")' value=\"立即出招\"></td></tr>";
-			}	
-			if(document.getElementById("chessdbDetailTbody")){ 
-				document.getElementById("chessdbDetailTbody").innerHTML = tmpStr;
-			}
+			DealQueryall(obj);
 			break;
 		case "position":
-			d = obj.result;
-			if(d.match("bestmove ")){
-				var e = d.split("bestmove "); 
-				
-				if(e[1].match("null") || e[1].match("none")){
-					play.my == 1 ? play.onGameEnd(-1) : play.onGameEnd(1);
-					bill.my = -bill.my;
-					play.my = -play.my;			
-					return;
-				}
-				var o = e[1].split(""); 
-				var a = [];
-				a = play.transformat(o);			
-				play.aiPace = a;		
-				if(!isanalyse){
-					setTimeout((function(){play.serverAIPlay();}),200);
-				}		
-				//回调返回函数
-				myws.Return();
-			}		
-			else if (d.length > 16){
-				var e = d.split(" ");
-				var depth = e[2],
-				seldepth = e[4],
-				multipv = e[6],		
-				nodes = e[10],
-				nps = e[12],
-				tbhits = e[14],
-				time = e[16] / 1000;
-				score = e[8];
-				if (isOffensive == movesIndex%2) {
-					score = -score;
-				}		
-		
-				var tempmap = comm.arr2Clone(play.map);
-				if (depth == 1) {
-					computelist = [];
-					cleanComputerDetail();
-				}
-		
-				if (depth > 0) {
-					var pv = [],
-					a = [];
-		
-					var tmpStr = new String();
-					var setting = new String();
-					for (var pvseek = 17; pvseek < e.length; pvseek++) {
-						if (e[pvseek] == "pv")
-							break;
-					}
-					bill.cleanLine();
-					for (j = 0; (j + pvseek) < e.length && j<4; j++) {
-						i = j + pvseek + 1;
-						if (e[i]) {
-							a = e[i].split("");					
-							o = play.transformat(a);					
-							computelist.push(o);
-							pv[j] = comm.createMove(tempmap, o[0], o[1], o[2], o[3]);
-							tmpStr = tmpStr + pv[j] + " ";
-							//走法提示
-							if (isVerticalReverse) {
-								o[0] = 8-o[0];
-								o[1] = 9-o[1];
-								o[2] = 8-o[2];
-								o[3] = 9-o[3];
-							}
-							if (isanalyse) {
-								if (j==0) {
-									bill.drawLine2(o,1);
-								}
-								if (j==1) {
-									bill.drawLine2(o,2);
-								}
-							}
-						}				
-					}
-					setting = "<td> </td>";
-					tmpStr = "<tr><td>" + (depth / 32).toFixed(2) + "</td><td>" + score + "</td><td>" + tmpStr + "</td>" + setting + "</tr>";
-					if(document.getElementById("computerDetailTbody")){ 
-						document.getElementById("computerDetailTbody").innerHTML = tmpStr + document.getElementById("computerDetailTbody").innerHTML;
-					} 			
-				}
-				//console.log(d);
-				play.aiPace = null;	
-			}		 
+			DealPosition(obj);
 			break;
 		default:
 			break;
@@ -214,13 +214,10 @@ function loadConfig() {
     mui('#delete').popover('toggle');
     
     //初始化
-    myws = new MyWebsocket('ws://120.55.37.210:9001/',!0);
+    myws = new MyWebsocket('ws://120.55.37.210:9002/',!0);
     myws.initWebsocket();
-    
+    //启动定时器，检查超时
     interval = setInterval(CheckReturn, 1000);	
-    
-//  mywstest = new MyWebsocket('ws://118.190.46.210:9011/',false);
-//  mywstest.initWebsocket();
 }
 
 function initLayer(e) {

@@ -1,4 +1,12 @@
 var play = play || {};
+var removeOnDrops = [],
+callOnDrops = [],
+callOnDropsArgs = [];
+var time;
+var chessdblist = [];
+var computelist = [];
+var first = !1;
+var waitServerPlay = !1;
 play.init = function(e, a) {
     var a = a || comm.initMap;
     play.cMap = comm.arr2Clone(a);
@@ -23,10 +31,7 @@ play.init = function(e, a) {
         n && (comm.mans[n].x = o, comm.mans[n].y = m, comm.mans[n].isShow = !0)
     }
     comm.moves4Server = comm.getMap4Server(play.map)
-};
-var removeOnDrops = [],
-callOnDrops = [],
-callOnDropsArgs = [];
+}
 play.onChessDrop = function() {
     function e() {
         for (var e = callOnDrops.length - 1; e >= 0; e--) {
@@ -43,17 +48,17 @@ play.onChessDrop = function() {
     comm.soundplay("drop"),
     //play.showThink(),
     setTimeout(e, 200)
-},
+}
 play.addCallOnDrop = function(e, a) {	
     callOnDrops.push(e),
     callOnDropsArgs.push(a)
-},
+}
 play.addRemoveOnDrop = function(e) {
     removeOnDrops.push(e)
-},
+}
 play.regret = function() {
     play.pace.length >= 1 ? (regret()) : showFloatTip("还没开始下棋呢")
-},
+}
 play.clickCanvas = function(e) {
     if (play.isAnimating) return ! 1;
     if (!play.isPlay) return ! 1;
@@ -64,7 +69,7 @@ play.clickCanvas = function(e) {
     n = m.y;
     a ? play.clickMan(a, o, n) : play.clickPoint(o, n),
     play.isFoul = play.checkFoul()
-},
+}
 play.clickMan = function(e, a, m) {	
     var o = comm.mans[e];
     if (play.nowManKey && play.nowManKey != e && o.my != comm.mans[play.nowManKey].my) {
@@ -102,13 +107,12 @@ play.clickMan = function(e, a, m) {
 		comm.mans[e].ps = comm.mans[e].bl(), 
 		comm.dot.dots = comm.mans[e].ps, 
 		comm.showDots(), 
-		first ? (comm.soundplay("drop"), first = !1) : comm.soundplay("select"), 
+		first ? (comm.soundplay("drop"), first = !1) : comm.soundstepEndplay("select"), 
 		comm.light.x = comm.spaceX * o.x + comm.pointStartX - 20, 
 		comm.light.y = comm.spaceY * o.y + comm.pointStartY - 24
 		)
 	}
-};
-var first = !1;
+}
 play.clickPoint = function(e, a) {
     var m = play.nowManKey,
     o = comm.mans[m];
@@ -131,26 +135,25 @@ play.clickPoint = function(e, a) {
 		play.AIPlay(n + e + a),
         comm.light.visible = !1;
     }
-};
-var time;
-function echoTips(e){	
+}
+play.echoTips = function (e){	
 	t = 0;
 	time = setInterval(function(){
 		$("#AIThink").text(e + "(" + (++t) + "s)"),
 		$("#AIThink").show();			
 	},1000);
 }
-function hideTips(){
+play.hideTips = function (){
 	clearInterval(time);
-};
+}
 play.showThink = function() {
 	room_id = getUrlParam("roomid");
 	room_id ? ( play.my == -1 ? echoTips("红方思考中。。。") : echoTips("黑方思考中。。。") ) : !1;
-},
+}
 play.hideThink = function() {
     clearInterval(time);
 	$("#AIThink").hide();
-},
+}
 play.stepPlay = function(e, a, m) {
     m = m || !1,
     comm.hideDots(),
@@ -159,35 +162,34 @@ play.stepPlay = function(e, a, m) {
     play.nowManKey = o;
     var o = play.map[a.y][a.x];
     o ? play.AIclickMan(o, a.x, a.y, m) : play.AIclickPoint(a.x, a.y, m)
-};
-var waitServerPlay = !1;
+}
 play.autoPlay = function(){ 		
 	if(!waitServerPlay){
 			play.AIPlay();		
 			if(play.my == 1) play.my = -1;
 			else play.my = 1;	
 		}			
-},
+}
 play.AIPlay = function(e) {
 	room_id = getUrlParam("roomid");
 	room_id ? play.onlinePlay(e) : play.bAIPlay();
-},
+}
 play.onlinePlay = function(e) {
 	play.showThink();
 	waitServerPlay = !0;
 	sendMessage("move "+e);
 	console.log(e);
-},
+}
 play.bAIPlay = function() {
 	/*黑*/
 	waitServerPlay = !0;
 	sendMessage(play.getFen(isVerticalReverse ? comm.arrReverse(play.map) : play.map, -1));
-},
+}
 play.rAIPlay = function() {
 	/*红*/
 	waitServerPlay = !0;
 	sendMessage(play.getFen(isVerticalReverse ? comm.arrReverse(play.map) : play.map, 1));
-},
+}
 play.serverAIPlay = function(e) {		
     if (0 != play.isPlay) {		
         e = e || play.aiPace;
@@ -219,7 +221,7 @@ play.serverAIPlay = function(e) {
 		//if(playmode == 4) checkIsFinalKill();
 		
     }
-},
+}
 play.clientPlay = function() {
     if (0 != play.isPlay) {
         var e = AI.init();
@@ -233,7 +235,7 @@ play.clientPlay = function() {
         var a = play.map[e[3]][e[2]];
         a ? setTimeout(play.AIclickMan, 100, a, e[2], e[3]) : setTimeout(play.AIclickPoint, 100, e[2], e[3])
     }
-},
+}
 play.transformat = function(o){
 	/*坐标变换(a-i)->(0-8),(0-9)->(9-0)*/
 	var a = [];
@@ -242,9 +244,6 @@ play.transformat = function(o){
 	}
 	return a;
 }
-var chessdblist = [];
-var computelist = [];
-
 play.onmdownchessdblist = function(e) {	
 	cleanChessdbDetail();
 	waitServerPlay = !0;
@@ -254,10 +253,10 @@ play.onmdownchessdblist = function(e) {
 	comm.hideDots(),
 	comm.light.visible = !1;
 	var man = comm.mans[play.map[chessdblist[e][1]][chessdblist[e][0]]];
-	if (man.my == bill.my)
+	if (man.my == bill.my) {
 		play.serverAIPlay(chessdblist[e]);
-	
-},
+	}	
+}
 play.onmdowncomputelist = function(e) {	
 	cleanComputerDetail();
 	waitServerPlay = !0;
@@ -269,7 +268,7 @@ play.onmdowncomputelist = function(e) {
 	var man = comm.mans[play.map[computelist[e][1]][computelist[e][0]]];
 	if (man.my == bill.my)
 	play.serverAIPlay(computelist[e]);
-},
+}
 play.ParseMsg = function(d) {
 	//if(!waitServerPlay) return;
 	
@@ -425,51 +424,56 @@ play.ParseMsg = function(d) {
 		//console.log(d);
 		play.aiPace = null;	
 	}		 
-},
+}
 play.checkFoul = function() {
     var e = play.pace,
     a = parseInt(e.length, 10);
     return a > 11 && e[a - 1] == e[a - 5] && e[a - 5] == e[a - 9] ? e[a - 4].split("") : !1
-},
+}
 play.AIclickMan = function(e, a, m, o) {
-    var n = comm.mans[e];
-    n.isShow = !1,
-    o ? n.chess.parent.removeChild(n.chess) : play.addRemoveOnDrop(n.chess),
-    delete play.map[comm.mans[play.nowManKey].y][comm.mans[play.nowManKey].x],
-    play.map[m][a] = play.nowManKey,
-    play.showPane(comm.mans[play.nowManKey].x, comm.mans[play.nowManKey].y, a, m),
-    comm.mans[play.nowManKey].x = a,
-    comm.mans[play.nowManKey].y = m,
-    o ? comm.mans[play.nowManKey].move() : comm.mans[play.nowManKey].animate(),
-    play.nowManKey = !1,
-    "j0" == e && play.onGameEnd(-1),
-    "J0" == e && play.onGameEnd(1),
-    bill.replayBtnUpdate();
-},
+	try {
+		var n = comm.mans[e];
+	    n.isShow = !1,
+	    o ? n.chess.parent.removeChild(n.chess) : play.addRemoveOnDrop(n.chess),
+	    delete play.map[comm.mans[play.nowManKey].y][comm.mans[play.nowManKey].x],
+	    play.map[m][a] = play.nowManKey,
+	    play.showPane(comm.mans[play.nowManKey].x, comm.mans[play.nowManKey].y, a, m),
+	    comm.mans[play.nowManKey].x = a,
+	    comm.mans[play.nowManKey].y = m,
+	    o ? comm.mans[play.nowManKey].move() : comm.mans[play.nowManKey].animate(),
+	    play.nowManKey = !1,
+	    "j0" == e && play.onGameEnd(-1),
+	    "J0" == e && play.onGameEnd(1),
+	    bill.replayBtnUpdate();
+	}
+	catch(e) {
+        console.log(e);
+   	}  
+}
 play.AIclickPoint = function(e, a, m) {
     var o = play.nowManKey,
     n = comm.mans[o];
     play.nowManKey && (delete play.map[comm.mans[play.nowManKey].y][comm.mans[play.nowManKey].x], play.map[a][e] = o, comm.showPane(n.x, n.y, e, a), n.x = e, n.y = a, m ? n.move() : n.animate(), play.nowManKey = !1),
 	bill.replayBtnUpdate();
-},
+}
 play.indexOfPs = function(e, a) {
     for (var m = 0; m < e.length; m++) if (e[m][0] == a[0] && e[m][1] == a[1]) return ! 0;
     return ! 1
-},
+}
 play.getClickPoint = function(e) {
     var a = Math.round((e.stageX - comm.pointStartX - 20) / comm.spaceX),
     m = Math.round((e.stageY - comm.pointStartY - 20) / comm.spaceY);
     return { x: a, y: m }
-},
+}
 play.getClickMan = function(e) {
     var a = play.getClickPoint(e),
     m = a.x,
     o = a.y;
     return 0 > m || m > 8 || 0 > o || o > 9 ? !1 : play.map[o][m] && "0" != play.map[o][m] ? play.map[o][m] : !1
-},
+}
 play.onGameEndLose = function() {
     play.onGameEnd(-1, 1)
-},
+}
 play.onGameEnd = function(e, a) {
     play.isPlay = !1,
     comm.onGameEnd(e),
@@ -481,15 +485,15 @@ play.onGameEnd = function(e, a) {
    else{
         1 === e ? play.showWin() : play.showLose()
     }	
-},
+}
 play.showWin = function() {
     comm.soundplay("gamewin"),
 	!isVerticalReverse ? showFloatTip("红方胜！") : showFloatTip("黑方胜！");
-},
+}
 play.showLose = function() {
     comm.soundplay("gamelose"),
 	!isVerticalReverse ? showFloatTip("黑方胜！") : showFloatTip("红方胜！");
-};
+}
 play.getBoard = function (e,a){
 	var map = "";
 	var coutZero = 0;

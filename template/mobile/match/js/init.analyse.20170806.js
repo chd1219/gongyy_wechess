@@ -141,10 +141,12 @@ function DealPosition(obj) {
 	if(d.match("bestmove ")){
 		var e = d.split("bestmove "); 
 		var move = e[1];
+		//回调返回函数
+		myws.Return();
 		if(move.match("null") || move.match("none")){
 			play.my == 1 ? play.onGameEnd(-1) : play.onGameEnd(1);
 			bill.my = -bill.my;
-			play.my = -play.my;			
+			play.my = -play.my;		
 			return;
 		}
 		
@@ -174,8 +176,6 @@ function DealPosition(obj) {
 			play.aiPace = aiPace;
 			setTimeout((function(){play.serverAIPlay();}),200);
 		}		
-		//回调返回函数
-		myws.Return();
 	}		
 	else if (d.length > 16){
 		var info = new depthinfo(d);
@@ -232,10 +232,8 @@ function loadConfig() {
     //初始化
     myws = new MyWebsocket('ws://120.55.37.210:9001/',!0);
     myws.initWebsocket();
-    
+    //启动定时器，检查超时
     interval = setInterval(this.CheckReturn, 1000);	
-//  mywstest = new MyWebsocket('ws://118.190.46.210:9011/',false);
-//  mywstest.initWebsocket();
 }
 
 function initLayer(e) {

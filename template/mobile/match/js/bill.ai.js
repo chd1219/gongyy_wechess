@@ -47,7 +47,7 @@ bill.init = function (e, a, k) {
 		}
 	comm.moves4Server = comm.getMap4Server(bill.map),
 	k == !0 ? (bill.isPlay = !0) : ($("#saveBtn").show(), bill.isPlay = !1);
-},
+}
 bill.offensive = function () {
 	if (movesIndex > 0 || 　moves.length > 0) {
 		return;
@@ -59,7 +59,7 @@ bill.offensive = function () {
 	moves.length = 0;
 	bill.paceEx.length = 0;
 	bill.replayBtnUpdate();
-},
+}
 bill.onChessDrop = function () {
 	function e() {
 		for (var e = callOnDrops.length - 1; e >= 0; e--) {
@@ -75,14 +75,14 @@ bill.onChessDrop = function () {
 	}
 	comm.soundplay("drop"),
 	setTimeout(e, 200)
-},
+}
 bill.addCallOnDrop = function (e, a) {
 	callOnDrops.push(e),
 	callOnDropsArgs.push(a)
-},
+}
 bill.addRemoveOnDrop = function (e) {
 	removeOnDrops.push(e)
-},
+}
 bill.regret = function () {
 	if (bill.paceEx.length == 0 || isVerticalReverse && bill.paceEx.length == 1) {
 		showFloatTip("您还没开始走子");
@@ -113,8 +113,7 @@ bill.regret = function () {
 	currentId = bill.paceEx[moves.length-1][0][1];
 		
 	bill.replayBtnUpdate();
-
-},
+}
 bill.send = function (e) {
 	var a = {};
 	a.map = bill.moves4Server,
@@ -514,13 +513,9 @@ bill.AIPlay = function () {
 	play.map = bill.map;
 	if (movesIndex % 2 == 1) { //黑
 		play.bAIPlay();
-//		play.my = -1;
-//		bill.my = 1;
 	}
 	if (movesIndex % 2 == 0) { //红
 		play.rAIPlay();
-//		play.my = 1;
-//		bill.my = -1;
 	}
 }
 bill.AIclickMan = function (e, a, m, o) {
@@ -568,14 +563,13 @@ bill.cleanChess = function () {
 	comm.hideDots(),
 	comm.light.visible = !1
 }
-
 bill.isend = 0,
 bill.notes = [],
 bill.emptyMap = [[, , , , "J0", , , , ""], [, , , , , , , , ""], [, , , , , , , , ""], [, , , , , , , , ""], [, , , , , , , , ""], [, , , , , , , , ""], [, , , , , , , , ""], [, , , , , , , , ""], [, , , , , , , , ""], [, , , , "j0", , , , ""]],
 bill.sMapFull = [["C0", "M0", "P0", "X0", "S0", "Z0", ""], ["c0", "m0", "p0", "x0", "s0", "z0", ""]],
 bill.sMapEmpty = [[, , , , , , , , ], [, , , , , ]],
-bill.chessMan = { "C": ["C0", "C1"], "M": ["M0", "M1"], "P": ["P0", "P1"], "X": ["X0", "X1"], "S": ["S0", "S1"], "Z": ["Z0", "Z1", "Z2", "Z3", "Z4"], "c": ["c0", "c1"], "m": ["m0", "m1"], "p": ["p0", "p1"], "x": ["x0", "x1"], "s": ["s0", "s1"], "z": ["z0", "z1", "z2", "z3", "z4"] }
-bill.emptychessMan = { "C": [], "M": [], "P": [], "S": [], "X": [], "Z": [], "c": [], "m": [], "p": [], "s": [], "x": [], "z": [] }
+bill.chessMan = { "C": ["C0", "C1"], "M": ["M0", "M1"], "P": ["P0", "P1"], "X": ["X0", "X1"], "S": ["S0", "S1"], "Z": ["Z0", "Z1", "Z2", "Z3", "Z4"], "c": ["c0", "c1"], "m": ["m0", "m1"], "p": ["p0", "p1"], "x": ["x0", "x1"], "s": ["s0", "s1"], "z": ["z0", "z1", "z2", "z3", "z4"] },
+bill.emptychessMan = { "C": [], "M": [], "P": [], "S": [], "X": [], "Z": [], "c": [], "m": [], "p": [], "s": [], "x": [], "z": [] },
 bill.createMan = function (e, a, m) {
 	if (e) {
 		var n = new comm["class"].Man(e);
@@ -603,100 +597,62 @@ bill.createMans = function (e) {
 		}
 	}
 }
-bill.bylawX = function () {
+bill.bylaw = {},
+bill.bylaw.X = function () {
 	var n = [];
-	n.push([2, 0]),
-	n.push([6, 0]),
-	n.push([2, 4]),
-	n.push([6, 4]),
-	n.push([0, 2]),
-	n.push([4, 2]),
-	n.push([8, 2]);
+	n.push([2, 0]),	n.push([6, 0]),	n.push([2, 4]),	n.push([6, 4]),
+	n.push([0, 2]),	n.push([4, 2]),	n.push([8, 2]);
 	return n;
 }
-bill.bylawS = function (e, a, m, o) {
+bill.bylaw.S = function (e, a, m, o) {
 	var n = [];
-	n.push([3, 0]),
-	n.push([5, 0]),
-	n.push([4, 1]),
-	n.push([3, 2]),
-	n.push([5, 2]);
+	n.push([3, 0]),	n.push([5, 0]),	n.push([4, 1]),
+	n.push([3, 2]),	n.push([5, 2]);
 	return n;
 }
-bill.bylawJ = function (e, a, m, o) {
+bill.bylaw.J = function (e, a, m, o) {
 	var n = [];
-	n.push([4, 0]),
-	n.push([5, 0]),
-	n.push([3, 0]),
-	n.push([4, 1]),
-	n.push([5, 1]),
-	n.push([3, 1]),
-	n.push([4, 2]),
-	n.push([5, 2]),
-	n.push([3, 2]);
+	n.push([4, 0]),	n.push([5, 0]),	n.push([3, 0]),
+	n.push([4, 1]),	n.push([5, 1]),	n.push([3, 1]),
+	n.push([4, 2]),	n.push([5, 2]),	n.push([3, 2]);
 	return n;
 }
-bill.bylawZ = function (e, a, m, o) {
+bill.bylaw.Z = function (e, a, m, o) {
 	var n = [];
-	n.push([0, 3]),
-	n.push([0, 4]),
-	n.push([2, 3]),
-	n.push([2, 4]),
-	n.push([4, 3]),
-	n.push([4, 4]),
-	n.push([6, 3]),
-	n.push([6, 4]),
-	n.push([8, 3]),
+	n.push([0, 3]),	n.push([0, 4]),	n.push([2, 3]),
+	n.push([2, 4]),	n.push([4, 3]),	n.push([4, 4]),
+	n.push([6, 3]),	n.push([6, 4]),	n.push([8, 3]),
 	n.push([8, 4]);
 	for (var i = 0; i < 9; i++)
 		for (var j = 5; j < 10; j++)
 			n.push([i, j]);
 	return n;
 }
-bill.bylawx = function () {
+bill.bylaw.x = function () {
 	var n = [];
-	n.push([2, 5]),
-	n.push([6, 5]),
-	n.push([2, 9]),
-	n.push([6, 9]),
-	n.push([0, 7]),
-	n.push([4, 7]),
+	n.push([2, 5]),	n.push([6, 5]),	n.push([2, 9]),
+	n.push([6, 9]),	n.push([0, 7]),	n.push([4, 7]),
 	n.push([8, 7]);
 	return n;
 }
-bill.bylaws = function (e, a, m, o) {
+bill.bylaw.s = function (e, a, m, o) {
 	var n = [];
-	n.push([3, 7]),
-	n.push([5, 7]),
-	n.push([4, 8]),
-	n.push([3, 9]),
-	n.push([5, 9]);
+	n.push([3, 7]),	n.push([5, 7]),	n.push([4, 8]),
+	n.push([3, 9]),	n.push([5, 9]);
 	return n;
 }
-bill.bylawj = function (e, a, m, o) {
+bill.bylaw.j = function (e, a, m, o) {
 	var n = [];
-	n.push([4, 7]),
-	n.push([5, 7]),
-	n.push([3, 7]),
-	n.push([4, 8]),
-	n.push([5, 8]),
-	n.push([3, 8]),
-	n.push([4, 9]),
-	n.push([5, 9]),
-	n.push([3, 9]);
+	n.push([4, 7]),	n.push([5, 7]),	n.push([3, 7]),
+	n.push([4, 8]),	n.push([5, 8]),	n.push([3, 8]),
+	n.push([4, 9]),	n.push([5, 9]),	n.push([3, 9]);
 	return n;
 }
-bill.bylawz = function (e, a, m, o) {
+bill.bylaw.z = function (e, a, m, o) {
 	var n = [];
-	n.push([0, 5]),
-	n.push([0, 6]),
-	n.push([2, 5]),
-	n.push([2, 6]),
-	n.push([4, 5]),
-	n.push([4, 6]),
-	n.push([6, 5]),
-	n.push([6, 6]),
-	n.push([8, 5]),
+	n.push([0, 5]),	n.push([0, 6]),	n.push([2, 5]),
+	n.push([2, 6]),	n.push([4, 5]),	n.push([4, 6]),
+	n.push([6, 5]),	n.push([6, 6]),	n.push([8, 5]),
 	n.push([8, 6]);
 	for (var i = 0; i < 9; i++)
 		for (var j = 0; j < 5; j++)
@@ -746,14 +702,11 @@ bill.checkManDots = function (e) {
 	comm.hideDots();
 	e = e.slice(0, 1);
 	//显示可走的点
-	isVerticalReverse == 0 ? (comm.dot.dots = { "J": bill.bylawJ(), "S": bill.bylawS(), "X": bill.bylawX(), "Z": bill.bylawZ(), "j": bill.bylawj(), "s": bill.bylaws(), "x": bill.bylawx(), "z": bill.bylawz() } [e] || []) : (comm.dot.dots = { "J": bill.bylawj(), "S": bill.bylaws(), "X": bill.bylawx(), "Z": bill.bylawz(), "j": bill.bylawJ(), "s": bill.bylawS(), "x": bill.bylawX(), "z": bill.bylawZ() } [e] || [])
-
+	isVerticalReverse == 0 ? (bill.bylaw[comm.dot.dots]()) : (bill.bylaw[ReverseCase(comm.dot.dots)]());
 	comm.showDots();
 }
 bill.resizeCanvas = function () {
-
 	canvas = document.getElementById("chess");
-
 	stageWidth = window.screen.width;
 	stageHeight = 0;
 
