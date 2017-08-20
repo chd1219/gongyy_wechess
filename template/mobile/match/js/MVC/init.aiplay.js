@@ -16,7 +16,7 @@ var MyWebsocket = function (url, bRec) {
 			if(brec){
 				e = evt.data;
 				result = e;
-				if (isJSON(e)){
+				if (comm.isJSON(e)){
 					var obj = JSON.parse(e); //由JSON字符串转换为JSON对象
 					ParseMsg(obj); 
 				}	
@@ -85,13 +85,13 @@ function DealQueryall(obj) {
 	var tmpStr = new String();	
 	chessdblist = [];
 	for (i=0;i<e.length && i<10;i++) {	
-		var tempmap = comm.arr2Clone(play.map);
+		var tempmap = comm.arr2Clone(comm.map);
 		var o = e[i].split(",");
 		a = o[0].split("");			
-		n = play.transformat(a);	
+		n = comm.transformat(a);	
 		chessdblist.push(n);
 		p = comm.createMove(tempmap,n[0],n[1],n[2],n[3]);
-		tmpStr += "<tr style=\"height:40px;\"><td>"+ p +"</td><td>"+ o[2] +"</td><td>"+ o[1] +"</td><td><input type=\"Button\" onclick='play.onmdownchessdblist(\""+i+"\")' value=\"立即出招\"></td></tr>";
+		tmpStr += "<tr style=\"height:40px;\"><td>"+ p +"</td><td>"+ o[2] +"</td><td>"+ o[1] +"</td><td><input type=\"Button\" onclick='Player.onmdownchessdblist(\""+i+"\")' value=\"立即出招\"></td></tr>";
 	}	
 	if(document.getElementById("chessdbDetailTbody")){ 
 		document.getElementById("chessdbDetailTbody").innerHTML = tmpStr;
@@ -104,17 +104,17 @@ function DealPosition(obj) {
 		//回调返回函数
 		myws.Return();
 		if(e[1].match("null") || e[1].match("none")){
-			play.my == 1 ? play.onGameEnd(-1) : play.onGameEnd(1);
-			bill.my = -bill.my;
-			play.my = -play.my;			
+			Player.my == 1 ? Player.onGameEnd(-1) : Player.onGameEnd(1);
+			comm.my = -comm.my;
+			Player.my = -Player.my;			
 			return;
 		}
 		var o = e[1].split(""); 
 		var a = [];
-		a = play.transformat(o);			
-		play.aiPace = a;		
+		a = comm.transformat(o);			
+		Player.aiPace = a;		
 		if(!isanalyse){
-			setTimeout((function(){play.serverAIPlay();}),200);
+			setTimeout((function(){Player.serverAIPlay();}),200);
 		}		
 	}		
 	else if (d.length > 16){
@@ -131,7 +131,7 @@ function DealPosition(obj) {
 			score = -score;
 		}		
 
-		var tempmap = comm.arr2Clone(play.map);
+		var tempmap = comm.arr2Clone(comm.map);
 		if (depth == 1) {
 			computelist = [];
 			cleanComputerDetail();
@@ -147,12 +147,12 @@ function DealPosition(obj) {
 				if (e[pvseek] == "pv")
 					break;
 			}
-			bill.cleanLine();
+			cleanLine();
 			for (j = 0; (j + pvseek) < e.length && j<4; j++) {
 				i = j + pvseek + 1;
 				if (e[i]) {
 					a = e[i].split("");					
-					o = play.transformat(a);					
+					o = comm.transformat(a);					
 					computelist.push(o);
 					pv[j] = comm.createMove(tempmap, o[0], o[1], o[2], o[3]);
 					tmpStr = tmpStr + pv[j] + " ";
@@ -165,10 +165,10 @@ function DealPosition(obj) {
 					}
 					if (isanalyse) {
 						if (j==0) {
-							bill.drawLine2(o,1);
+							comm.drawLine2(o,1);
 						}
 						if (j==1) {
-							bill.drawLine2(o,2);
+							comm.drawLine2(o,2);
 						}
 					}
 				}				
@@ -198,18 +198,15 @@ function ParseMsg(obj) {
 }
 
 function loadConfig() {
-	comm.initChess(comm.emptyMap);
 	setEnable("prevBtn", !1);
 	setEnable("nextBtn", !1);
 	setEnable("firstBtn", !1);
 	setEnable("endBtn", !1);
 
-	bill.pace = [];
-	bill.resizeCanvas();
-	createbroad = !1;
-	comm.init();
-	bill.init(3, bill.map, !0);
-	play.map = bill.map;
+	comm.pace = [];
+	resizeCanvasAI();
+	
+	comm.init(3, comm.map, !0);
 	movesIndex = 0
     //方便用户设置
     mui('#delete').popover('toggle');
@@ -222,34 +219,32 @@ function loadConfig() {
 }
 
 function initLayer(e) {
-    initCanvas(e);
-    onload(),
-    loadConfig();
-    bill.replayBtnUpdate();
+	onload();
+	createbroad = !1;
+	initialization(e);    
+    loadConfig(); 
+    replayBtnUpdate();	
 }
 
 onload = function() {
-    comm.dot = {
-        dots: []
-    },
-    comm.mans = {},
-	
-    $("#isOffensiveBtn").on('tap',bill.offensive),
-    $("#blackautoplayBtn").on('tap',bill.bPlay),
-    $("#redautoplayBtn").on('tap',bill.rPlay),
-    $("#soundBtn").on('tap',bill.sound),
-	$("#verticalreverseBtn").on('tap',bill.reverse),	
-	$("#noteBtn").on('tap',bill.note),	
-	$("#firstBtn").on('tap',bill.replayFirst),
-	$("#autoreplayBtn").on('tap',bill.autoreplay),
-	$("#prevBtn").on('tap',bill.replayPrev),
-    $("#nextBtn").on('tap',bill.replayNext),
-    $("#endBtn").on('tap',bill.replayEnd),
-	$("#regretBtn").on('tap',bill.regret),
-	$("#sendBtn").on('tap',bill.send),
-	$("#fullBtn").on('tap',bill.fullBroad),
-	$("#clearBtn").on('tap',bill.cleanBroad),				
-	$("#saveBtn").on('tap',bill.save);		
+ 	$("#isOffensiveBtn").on('tap', onOffensive),
+    $("#analyseBtn").on('tap', onAnalyse),
+    $("#blackautoplayBtn").on('tap', onBluePlay),
+    $("#redautoplayBtn").on('tap', onRedPlay),
+    $("#soundBtn").on('tap', onSound),
+    $("#verticalreverseBtn").on('tap', onReverse),    
+    $("#noteBtn").on('tap', onNote),  
+    $("#editboardBtn").on('tap', onEditboard),  
+    $("#firstBtn").on('tap', onReplayFirst),
+    $("#autoreplayBtn").on('tap', onAutoreplay),
+    $("#prevBtn").on('tap', onReplayPrev),
+    $("#nextBtn").on('tap', onReplayNext),
+    $("#endBtn").on('tap', onReplayEnd),
+    $("#regretBtn").on('tap', onRegret),
+    $("#sendBtn").on('tap', onSend),
+    $("#fullBtn").on('tap', onFullBroad),
+    $("#clearBtn").on('tap', onCleanBroad),               
+    $("#saveBtn").on('tap', onSave);      	
 };
 
 function Setting() {
@@ -295,14 +290,13 @@ function Setting() {
 	showLevel(power);
     
 	if (computer == 'red') {
-		bill.my = -1;
-		bill.reverse();
-		play.map = bill.map;
-		play.rAIPlay();
+		comm.my = -1;
+		onReverse();
+		Player.rAIPlay();
 		$("#black").hide();		
     }
     else {
-    	bill.my = 1;
+    	comm.my = 1;
     	$("#red").hide();		
     }
 

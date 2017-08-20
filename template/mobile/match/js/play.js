@@ -56,9 +56,7 @@ play.addCallOnDrop = function(e, a) {
 play.addRemoveOnDrop = function(e) {
     removeOnDrops.push(e)
 }
-play.regret = function() {
-    play.pace.length >= 1 ? (regret()) : showFloatTip("还没开始下棋呢")
-}
+
 play.clickCanvas = function(e) {
     if (play.isAnimating) return ! 1;
     if (!play.isPlay) return ! 1;
@@ -136,24 +134,6 @@ play.clickPoint = function(e, a) {
         comm.light.visible = !1;
     }
 }
-play.echoTips = function (e){	
-	t = 0;
-	time = setInterval(function(){
-		$("#AIThink").text(e + "(" + (++t) + "s)"),
-		$("#AIThink").show();			
-	},1000);
-}
-play.hideTips = function (){
-	clearInterval(time);
-}
-play.showThink = function() {
-	room_id = getUrlParam("roomid");
-	room_id ? ( play.my == -1 ? echoTips("红方思考中。。。") : echoTips("黑方思考中。。。") ) : !1;
-}
-play.hideThink = function() {
-    clearInterval(time);
-	$("#AIThink").hide();
-}
 play.stepPlay = function(e, a, m) {
     m = m || !1,
     comm.hideDots(),
@@ -217,9 +197,6 @@ play.serverAIPlay = function(e) {
 		bill.map = play.map;
 		/*锁定，等待1s后解锁*/
 		setTimeout((function(){waitServerPlay = !1;}),1000);
-		//if(playmode == 1) setTimeout((function(){checkIsFinalKill();}),1800);
-		//if(playmode == 4) checkIsFinalKill();
-		
     }
 }
 play.clientPlay = function() {
@@ -243,187 +220,6 @@ play.transformat = function(o){
 		a[i] = {"a":"0","b":"1","c":"2","d":"3","e":"4","f":"5","g":"6","h":"7","i":"8","0":"9","1":"8","2":"7","3":"6","4":"5","5":"4","6":"3","7":"2","8":"1","9":"0"}[o[i]] || "";			                      
 	}
 	return a;
-}
-play.onmdownchessdblist = function(e) {	
-	cleanChessdbDetail();
-	waitServerPlay = !0;
-	bill.nowManKey = !1,
-	comm.hidePane(),
-	comm.dot.dots = [],
-	comm.hideDots(),
-	comm.light.visible = !1;
-	var man = comm.mans[play.map[chessdblist[e][1]][chessdblist[e][0]]];
-	if (man.my == bill.my) {
-		play.serverAIPlay(chessdblist[e]);
-	}	
-}
-play.onmdowncomputelist = function(e) {	
-	cleanComputerDetail();
-	waitServerPlay = !0;
-	bill.nowManKey = !1,
-	comm.hidePane(),
-	comm.dot.dots = [],
-	comm.hideDots(),
-	comm.light.visible = !1;
-	var man = comm.mans[play.map[computelist[e][1]][computelist[e][0]]];
-	if (man.my == bill.my)
-	play.serverAIPlay(computelist[e]);
-}
-play.ParseMsg = function(d) {
-	//if(!waitServerPlay) return;
-	
-	if(d.match("bestmove ")){
-		var e = d.split("bestmove "); 
-		
-		if(e[1].match("null") || e[1].match("none")){
-			play.my == 1 ? play.onGameEnd(-1) : play.onGameEnd(1);
-			bill.my = -bill.my;
-			play.my = -play.my;			
-			return;
-		}
-		var o = e[1].split(""); 
-		var a = [];
-		a = play.transformat(o);			
-		play.aiPace = a;
-		if (isOffensive) {
-			if ((b_autoset != 0 && movesIndex%2 == 1) || (r_autoset != 0 && movesIndex%2 == 0)) 
-				setTimeout((function(){play.serverAIPlay();}),200);
-		}
-		else {
-			if ((b_autoset != 0 && movesIndex%2 == 0) || (r_autoset != 0 && movesIndex%2 == 1)) 
-				setTimeout((function(){play.serverAIPlay();}),200);
-		}
-	}	
-	else if(d.match("rank:")) {
-		//var e = (d.substr(8,d.length-8)).split("|");	
-		var e = d.split("|");	
-		cleanChessdbDetail();		
-		if (e[0].match("stalemate") || e[0].match("checkmate")) {
-			showFloatTip("绝杀！");
-			return;
-		}				
-		if (e[0].match("unknown") || e[0].match("invalid board")){
-			return;			
-		}
-		var tmpStr = new String();	
-		chessdblist = [];
-		for (i=0;i<e.length && i<10;i++) {	
-			var tempmap = comm.arr2Clone(play.map);
-			var o = e[i].split(",");
-			o[0] = o[0].substring(5,9);
-			o[1] = o[1].substring(6,o[1].length);
-			o[2] = o[2].substring(5,o[2].length);
-
-			a = o[0].split("");
-			
-			n = play.transformat(a);	
-			chessdblist.push(n);
-			p = comm.createMove(tempmap,n[0],n[1],n[2],n[3]);
-			tmpStr += "<tr style=\"height:40px;\"><td>"+ p +"</td><td>"+ o[2] +"</td><td>"+ o[1] +"</td><td><input type=\"Button\" onclick='play.onmdownchessdblist(\""+i+"\")' value=\"立即出招\"></td></tr>";
-		}	
-		if(document.getElementById("chessdbDetailTbody")){ 
-			document.getElementById("chessdbDetailTbody").innerHTML = tmpStr;
-		}
-	}
-	else if(d.match("Queryall:")) {
-		var e = (d.substr(9,d.length-9)).split("|");	
-		cleanChessdbDetail();		
-		if (e[0].match("stalemate") || e[0].match("checkmate")) {
-			showFloatTip("绝杀！");
-			return;
-		}				
-		if (e[0].match("unknown") || e[0].match("invalid board")){
-			return;			
-		}
-		var tmpStr = new String();	
-		chessdblist = [];
-		for (i=0;i<e.length && i<10;i++) {	
-			var tempmap = comm.arr2Clone(play.map);
-			var o = e[i].split(",");
-			a = o[0].split("");			
-			n = play.transformat(a);	
-			chessdblist.push(n);
-			p = comm.createMove(tempmap,n[0],n[1],n[2],n[3]);
-			tmpStr += "<tr style=\"height:40px;\"><td>"+ p +"</td><td>"+ o[2] +"</td><td>"+ o[1] +"</td><td><input type=\"Button\" onclick='play.onmdownchessdblist(\""+i+"\")' value=\"立即出招\"></td></tr>";
-		}	
-		if(document.getElementById("chessdbDetailTbody")){ 
-			document.getElementById("chessdbDetailTbody").innerHTML = tmpStr;
-		}
-	}
-	else if (d.length > 16){
-		var e = d.split(" ");
-		var depth = e[2],
-		seldepth = e[4],
-		multipv = e[6],		
-		nodes = e[10],
-		nps = e[12],
-		tbhits = e[14],
-		time = e[16] / 1000;
-		score = e[8];
-		if (isOffensive) {
-			movesIndex%2 == 1 ? score = -score : score = score;
-		}
-		else {
-			movesIndex%2 == 0 ? score = -score : score = score;
-		}
-
-		var tempmap = comm.arr2Clone(play.map);
-		if (depth == 2) {
-			computelist = [];
-			cleanComputerDetail();
-		}
-
-		if (depth > 1) {
-			var pv = [],
-			a = [];
-
-			var tmpStr = new String();
-			var setting = new String();
-			for (var pvseek = 17; pvseek < e.length; pvseek++) {
-				if (e[pvseek] == "pv")
-					break;
-			}
-			bill.cleanLine();
-			for (j = 0; (j + pvseek) < e.length && j<4; j++) {
-				i = j + pvseek + 1;
-				if (e[i]) {
-					a = e[i].split("");					
-					o = play.transformat(a);					
-					computelist.push(o);
-					pv[j] = comm.createMove(tempmap, o[0], o[1], o[2], o[3]);
-					tmpStr = tmpStr + pv[j] + " ";
-					//走法提示
-					if (isVerticalReverse) {
-						o[0] = 8-o[0];
-						o[1] = 9-o[1];
-						o[2] = 8-o[2];
-						o[3] = 9-o[3];
-					}
-					if (isanalyse) {
-						if (j==0) {
-							bill.drawLine2(o,1);
-						}
-						if (j==1) {
-							bill.drawLine2(o,2);
-						}
-					}
-				}				
-			}
-			/*if (b_autoset == 0 && r_autoset == 0) {
-				setting = "<td><input type=\"Button\" onclick='play.onmdowncomputelist(\"" + (computelist.length - 1) + "\")' value=\"立即出招\"></td>";
-			} else {
-				setting = "<td> </td>";
-			}*/
-			setting = "<td> </td>";
-			tmpStr = "<tr><td>" + (depth / 32).toFixed(2) + "</td><td>" + score + "</td><td>" + tmpStr + "</td>" + setting + "</tr>";
-			if(document.getElementById("computerDetailTbody")){ 
-				document.getElementById("computerDetailTbody").innerHTML = tmpStr + document.getElementById("computerDetailTbody").innerHTML;
-			} 
-			
-		}
-		//console.log(d);
-		play.aiPace = null;	
-	}		 
 }
 play.checkFoul = function() {
     var e = play.pace,

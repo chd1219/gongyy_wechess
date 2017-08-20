@@ -1,11 +1,20 @@
+/*Websocket变量*/
 var myws = null;
+/*测试Websocket变量*/
 var mywstest = null;
+/*超时计数*/
 var timeout = 0;
+/*计时器*/
 var interval = 0;
+/*判断服务器是否有数据返回*/
 var waitServer = !1;
+/*记录发送的消息*/
 var msg = "";
+/*引擎信息缓存*/
 var depthinfolist = [];
+/*云库信息缓存*/
 var cloudinfolist = [];
+/*定义Websocket类*/
 var MyWebsocket = function (url, bRec) {  
 	this.url = url;
 	var brec = bRec;
@@ -26,8 +35,7 @@ var MyWebsocket = function (url, bRec) {
 		ws.onopen = function () {
 		}
 		ws.onclose = function () {
-		}		
-	
+		}			
 		ws.onerror = function () {
 		}	
 	}
@@ -69,8 +77,9 @@ var MyWebsocket = function (url, bRec) {
 		timeout = 0;
 		waitServer = !1;
 	}
-}; 
-function CheckReturn() {
+}
+/*判断是否超时*/
+function CheckTimeout() {
 	if(waitServer){
 		timeout++;		
 		if(timeout%10 == 9){
@@ -80,10 +89,12 @@ function CheckReturn() {
 		}		
 	}	
 }
+/*发送消息函数*/
 function sendMessage(e){
 	myws.Send(e);
 //	mywstest.Send(e);
 }
+/*定义引擎信息的数据结构*/
 var depthinfo = function(d){
 	var e = d.split(" ");
 	this.depth = (e[2] / 32).toFixed(2),
@@ -104,6 +115,7 @@ var depthinfo = function(d){
 		}
 	}
 }
+/*定义云库信息的数据结构*/
 var cloudinfo = function(d){
 	var e = d.split(",");
 	this.move = e[0],
@@ -111,6 +123,7 @@ var cloudinfo = function(d){
 	this.rank = e[2],
 	this.note = e[3];
 }
+/*解析返回的云库信息*/
 function DealQueryall(obj) {
 	var e = (obj.result).split("|");				
 	if (e[0].match("stalemate") || e[0].match("checkmate")) {
@@ -136,12 +149,13 @@ function DealQueryall(obj) {
 		document.getElementById("chessdbDetailTbody").innerHTML = tmpStr;
 	}
 }
+/*解析返回的引擎信息*/
 function DealPosition(obj) {
 	d = obj.result;
 	if(d.match("bestmove ")){
 		var e = d.split("bestmove "); 
 		var move = e[1];
-		//回调返回函数
+		/*回调返回函数*/
 		myws.Return();
 		if(move.match("null") || move.match("none")){
 			play.my == 1 ? play.onGameEnd(-1) : play.onGameEnd(1);
@@ -151,7 +165,7 @@ function DealPosition(obj) {
 		}
 		
 		if(!isanalyse){
-			//对比引擎和云库结果，取分数最大的走法
+			/*对比引擎和云库结果，取分数最大的走法*/
 			var max = 0;
 			for (var i=0;i<cloudinfolist.length && i<1;i++) {
 				var info = cloudinfolist[i];
@@ -194,7 +208,7 @@ function DealPosition(obj) {
 				computelist.push(o);
 				var move = comm.createMove(tempmap, o[0], o[1], o[2], o[3]);
 				tmpStr = tmpStr + move + " ";
-				//走法提示
+				/*走法提示*/
 				if (isVerticalReverse) {
 					o[0] = 8-o[0];
 					o[1] = 9-o[1];
@@ -212,6 +226,7 @@ function DealPosition(obj) {
 		} 		
 	}		
 }
+/*解析返回信息*/
 function ParseMsg(obj) {
 	if(Number(obj.index) != movesIndex) return;
 	switch(obj.commandtype){
@@ -225,28 +240,34 @@ function ParseMsg(obj) {
 			break;
 	}	
 }
-
+/*加载配置信息*/
 function loadConfig() {
     comm.initChess(comm.initMap);
 	bill.create();	
-    //初始化
+	/*初始化Websocket*/
     myws = new MyWebsocket('ws://120.55.37.210:9001/',!0);
     myws.initWebsocket();
-    //启动定时器，检查超时
-    interval = setInterval(this.CheckReturn, 1000);	
+	/*启动定时器，检查超时*/
+    interval = setInterval(this.CheckTimeout, 1000);	
 }
-
+/*初始化结构布局*/
 function initLayer(e) {
     initCanvas(e);
     onload(),
     loadConfig()    
 }
-
-function analyse() {
-    isanalyse ?  (showFloatTip("关闭分析模式"), isanalyse = 0 , bill.cleanLine()) : (checkautoplay());
+/*触发分析模式*/
+function onAnalyse() {
+    isanalyse ?  closeAnalyse() : startAnalyse();
 }
-
-function checkautoplay (){
+/*关闭分析模式*/
+function closeAnalyse (){
+	showFloatTip("关闭分析模式"),;
+	isanalyse = 0 ;
+	bill.cleanLine()
+}
+/*开启分析模式*/
+function startAnalyse (){
     showFloatTip("开启分析模式");
     isanalyse = 1;
     if(b_autoset){
@@ -265,7 +286,7 @@ function checkautoplay (){
     }
     bill.replayBtnUpdate();
 }
-
+/*预加载*/
 onload = function() {
     comm.dot = {
         dots: []
@@ -273,7 +294,7 @@ onload = function() {
     comm.mans = {},
 	
     $("#isOffensiveBtn").on('tap',bill.offensive),
-    $("#analyseBtn").on('tap',analyse),
+    $("#analyseBtn").on('tap',onAnalyse),
     $("#blackautoplayBtn").on('tap',bill.bPlay),
     $("#redautoplayBtn").on('tap',bill.rPlay),
     $("#soundBtn").on('tap',bill.sound),

@@ -752,11 +752,9 @@ bill.onGameEnd = function (e, a) {
     if (r_autoset != 0) {
         clearInterval(r_autoset);
     }
-
     if (showThinkset != 0) {
         clearInterval(showThinkset);        
-    }   
-	
+    }   	
     bill.isend = 1;
     /*锁定，等待1s后解锁*/
     setTimeout((function () {
