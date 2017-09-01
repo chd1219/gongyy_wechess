@@ -28,9 +28,8 @@ onBluePlay = function () {
 		b_autoset = setInterval(function () {
 				if (waitServerPlay)
 					return;
-				if ((movesIndex % 2 == 1 && comm.isOffensive) || (movesIndex % 2 == 0 && !comm.isOffensive)) {
-					Player.bAIPlay();
-					comm.my = 1;
+				if (comm.getHold() == BLACK) {
+					Player.AIPlay();
 				}
 			}, 2000));
 }
@@ -42,9 +41,8 @@ onRedPlay = function () {
 		r_autoset = setInterval(function () {
 				if (waitServerPlay)
 					return;
-				if ((movesIndex % 2 == 0 && comm.isOffensive) || (movesIndex % 2 == 1 && !comm.isOffensive)) {
-					Player.rAIPlay();
-					comm.my = -1;
+				if (comm.getHold() == RED) {
+					Player.AIPlay();
 				}
 			}, 2000))
 }
@@ -66,16 +64,16 @@ onRegret = function () {
 	cleanLine();
 	comm.isend = !1,
 	comm.isPlay = !0,
-	moves = comm.getMoves4Server(-1);
+	comm.moves = comm.getMoves4ServerEx(-1);
 	cleanChess();
 	isVerticalReverse ? comm.init(3, comm.arrReverse(comm.cMap), !0) : comm.init(3, comm.cMap, !0);
 	if (movesIndex > 0) {
 		movesIndex--;
 		for (var e = 0; movesIndex > e; e++)
-			comm.stepPlay(moves[e].src, moves[e].dst, !0);
+			Player.stepPlay(comm.moves[e].src, comm.moves[e].dst, !0);
 	}
 	comm.paceEx.pop();
-	moves.length--;
+	comm.moves.length--;
 	replayBtnUpdate();
 }
 /*发送棋谱*/
@@ -104,9 +102,9 @@ onSend = function (e) {
 
 	isVerticalReverse ? sendmap = comm.arrReverse(comm.cMap) : sendmap = comm.cMap;
 
-	var map = comm.getMap6Server(sendmap);
-	var moves = comm.getMoves6ServerEx();
-	var notes = comm.getNotes2Server();
+	var map = comm.getMap4Server2(sendmap);
+	var moves = comm.getMoves4ServerEx();
+	var notes = comm.getNotes4Server();
         var _json = {"map": map, "moves": moves, "notes": notes, "filename": comm.filename, "BillType": 1};
 	$.ajax({
 		type: "POST",
@@ -131,37 +129,30 @@ onCreate2 = function () {
 }
 /*创建棋谱*/
 onCreate = function () {
-	$("#createBtn").hide(),
-	$("#mode1").hide(),
-	$("#mode2").hide(),
-	$("#mode3").hide(),
-	$("#mode4").hide(),
-	$("#mode5").show(),
-	$("#restartdialog").hide(),
-	createbroad = !0,
+	mode = playmode.EDITBOARD;
 	setEnable("prevBtn2", !1),
 	setEnable("nextBtn2", !1),
 	comm.pace = [],
 	cleanChess();
 	comm.init(3, comm.map, !1);
-	comm.cleanBroad();
+	onCleanBroad();	
 }
 /*响应先后手*/
 onAIOffensive = function () {
-	if (movesIndex > 0 || 　moves.length > 0) {
+	if (movesIndex > 0 || 　comm.moves.length > 0) {
 		return;
 	}
 	cleanChess();
-	comm.isOffensive == !0 ? isOffensive = !1 : isOffensive = !0;
+	comm.isOffensive == 1 ? comm.isOffensive = 0 : comm.isOffensive = 1;
 	isVerticalReverse ? comm.init(3, comm.arrReverse(comm.cMap), !0) : comm.init(3, comm.cMap, !0);
 	movesIndex = 0;
-	moves.length = 0;
+	comm.moves.length = 0;
 	comm.paceEx.length = 0;
 	replayBtnUpdate();
 }
 /*响应先后手*/
 onOffensive = function () {
-	if (movesIndex > 0 ||　moves.length > 0){
+	if (movesIndex > 0 ||　comm.moves.length > 0){
 		showFloatTip("棋局已开始，请重新开始后再选择");
         isComPlay = 1;
         console.log($("#isOffensiveTog").attr('class'));
@@ -175,10 +166,10 @@ onOffensive = function () {
 		return;
 	}
 	cleanChess();
-	comm.isOffensive == !0 ? isOffensive = !1 : isOffensive = !0;
+	comm.isOffensive == 1 ? comm.isOffensive = 0 : comm.isOffensive = 1;
 	isVerticalReverse ? comm.init(3, comm.arrReverse(comm.cMap), !0) : comm.init(3, comm.cMap, !0);
 	movesIndex = 0;
-	moves.length = 0;
+	comm.moves.length = 0;
 	comm.paceEx.length = 0;
 	replayBtnUpdate();
 }
@@ -209,9 +200,9 @@ onEditboard = function () {
 		$("#redautoplayTog").html('<div class="mui-switch-handle"></div>');
 	}
     $(".mode4").hide(),
-    mode = 5;
-    createbroad = !0,
-    comm.init();
+    mode = playmode.EDITBOARD;
+    Board.init();
+    
     comm.sMapList = comm.getsMap();  
     var ss = 0;  
 
@@ -225,14 +216,15 @@ onEditboard = function () {
         if (comm.sMapList[x].length > 0) {            
             comm.sMap[m][n] = comm.sMapList[x][0];
             m ? flag = boardset.routside : flag = boardset.boutside;
-            comm.createMan(comm.sMap[m][n], flag, n * boardset.outsidescale);
-            comm.drawNum(m, n, comm.sMapList[x].length);
+            createMan(comm.sMap[m][n], flag, n * boardset.outsidescale);
+            drawNum(m, n, comm.sMapList[x].length);
         }     
         else {
             comm.sMap[m][n] = "";
         }   
         ss++;
     }
+    resizeBoard();
 }
 /*响应翻转按钮*/
 onReverse = function () {
@@ -270,7 +262,7 @@ onAutoreplay = function () {
 		showFloatTip("请取消电脑思考，再点击自动播放");
 		return;
 	}
-	movesIndex >= moves.length ? showFloatTip("播放结束") : (autoreplayset != 0 ? (showFloatTip("播放结束"), clearInterval(autoreplayset), autoreplayset = 0) : (showFloatTip("开始自动播放"), autoreplayset = setInterval(comm.replayNext, autoreplayspan)));
+	movesIndex >= comm.moves.length ? showFloatTip("播放结束") : (autoreplayset != 0 ? (showFloatTip("播放结束"), clearInterval(autoreplayset), autoreplayset = 0) : (showFloatTip("开始自动播放"), autoreplayset = setInterval(comm.replayNext, autoreplayspan)));
 }
 /*响应下一步按钮*/
 onReplayNext = function () {
@@ -279,15 +271,17 @@ onReplayNext = function () {
 	if (!relayNextLock) {
 		relayNextLock = 1;
 		waitServerPlay = !1;
-		setTimeout(comm.replayNextset, 200);
+		//setTimeout(comm.replayNextset, 200);
+		comm.replayNextset();
 	}
+	replayBtnUpdate();
 }
 /*响应上一步按钮*/
 onReplayPrev = function () {
-/*	if(mode == 5) {
-		comm.regret();	
+	if(mode == playmode.AIPLAY) {
+		comm.airegret();	
 		return;
-	}*/
+	}
 	cleanChessdbDetail();
 	cleanComputerDetail();
 	if (!relayPrevLock) {
@@ -301,13 +295,13 @@ onReplayPrev = function () {
 		comm.isend = !1;
 		comm.isPlay = !0;
 		waitServerPlay = !1;
-		moves = comm.getMoves4Server(-1);
+		comm.moves = comm.getMoves4Server();
 		cleanChess();
 		comm.init(3, comm.cMap, !0);
 		if (movesIndex > 0) {
 			movesIndex--;
-			for (var e = 0; movesIndex > e; e++)
-				comm.stepPlay(moves[e].src, moves[e].dst, !0);
+			for (var e = 0; e < movesIndex; e++)
+				Player.stepPlay(comm.moves[e].src, comm.moves[e].dst, !0);
 		}
 		relayPrevLock = 0;
 	}
@@ -325,7 +319,7 @@ onReplayFirst = function () {
 	comm.isend = !1;
 	comm.isPlay = !0;
 	waitServerPlay = !1;
-	moves = comm.getMoves4Server(-1);
+	comm.moves = comm.getMoves4ServerEx(-1);
 	cleanChess();
 	comm.init(3, comm.cMap, !0);
 
@@ -345,14 +339,14 @@ onReplayEnd = function () {
 	comm.isend = !1;
 	comm.isPlay = !0;
 	waitServerPlay = !1;
-	moves = comm.getMoves4Server(-1);
+	comm.moves = comm.getMoves4Server();
 	cleanChess();
 	comm.init(3, comm.cMap, !0);
 
-	movesIndex = moves.length;
+	movesIndex = comm.moves.length;
 	currentId = comm.paceEx[movesIndex - 1][0][1];
-	for (var e = 0; movesIndex > e; e++)
-		comm.stepPlay(moves[e].src, moves[e].dst, !0);
+	for (var e = 0; e < movesIndex; e++)
+		Player.stepPlay(comm.moves[e].src, comm.moves[e].dst, !0);
 
 	replayBtnUpdate();
 }
@@ -366,21 +360,21 @@ onSave = function () {
 		showFloatTip("开局不能将");
 		return;
 	}
-	createbroad = !1;
 	comm.cMap = comm.arr2Clone(comm.map),
 	cleanChess(),
 	cleanChessEx();
+	mode = playmode.ANALYSE;
 	Board.init();
 	comm.init(3, comm.map, !0);	
 	movesIndex = 0,
 	comm.pace = [],
 	comm.paceEx = [],
-	moves = [],
-	notes = [];
+	comm.moves = [],
+	comm.notes = [];
 	replayBtnUpdate();
 
 	/*方便用户设置*/
-	mui('#delete').popover('toggle');
+	mui('#delete').popover('toggle');	
 	resizeCanvasAnalyse();
 }
 /*注释*/

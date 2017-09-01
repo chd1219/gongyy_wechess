@@ -5,169 +5,170 @@
  * chd
  */
 
-/*定义玩家类*/
-Player = function(){
-	/*是否先手*/
-	var isOffensive;
-	/*是否电脑*/
-	var isAI;
-	/*执红或执黑*/
-	var color;
-	/*棋子正在走动*/
-	var isAnimating;
-	/*等待服务器*/
-	var waitServerPlay;	
-}
-/*初始化*/
-Player.init = function() {
-	
-}
-/*点击棋子*/
-Player.clickMan = function() {
-	
-}
+var Player = Player || {};
 /*点击Canvas*/
 Player.clickCanvas = function (e) {
-	if (mode != 5)
-		return;
-	if (comm.isAnimating)
-		return !1;
-	if (!comm.isPlay)
-		return !1;
-	if (waitServPlay) {
-		return !1;
-	}
-	if (comm.nowManKey == e) {
-		Player.cancleSelected();
-	} else {
-		if (comm.nowManKey) {
-			var o = comm.mans[comm.nowManKey];
-			if (o.y > -1 && o.y < 10) {
-				comm.clickManI2O(e, x, y)
-			} else {
-				Player.cancleSelected();
-				var o = comm.mans[e];
-				comm.nowManKey = e;
-                first ? (comm.soundplay("drop"), first = !1) : comm.soundplay("select"), comm.light.x = comm.spaceX * o.x + comm.pointStartX - 20, comm.light.y = comm.spaceY * o.y + comm.pointStartY - 24, comm.light.visible = !0
-            }
-        }
-        else {
-            var o = comm.mans[e];
-            comm.nowManKey = e;
-            first ? (comm.soundplay("drop"), first = !1) : comm.soundplay("select"), comm.light.x = comm.spaceX * o.x + comm.pointStartX - 20, comm.light.y = comm.spaceY * o.y + comm.pointStartY - 24, comm.light.visible = !0
+	var point = Player.getClickPoint(e);
+	var manKey = Player.getClickMan(point);
+	manKey ? Player.clickMan(manKey, point) : Player.clickPoint(point);
+}
+/*点击棋子*/
+Player.clickMan = function(manKey, point) {
+	/*是否已经选中一个棋子*/
+	if (comm.nowManKey) {
+		/*两次棋子相同*/
+		if (comm.nowManKey == manKey) {
+			/*取消选中*/
+			Player.cancleSelected();
+		}
+		else {
+			if (mode == playmode.EDITBOARD) {
+				/*交换棋子*/						
+				Player.exchangMan(point);	
+				isexchange = 0;
+			}
+			else {
+				var o = comm.mans[manKey];
+				if (o.my != comm.getHold()) {
+					/*吃子*/
+					Player.eatMan(point);
+				}
+				else {
+					/*选中当前棋子*/
+					Player.selected(point);
+				}
+			}
 		}
 	}
+	else {
+		/*选中当前棋子*/
+		if (mode == playmode.EDITBOARD) {
+			Player.selected(point);			
+		}
+		else {
+			var o = comm.mans[manKey];
+			if (o.my != comm.getHold()) {
+				hideDots();
+				showFloatTip("对方下子");
+			}
+			else {
+				/*选中当前棋子*/
+				Player.selected(point);
+			}
+		}
+	}
+}
+/*点击棋盘点*/
+Player.clickPoint = function(point) {
+	if (comm.nowManKey) {
+		/*移动棋子*/
+		Player.moveMan(point);
+	}
+}
+/*选中棋子*/
+Player.selected = function (point) {
+	comm.nowManKey = Player.getClickMan(point);
+	comm.soundplay("select");
+	if(point.y < 0) {
+		point.x = point.x * boardset.outsidescale;
+		point.y = boardset.boutside;
+	}
+	if(point.y > 9) {
+		point.x = point.x * boardset.outsidescale;
+		point.y = boardset.routside;
+	}
+	light.x = comm.spaceX * point.x + comm.pointStartX - 20;	
+	light.y = comm.spaceY * point.y + comm.pointStartY - 25; 
+	light.visible = !0;
+	
+	if (mode != playmode.EDITBOARD) {
+		hideDots();
+		comm.mans[comm.nowManKey].alpha = 0.6;
+		comm.mans[comm.nowManKey].ps = comm.mans[comm.nowManKey].bl();
+		comm.dot.dots = comm.mans[comm.nowManKey].ps;
+		showDots();
+		cleanComputerDetail();
+		cleanChessdbDetail();
+	}			
 }
 /*取消选择*/
 Player.cancleSelected = function () {
 	comm.nowManKey = !1,
 	comm.dot.dots = [],
-	comm.hideDots(),
-	comm.light.visible = !1;
+	hideDots(),
+	hidePane(),
+	light.visible = !1;
 }
-/*点击棋盘*/
-Player.clickPoint = function (e, a) {
-	if (comm.isPlay == !0) { 
-		/*棋谱模式*/
-		comm.clickPointPlaying(e, a)
-	} else if (comm.nowManKey) {
-		/*摆棋模式*/
-		comm.clickPointPre(e, a)
+/*交换棋子*/						
+Player.exchangMan = function (point) {
+	
+}
+/*吃子*/
+Player.eatMan = function (point) {
+	manKey = Player.getClickMan(point);
+	man = comm.mans[manKey];
+	if (Player.indexOfPs(comm.mans[comm.nowManKey].ps, [point.x, point.y])) {
+		/*删除被吃棋子*/
+		man.isShow = !1;
+		addRemoveOnDrop(man.chess);
+		/*移动棋子*/
+		Player.moveMan(point);
+		if ("j0" == manKey || "J0" == manKey) {
+			comm.onGameEnd();			
+		}
+	} else {
+		hideDots();
+		showFloatTip("对方下子");
 	}
+}
+/*移动棋子*/
+Player.moveMan = function (point) {
+	if (!comm.checkMans(comm.nowManKey, point)) {		
+		showFloatTip("摆放错误，请重试");
+		return;
+	}
+
+	try{ 
+		if (mode == playmode.EDITBOARD) {
+			n = comm.mans[comm.nowManKey];
+			delete comm.map[comm.mans[comm.nowManKey].y][comm.mans[comm.nowManKey].x],
+			comm.map[point.y][point.x] = comm.nowManKey,
+			showPane(n.x, n.y, point.x, point.y),
+			n.x = point.x,
+			n.y = point.y,
+			n.animate();
+		}
+		/*判断走法是否合法*/
+		else if (Player.indexOfPs(comm.mans[comm.nowManKey].ps, [point.x, point.y])) {
+			n = comm.mans[comm.nowManKey];
+			delete comm.map[comm.mans[comm.nowManKey].y][comm.mans[comm.nowManKey].x],
+			comm.map[point.y][point.x] = comm.nowManKey,
+			showPane(n.x, n.y, point.x, point.y),
+			n.x = point.x,
+			n.y = point.y,
+			n.animate();
+			var n = comm.mans[comm.nowManKey].x + "" + comm.mans[comm.nowManKey].y+point.x + point.y;
+			Player.stepEnd(n);					
+		}
+	}catch(e){
+		console.log(e);
+	}	
 	Player.cancleSelected();
 }
-/*点击棋盘-棋谱模式*/
-Player.clickPointPlaying = function (e, a) {
-	var m = comm.nowManKey;
-	o = comm.mans[m];
-	if (comm.nowManKey && comm.indexOfPs(comm.mans[m].ps, [e, a])) {
-		var n = o.x + "" + o.y;
-		delete comm.map[o.y][o.x],
-		comm.map[a][e] = m,
-		showPane(o.x, o.y, e, a);
-		o.x = e,
-		o.y = a,
-		o.animate(),
-		comm.stepEnd(n + e + a);		
+/*落子*/
+Player.stepEnd = function(e){
+	movesIndex++;
+	comm.pace.push(e);
+	comm.branch(e);
+	if (isanalyse) {
+		comm.send();
 	}
+	if (mode == playmode.AIPLAY) {
+		Player.AIPlay();		
+	}
+	replayBtnUpdate();
 }
-/*点击棋盘-摆棋模式*/
-Player.clickPointPre = function (e, a) { 
-	var m = comm.nowManKey;
-	o = comm.mans[m];
-	/*出界*/
-	if (e < 0 || e > 8) {
-		return;
-	}
-	/*棋盘外->棋盘外*/
-	if ((a < 0 || a > 9) && (o.y < 0 || o.y > 9)) {
-		return;
-	}
-	/*棋盘内->棋盘外*/
-	if (a < 0 || a > 9) {
-		a < 0 ? (a = boardset.boutside) : (a = boardset.routside);
-		a < 0 ? (o.my == -1 ? col = 0 : col = -1) : (o.my == 1 ? col = 1 : col = -1);
-		if (col == -1)			return !1;
-
-        var maptemp = {"C": 0, "M": 1, "P": 2, "X": 3, "S": 4, "Z": 5, "c": 0, "m": 1, "p": 2, "x": 3, "s": 4, "z": 5};
-		e = maptemp[m.slice(0, 1)];
-		if (e > -1) {
-			var templist = [];
-			templist = comm.sMapList[m.slice(0, 1)];
-			var oldchess = comm.sMap[col][e];
-			comm.sMap[col][e] = m;
-			e = e * boardset.outsidescale;
-			templist.push(m);
-
-			stage.removeChild(chessnum[col * 6 + e / boardset.outsidescale]),
-			templist.length ? comm.drawNum(col, e / boardset.outsidescale, templist.length) : !1;
-		} else {
-			showFloatTip("将帅不能移出棋盘");
-			return !1;
-		}
-	} else {
-		/*棋盘内->棋盘内*/
-		if (comm.checkMans(m, a, e)) {
-			comm.map[a][e] = m;
-		} else {
-			showFloatTip("摆放错误，请重试");
-			return !1;
-		}
-	}
-	/*棋盘外->棋盘内*/
-	if (o.y < 0 || o.y > 9) {
-		o.y < 0 ? (col = 0) : (col = 1);
-		row = parseInt(o.x / boardset.outsidescale);
-		delete comm.sMap[col][row];
-		var templist = [];
-		templist = comm.sMapList[m.slice(0, 1)];
-		for (var i = 0; i < templist.length; i++) {
-			if (templist[i] == m) {
-				delete templist[i];
-				for (var j = i; j < templist.length - 1; j++) {
-					templist[j] = templist[j + 1];
-				}
-				break;
-			}
-		}
-		templist.length -= 1;
-		newchess = templist[0];
-		comm.createMan(newchess, o.y, o.x),
-		stage.removeChild(chessnum[col * 6 + row]),
-		templist.length ? comm.drawNum(col, row, templist.length) : !1;
-		comm.sMap[col][row] = newchess;
-	} else {
-		delete comm.map[o.y][o.x];
-	}
-
-	o.x = e,
-	o.y = a,
-	o.animate();
-	/*删除原来的棋子*/
-	setTimeout(function () {
-		removeChess(oldchess)
-	}, 300);
-}
+/*检查走法是否合法*/
 Player.indexOfPs = function (e, a) {
 	for (var m = 0; m < e.length; m++)
 		if (e[m][0] == a[0] && e[m][1] == a[1])
@@ -182,13 +183,12 @@ Player.getClickPoint = function (e) {
 	return { x: a, y: m }
 }
 /*获取鼠标选中的棋子*/
-Player.getClickMan = function (e) {
-	var a = comm.getClickPoint(e),
+Player.getClickMan = function (a) {
 	m = a.x,
 	o = a.y;
-	if (o < 0 && createbroad)
+	if (o < 0)
 		return comm.sMap[0][m];
-	else if (o > 9 && createbroad)
+	else if (o > 9)
 		return comm.sMap[1][m];
 	else
 		return 0 > m || m > 8 || 0 > o || o > 9 ? !1 : comm.map[o][m] && "0" != comm.map[o][m] ? comm.map[o][m] : !1
@@ -196,8 +196,8 @@ Player.getClickMan = function (e) {
 /*步进*/
 Player.stepPlay = function (e, a, m) {
 	m = m || !1,
-	comm.hideDots(),
-	comm.light.visible = !1;
+	hideDots(),
+	light.visible = !1;
 	var o = comm.map[e.y][e.x];
 	comm.nowManKey = o;
 	var o = comm.map[a.y][a.x];
@@ -205,19 +205,8 @@ Player.stepPlay = function (e, a, m) {
 }
 /*AI走子*/
 Player.AIPlay = function () {
-	if (waitServerPlay) {
-		return;
-	}		
-	/*黑*/
-	if (movesIndex % 2 == 1) {
-		comm.bAIPlay();
-		comm.my = 1;
-	}
-	/*红*/
-	if (movesIndex % 2 == 0) { 
-		comm.rAIPlay();
-		comm.my = -1;
-	}
+	waitServerPlay = !0;
+	sendMessage(comm.getFen());
 }
 /*AI选中棋子*/
 Player.AIclickMan = function (e, a, m, o) {
@@ -231,7 +220,6 @@ Player.AIclickMan = function (e, a, m, o) {
 		comm.mans[comm.nowManKey].x = a,
 		comm.mans[comm.nowManKey].y = m,
 		o ? comm.mans[comm.nowManKey].move() : comm.mans[comm.nowManKey].animate(),
-		comm.my = -comm.my,
 		"j0" == e && comm.onGameEnd(-1),
 		"J0" == e && comm.onGameEnd(1),
 		comm.nowManKey = !1;
@@ -257,12 +245,19 @@ Player.AIclickPoint = function (e, a, m) {
 	}	
 }
 /*服务器返回自动走法*/
+Player.serverPlay = function(p1,p2) {		
+	var a = Player.getClickMan(p1);
+	a ? Player.clickMan(a, p1) : Player.clickPoint(p1);
+	var b = Player.getClickMan(p2);
+	b ? Player.clickMan(b, p2) : Player.clickPoint(p2);
+}
+/*服务器返回自动走法*/
 Player.serverAIPlay = function(e) {		
-    if (0 != comm.isPlay) {		
-        e = e || comm.aiPace;
+    if (comm.isPlay) {		
+        e = e || Player.aiPace;
         if (!e) return void(waitServerPlay = !0);
 		
-        comm.aiPace = void 0;
+        Player.aiPace = void 0;
 		if(isVerticalReverse){
 			e[0] = 8-e[0];
 			e[1] = 9-e[1];
@@ -270,7 +265,6 @@ Player.serverAIPlay = function(e) {
 			e[3] = 9-e[3];
 		}
 
-        if (mode == 1) comm.pace.push(e.join(""));
 		movesIndex++; 
 		comm.branch(e.join(""));
 		
@@ -280,18 +274,8 @@ Player.serverAIPlay = function(e) {
 		if (waitServerPlay){
 			a ? setTimeout(Player.AIclickMan, 1000, a, e[2], e[3]) : setTimeout(Player.AIclickPoint, 1000, e[2], e[3]);
 		}
-		comm.my = -comm.my;
+	
 		/*锁定，等待1s后解锁*/
 		setTimeout((function(){waitServerPlay = !1;}),1000);
     }
-}
-Player.bAIPlay = function() {
-	/*黑*/
-	waitServerPlay = !0;
-	sendMessage(comm.getFen(isVerticalReverse ? comm.arrReverse(comm.map) : comm.map, -1));
-}
-Player.rAIPlay = function() {
-	/*红*/
-	waitServerPlay = !0;
-	sendMessage(comm.getFen(isVerticalReverse ? comm.arrReverse(comm.map) : comm.map, 1));
 }

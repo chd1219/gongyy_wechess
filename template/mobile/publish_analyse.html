@@ -19,13 +19,6 @@
         var canvas, stage, exportRoot;
         var chessLayer, chessTopLayer, chessBottonLayer;
         var localStoragedata = '';  
-        var MODE_PLAY = 1;
-        var MODE_REPLAY = 2;
-        var MODE_BILL = 5;
-        var MODE_BILLREPLAY = 4;
-        var mode = 5;
-        var playmode = 1;
-        var isanalyse = 0;
         var file, level_id = -1;
         var chapterTitle = '';
 
@@ -590,6 +583,11 @@
        location.reload();
     });
 
+	document.getElementById("delete").addEventListener('webkitTransitionEnd', function () {
+        if($('#delete').css('display')=='none'){
+            Setting();
+        }
+    })
 
 </script>
 

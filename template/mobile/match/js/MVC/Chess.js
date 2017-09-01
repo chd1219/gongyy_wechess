@@ -86,12 +86,12 @@ createMans = function(e) {
     for (var a = 0; a < e.length; a++) for (var m = 0; m < e[a].length; m++) {
         var o = e[a][m];
         if (o) {
-			createMan(a, m, o);
+			createMan(o, a, m);
         }
     }
 }
 /*创建单个棋子*/
-createMan = function(a, m, o) {
+createMan = function(o, a, m) {
 	var n = new Man(o);
 	n.x = m,
 	n.y = a,

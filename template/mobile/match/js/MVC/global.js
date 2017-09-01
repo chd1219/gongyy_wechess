@@ -8,8 +8,8 @@
 var serverData = serverData || {};
 var fullMap, 
 fullMoves, 
-moves = [],
 movesIndex = 0,
+computelist = [],
 movesTipsShow = !0,
 isVerticalReverse = 0,
 movesInterval,
@@ -23,16 +23,18 @@ lastTime = 0,
 boardseek = 80;
 var commTipsImg;
 var Dots = {};
+var dot;
 var isanalyse = isanalyse || 0;
 var boardset = {boutside:-1.1, routside:10.3, outsidescale:1.58};
-var playtime = {red:0,black:0};
+var playtime = {red:0, black:0};
+var playmode = {AIPLAY:0, EDITBOARD:1, ANALYSE:2, REPLAY:3, CREATE:4, ONLINE:5};
+var RED = 1;
+var BLACK = -1;
 var showThinkset = 0;
 var first = !1;
 var isComPlay = 0;
-var createbroad = !0;
 var currentId = 0;
 var id = 0;
-var moves = [];
 var chessnum = [];
 var countPath = 0;
 var stageshape = [];
@@ -41,14 +43,19 @@ var autoreplayset = 0;
 var relayNextLock = 0;
 var relayPrevLock = 0;
 var autoreplayspan = 2000;
-var isOffensive = !0;
 var removeOnDrops = [];
 var callOnDrops = [];
 var callOnDropsArgs = [];
 var first = !1;
+var mode = 0;
+var isexchange = 0;
 var waitServerPlay = !1;
+var timingBegins = !1;
+/*引擎信息缓存*/
+var depthinfolist = [];
+/*云库信息缓存*/
+var cloudinfolist = [];
 var comm = comm || {};
-notes = [];
 emptyMap = [
 	[, , , , , , , , ""], 
 	[, , , , , , , , ""],

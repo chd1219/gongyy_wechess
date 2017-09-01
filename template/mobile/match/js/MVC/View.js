@@ -16,7 +16,7 @@ Board.init = function(e){
     comm.height = canvas.height,
     comm.spaceX = 69,
     comm.spaceY = 69;
-	if(mode == 5 && createbroad == 1){
+	if(mode == playmode.EDITBOARD){
 		comm.pointStartX = 22;
     	comm.pointStartY = 22+boardseek;
 	}else{
@@ -33,7 +33,7 @@ initChess = function(e, a) {
     var e = e || initMap;
     fullMoves = a || [],
     fullMap = e.concat(),
-    moves = fullMoves.concat(),
+    comm.moves = fullMoves.concat(),
     comm.init(3, e),
     initBoard(),
     initDots(),
@@ -45,7 +45,7 @@ initChessEx = function(e, a) {
     var e = e || initMap;
     fullMoves = a || [],
     fullMap = e.concat(),
-    moves = fullMoves.concat(),
+    comm.moves = fullMoves.concat(),
 	comm.init(3, e, !0);
     initBoard(),
     initDots(),
@@ -60,9 +60,9 @@ cleanChess = function () {
 			if (m)	removeChess(m);
 		}
 	}		
-	comm.hidePane(),
-	comm.hideDots(),
-	comm.light.visible = !1
+	hidePane(),
+	hideDots(),
+	light.visible = !1
 }
 /*清空扩展棋盘*/
 cleanChessEx = function () {
@@ -81,7 +81,7 @@ cleanChessEx = function () {
 initBoard = function() {
 	board = new lib.Board;
 	verticalReverseboard = new lib.VerticalReverseBoard;
-	if(mode == 5){
+	if(mode == playmode.EDITBOARD){
 		board.y = boardseek;
 		verticalReverseboard.y = boardseek;
 	}	
@@ -89,8 +89,14 @@ initBoard = function() {
 }
 /*棋盘重置*/
 resizeBoard = function() {
-	board.y = 0;	
-	verticalReverseboard.y = 0;
+	if(mode == playmode.EDITBOARD){
+		board.y = boardseek;
+		verticalReverseboard.y = boardseek;
+	}	
+	else {
+		board.y = 0;
+		verticalReverseboard.y = 0;
+	}	
 }
 /*初始化提示点*/
 initDots = function () {
@@ -101,7 +107,7 @@ initDots = function () {
             n = comm.pointStartY + comm.spaceY * e + parseInt(e / 3);
             m.x = o + 12;			
 			/*修改提示点的位置*/			
-			if(mode == 5){
+			if(mode == playmode.EDITBOARD){
 				m.y = n + 11 - boardseek;
 			}else{
 				m.y = n + 11;
@@ -135,13 +141,13 @@ setEnable = function (e, a) {
 }
 /*清除引擎信息*/
 cleanComputerDetail = function() {
-	if (mode == 5 && document.getElementById("computerDetailTbody")) {
+	if (document.getElementById("computerDetailTbody")) {
 		document.getElementById("computerDetailTbody").innerHTML = "";
 	}        
 }
 /*清除云库信息*/
 cleanChessdbDetail = function() {
-	if (mode == 5 && document.getElementById("chessdbDetailTbody")) {
+	if (document.getElementById("chessdbDetailTbody")) {
 		document.getElementById("chessdbDetailTbody").innerHTML = "";
 	}        
 }
@@ -165,7 +171,7 @@ resizeCanvas = function(){
 	canvasWidth =  window.screen.width - 10;
 	canvasHeight = canvasWidth / 640 * 866;
 
-	if(mode == 5){
+	if(mode == playmode.EDITBOARD){
 		stageHeight = (window.screen.width - 10)/ 640 * 706 ;
 	}else{
 		stageHeight = window.screen.width / 640 * 706 ;
@@ -175,7 +181,7 @@ resizeCanvas = function(){
 		/*如果屏幕太矮*/
 		stageHeight = window.screen.height - 100;
 		console.log(stageHeight);
-		if(mode == 5){
+		if(mode == playmode.EDITBOARD){
 			stageWidth = (stageHeight - 20) / 706 * 640 + 10;
 			canvasWidth = stageWidth - 10;
 			canvasHeight = canvasWidth / 640 * 866;
@@ -202,7 +208,7 @@ resizeCanvasAnalyse = function () {
 	canvasWidth = window.screen.width - 10;
 	canvasHeight = canvasWidth / 640 * 866;
 
-	if (mode == 5) {
+	if (mode == playmode.ANALYSE) {
 		stageHeight = (window.screen.width - 10) / 640 * 706 - 10;
 	} else {
 		stageHeight = window.screen.width / 640 * 866;
@@ -212,7 +218,7 @@ resizeCanvasAnalyse = function () {
 		/*如果屏幕太矮*/
 		stageHeight = window.screen.height - 100;
 		console.log(stageHeight);
-		if (mode == 5) {
+		if (mode == playmode.ANALYSE) {
 			stageWidth = stageHeight / 706 * 640 + 10;
 		} else {
 			stageWidth = stageHeight / 866 * 640 + 10;
@@ -240,7 +246,7 @@ resizeCanvasAI = function () {
 	canvasWidth = window.screen.width - 10;
 	canvasHeight = canvasWidth / 640 * 866;
 
-	if (mode == 5) {
+	if (mode == playmode.AIPLAY) {
 		stageHeight = (window.screen.width - 10) / 640 * 706 - 10;
 	} else {
 		stageHeight = window.screen.width / 640 * 866;
@@ -250,7 +256,7 @@ resizeCanvasAI = function () {
 		//如果屏幕太矮
 		stageHeight = window.screen.height - 100;
 		console.log(stageHeight);
-		if (mode == 5) {
+		if (mode == playmode.AIPLAY) {
 
 			stageWidth = stageHeight / 706 * 640 + 10;
 
@@ -265,17 +271,33 @@ resizeCanvasAI = function () {
 	canvas.style.height = canvasHeight + 'px';
 	$('.wgo-board').css('width', stageWidth + 'px');
 	$('.wgo-board').css('height', stageHeight + 'px');
-	//console.log('现在的屏幕和canvas的宽度之差为'+window.screen.height+' - '+stageHeight);
 	$(".mode5").hide();
 	$(".mode4").show();
 	$(document).attr("title", "人机对弈");
 	$(".mui-title").html("人机对弈");
-	resizeBoard();
 }
 /*初始化Canvas*/
-initCanvas = function(e){
-	resizeCanvas();
-	
+initCanvas = function(e){	
+	switch(mode) {
+		case playmode.AIPLAY:
+			resizeCanvasAI();
+			break;
+		case playmode.EDITBOARD:
+			resizeCanvas();
+			break;
+		case playmode.ANALYSE:
+			resizeCanvasAnalyse();
+			break;
+		case playmode.REPLAY:
+			break;
+		case playmode.CREATE:
+			break;
+		case playmode.ONLINE:
+			break;
+		default:
+			resizeCanvas();
+			break;
+	}
 	canvas = document.getElementById("chess");
     images = images || {},
     ss = ss || {},
@@ -390,13 +412,7 @@ hideLoading = function () {
     $("#loading").hide()
 }
 showBtns = function () {
-    $("#mode1").hide();
-	$("#mode2").hide();
-	$("#mode3").hide();
-	$("#mode4").hide();
-	$("#mode5").hide();
-	(mode == 1 && $("#mode1").show()) || (mode == 2 && $("#mode2").show()) || (mode == 3 && $("#mode3").show()) || (mode == 4 && $("#mode4").show()) || (mode == 5 && $("#mode5").show());
-    $("#btnBox").show()
+
 }
 showResult = function (e) {
     e ? ($("#gameLose").hide(), $("#gameWin").show(), $("#mode1").hide(), $("#mode2").hide(), $("#mode3").show()) : ($("#gameLose").show(), $("#gameWin").hide(), setEnable("regretBtn", !1)),
@@ -452,8 +468,8 @@ hidePane = function() {
 }
 /*显示提示点*/
 showDots = function() {
-    for (var e = 0; e < dot.dots.length; e++) {
-        var a = dot.dots[e].join(""),
+    for (var e = 0; e < comm.dot.dots.length; e++) {
+        var a = comm.dot.dots[e].join(""),
         m = dots[a];
         m.visible = !0
     }
@@ -469,7 +485,7 @@ create2 = function () {
 }
 /*创建棋谱*/
 create = function () {
-	createbroad = !0,
+	mode = playmode.EDITBOARD;
 	setEnable("prevBtn2", !1),
 	setEnable("nextBtn2", !1),
 	comm.pace = [],
@@ -510,7 +526,7 @@ replayBtnUpdate = function () {
 		}, 200);
 		return;
 	}
-	moves = moves || [];
+	moves = comm.moves || [];
 	var count = 0;
 	for (var i = 0; i < moves.length; i++) {
 		if (moves[i])
@@ -526,44 +542,39 @@ replayBtnUpdate = function () {
 	if (movesIndex >= count && autoreplayset != 0)
 		clearInterval(autoreplayset);
 	
-	if (notes[currentId]) {
-		$("#noteInfo").text(notes[currentId]),
+	if (comm.notes[currentId]) {
+		$("#noteInfo").text(comm.notes[currentId]),
 		$("#noteInfo").parent('.mui-toast-container').addClass('mui-active');
 	} else {
 		$("#noteInfo").parent('.mui-toast-container').removeClass('mui-active');
 	}
-	comm.isAnimating ? setTimeout(function () {
-			showThink()
-		}, 2000) : showThink();
-	if (mode == 5 && comm.nowManKey == !1 && document.getElementById("chessdbDetailTbody")) {
-		setTimeout(function () {
-			sendMessage(comm.queryall(isVerticalReverse ? comm.arrReverse(comm.map) : comm.map), comm.my);
-		}, 1000);
-	}
-	if (isanalyse) {
-		cleanLine();
-		if (b_autoset) {
-			if ((movesIndex % 2 == 1 && comm.isOffensive) || (movesIndex % 2 == 0 && !comm.isOffensive))
-				return;
-		}
-		if (r_autoset) {
-			if ((movesIndex % 2 == 0 && comm.isOffensive) || (movesIndex % 2 == 1 && !comm.isOffensive))
-				return;
-		}
-		setTimeout(function () {
-			sendMessage(comm.getFen(isVerticalReverse ? comm.arrReverse(comm.map) : comm.map), comm.my);
-		}, 1000);
-	}
 }
 /*显示思考信息*/
 showThink = function () {
-	 var count = 0;  
+    showThinkset = setInterval(function(){    	
+    	if (mode == playmode.EDITBOARD) {
+    		clearInterval(showThinkset);
+    	}
+    	var count = comm.paceEx.length;
+    	 /*人机对弈计时从设置完成后开始*/
+    	if (timingBegins) {
+    		comm.getHold() == BLACK ? playtime.black++ : playtime.red++;    		
+    	}
+    	$("#AIThink").text("第" + movesIndex + "步 / 总" + count + "步    " + "耗时: 红方 "+ playtime.red+"秒/黑方 "+playtime.black+"秒"), 
+    	$("#AIThink").show()
+    }, 1000);      
+}
+/*显示思考信息*/
+showThink1 = function () {
+	var count = 0;  
     var time = 0;
     count = comm.paceEx.length;
     if( comm.isend == 1) return;
-    if (comm.isOffensive == (movesIndex % 2)) {            
-        comm.my = -1;
-        if (showThinkset != 0) {
+    /*人机对弈计时从设置完成后开始*/
+    if (mode == playmode.AIPLAY && !timingBegins) return;
+    
+    if (comm.getHold() == BLACK) {       
+    	if (showThinkset != 0) {
             clearInterval(showThinkset);
         }
         showThinkset = setInterval(function(){
@@ -574,7 +585,6 @@ showThink = function () {
         }, 1000);                   
     }
     else {
-        comm.my = 1;            
         if (showThinkset != 0) {
             clearInterval(showThinkset);
         }

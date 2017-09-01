@@ -13,14 +13,10 @@ var MyWebsocket = function (url, bRec) {
 		var wsImpl = window.WebSocket || window.MozWebSocket;
 		ws = new ReconnectingWebSocket(this.url);
 		ws.onmessage = function (evt) {
-			if(brec){
-				e = evt.data;
-				result = e;
-				if (comm.isJSON(e)){
-					var obj = JSON.parse(e); //由JSON字符串转换为JSON对象
-					ParseMsg(obj); 
-				}	
-			}			
+			if(brec) {
+				onMessage(evt.data);
+				//console.log(evt.data);
+			}	
 		}
 		ws.onopen = function () {
 		}
@@ -38,6 +34,11 @@ var MyWebsocket = function (url, bRec) {
 		if(ws){
     		setTimeout(function () {
 				if(e.match("position")){
+					var command = new commandhistory;
+					command.index = movesIndex;
+					command.board = e;
+					command.result = [];
+					comm.historylist[movesIndex] = command;
 					var a = {};
 					a.type = 0;
 					a.computer = computer;
@@ -105,7 +106,6 @@ function DealPosition(obj) {
 		myws.Return();
 		if(e[1].match("null") || e[1].match("none")){
 			Player.my == 1 ? Player.onGameEnd(-1) : Player.onGameEnd(1);
-			comm.my = -comm.my;
 			Player.my = -Player.my;			
 			return;
 		}
@@ -127,7 +127,7 @@ function DealPosition(obj) {
 		tbhits = e[14],
 		time = e[16] / 1000;
 		score = e[8];
-		if (isOffensive == movesIndex%2) {
+		if (comm.isOffensive == movesIndex%2) {
 			score = -score;
 		}		
 
@@ -205,8 +205,7 @@ function loadConfig() {
 
 	comm.pace = [];
 	resizeCanvasAI();
-	
-	comm.init(3, comm.map, !0);
+	comm.isPlay = !0;
 	movesIndex = 0
     //方便用户设置
     mui('#delete').popover('toggle');
@@ -216,11 +215,11 @@ function loadConfig() {
     myws.initWebsocket();
     //启动定时器，检查超时
     interval = setInterval(CheckReturn, 1000);	
+    mode = playmode.AIPLAY;    
 }
 
 function initLayer(e) {
 	onload();
-	createbroad = !1;
 	initialization(e);    
     loadConfig(); 
     replayBtnUpdate();	
@@ -290,19 +289,19 @@ function Setting() {
 	showLevel(power);
     
 	if (computer == 'red') {
-		comm.my = -1;
 		onReverse();
-		Player.rAIPlay();
+		Player.AIPlay();
 		$("#black").hide();		
     }
     else {
-    	comm.my = 1;
-    	$("#red").hide();		
+       	$("#red").hide();		
     }
 
 	$("#restartli").show();		
 	
+	timingBegins = !0;
 	isPlaying = !0;
+	showThink();
 }
 
 function showLevel(e){
