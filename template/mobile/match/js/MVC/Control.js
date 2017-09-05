@@ -17,7 +17,7 @@ comm.init = function (e, a, k) {
     comm.sMapList = comm.sMapList || {};
     comm.nowManKey = !1,
     comm.pace = comm.pace || [],
-    comm.paceEx = comm.paceEx || [],
+    comm.nodes = comm.nodes || [],
     comm.isPlay = !0,
     comm.isAnimating = !1,
     comm.isFoul = !1,
@@ -40,6 +40,12 @@ commandhistory = function() {
 	var index;
 	var board;
 	var result;
+}
+Node = function(id, parter, step) {
+	this.id = id || 0;
+	this.parter = parter || 0;
+	this.child = [];
+	this.step = step || "";
 }
 /*数组克隆*/
 comm.arr2Clone = function(e) {
@@ -91,18 +97,6 @@ comm.getMoves4Server2 = function() {
     }
     return e
 }
-comm.getMoves4ServerEx = function () {
-	var e = "",
-		o = "";
-	for (a = 0; a < comm.paceEx.length; a++) {
-		var nextpaceEx = comm.paceEx[a];
-		for (j = 0; j < nextpaceEx.length; j++) {
-			o = ' ' + nextpaceEx[j][0] + ' ' + nextpaceEx[j][1] + ' ' + nextpaceEx[j][2] + ' ' + a;
-			e += o;
-		}
-	}
-	return e
-}
 comm.getMap4Server = function(e) {
     var map4server = [];
     for (var a = 10, m = 0; m < e.length; m++) {
@@ -122,52 +116,29 @@ comm.getMap4Server = function(e) {
     return map4server
 }
 comm.getMoves4Server = function() {
+	if (!comm.nodes.length) {
+		return [];
+	}
 	if (mode == playmode.AIPLAY) {
-		for (var e = [], a = 0; a < comm.paceEx.length; a++) {
-			e[a] = comm.Step2XY(comm.paceEx[a][0][0])
+		for (var e = [], a = 1; a < comm.nodes.length; a++) {
+			e[a-1] = comm.Step2XY(comm.nodes[a].step)
 		}
 		return e
 	}
 	var e = [];
-	e.length = comm.paceEx.length;
-	nextid = currentId;
-	preid = currentId;
-
-	/*向后延伸*/
-	for (var a = movesIndex; a < comm.paceEx.length; a++) {
-		var nextpaceEx = comm.paceEx[a];
-		for (var j = 0; nextpaceEx && j < nextpaceEx.length; j++) {
-			if (nextpaceEx[j][2] == nextid) {
-				nextid = nextpaceEx[j][1];
-				e[a] = comm.Step2XY(nextpaceEx[j][0]);
-				break;
-			}
-		}
+	var tempID = currentId;
+	/*向后延伸,获取终局ID,多条路径，默认选择第一条*/
+	while(comm.nodes[tempID].child.length > 0) {
+		tempID = comm.nodes[tempID].child[0];
 	}
-	/*向前回溯*/
-	for (var a = movesIndex - 1; a >= 0; a--) {
-		var prepaceEx = comm.paceEx[a];
-		for (j = 0; prepaceEx && j < prepaceEx.length; j++) {
-			if (prepaceEx[j][1] == preid) {
-				preid = prepaceEx[j][2];
-				if (a == movesIndex - 1)
-					currentId = prepaceEx[j][2];
-				e[a] = comm.Step2XY(prepaceEx[j][0]);
-				break;
-			}
-		}
+	/*回溯整条路径*/
+	while(comm.nodes[tempID].parter > 0) {
+		var step = comm.nodes[tempID].step;
+		e.push(comm.Step2XY(step));
+		tempID = comm.nodes[tempID].parter;
 	}
-	if (movesIndex == 0) {
-		var prepaceEx = comm.paceEx[0];
-		for (j = 0; prepaceEx && j < prepaceEx.length; j++) {
-			if (prepaceEx[j][1] == currentId) {
-				e[0] = comm.Step2XY(nextpaceEx[j][0]);
-				break;
-			}
-		}
-	}
-	moves = e;
-	return e;
+	moves = e.reverse();
+	return moves;
 }
 comm.getNotes4Server = function () {
 	var e = "",
@@ -259,20 +230,6 @@ comm.parseMoves = function(e) {
 	    a[m].dst.x = a[m].dst.x - 1,	    
 	    a[m].dst.y = comm.reverseY((a[m].dst.y - 1))
     }
-    return a
-}
-/*解析扩展走法信息*/
-comm.parseMovesEx = function(e) {
-    for (var a = [],m = 0; m < e.length; m++) {
-		if(a[e[m].index]){
-			a[e[m].index].push([e[m].step,e[m].id,e[m].perid]);
-		}
-		else{
-			a[e[m].index] = new Array();
-			a[e[m].index].push([e[m].step,e[m].id,e[m].perid]);
-		}		
-	}
-	comm.paceEx = a;
     return a
 }
 /*字符大小写互换*/
@@ -443,30 +400,33 @@ comm.getsMap = function () {
 }
 /*查找是否存在分支,否则增加分支*/
 comm.branch = function (step) {
-	if (comm.paceEx.length < movesIndex) {
-		comm.paceEx[movesIndex - 1] = new Array();
-		id++;
-		preId = currentId;
-		currentId = id;
-		comm.paceEx[movesIndex - 1].push([step, id, preId]);
-		o = comm.Step2XY(step);		
-		comm.moves.push(o);
-		return;
+	/*如果链表为空，插入根节点*/
+	if (!comm.nodes.length) {
+		var node = new Node();
+		comm.nodes.push(node);
 	}
+	/*检查是否已存在*/
 	if (!comm.checkbranch(step)) {
 		id++;
-		preId = currentId;
+		var node = new Node(id,currentId,step);
+		comm.nodes.push(node);
+		comm.nodes[node.parter].child.push(node.id);		
 		currentId = id;
-		comm.paceEx[movesIndex - 1].push([step, id, preId]);
 	}
 }
 /*检查分支*/
 comm.checkbranch = function (step) {
-	for (var i = 0; i < comm.paceEx[movesIndex - 1].length; i++) {
-		var o = comm.paceEx[movesIndex - 1][i];
-		if (o[2] == currentId && step == o[0]) {
-			currentId = o[1];
-			return !0;
+	if (comm.nodes[currentId].child.length == 0) {
+		return !1;
+	}
+	else {
+		var childID = comm.nodes[currentId].child;
+		for (var i=0;i<childID.length;i++) {
+			var childstep = comm.nodes[childID[i]].step;
+			if (childstep == step) {
+				currentId = comm.nodes[childID[i]].id;
+				return !0;
+			}
 		}
 	}
 	return !1;
@@ -632,10 +592,10 @@ comm.DealPosition = function (obj) {
 		}		
 	}		
 	else {
-		var info = new comm.depthinfo(d);
-		if(isNaN(info.depth)){ 
+		if (!d.match("depth")) {
 			return;
 		}
+		var info = new comm.depthinfo(d);
 		depthinfolist.push(info);
 		if (comm.isOffensive == movesIndex%2) {
 			info.score = -info.score;
@@ -663,7 +623,7 @@ comm.DealPosition = function (obj) {
 				}
 			}				
 		}				
-		if(document.getElementById("computerDetailTbody")){ 
+		if(document.getElementById("computerDetailTbody") && tmpStr.length > 4){ 
 			tmpStr = "<tr><td>" + info.depth + "</td><td>" + info.score + "</td><td>" + tmpStr + "</td></tr>";
 			document.getElementById("computerDetailTbody").innerHTML = tmpStr + document.getElementById("computerDetailTbody").innerHTML;
 		} 		
@@ -826,11 +786,10 @@ comm.Step2XY = function (e) {
 }
 /*走法转换*/
 comm.reverseMoves = function () {
-	for (a = 0; a < comm.paceEx.length; a++) {
-		var paceEx = comm.paceEx[a];
-		for (b = 0; b < paceEx.length; b++) {
-			paceEx[b][0] = comm.reverseStep(paceEx[b][0]);
-		}
+	for (a = 0; a < comm.nodes.length; a++) {
+		var node = comm.nodes[a];
+		node.step = comm.reverseStep(node.step);
+
 	}
 	for (a = 0; a < comm.pace.length; a++) {
 		comm.pace[a] = comm.reverseStep(comm.pace[a]);
@@ -857,7 +816,7 @@ comm.onGameEnd = function () {
 }
 /*悔棋*/
 comm.airegret = function () {
-	if (comm.paceEx.length == 0 || isVerticalReverse && comm.paceEx.length == 1) {
+	if (comm.nodes.length == 0 || isVerticalReverse && comm.nodes.length == 1) {
 		showFloatTip("您还没开始走子");
 		return;
 	}
@@ -877,14 +836,6 @@ comm.airegret = function () {
 		for (var e = 0; movesIndex > e; e++)
 			Player.stepPlay(moves[e].src, moves[e].dst, !0);
 	}
-	for (var i = 0; i < delsetp; i++) {
-		comm.paceEx.pop();
-		moves.length--;
-		id--;
-	}
-	preId = comm.paceEx[moves.length-1][0][2];
-	currentId = comm.paceEx[moves.length-1][0][1];
-		
 	replayBtnUpdate();
 }
 /*悔棋*/
@@ -893,11 +844,11 @@ comm.regret = function () {
 		showFloatTip("请取消电脑思考，再点击悔棋");
 		return;
 	}
-	if (comm.paceEx.length == 0) {
+	if (comm.nodes.length == 0) {
 		showFloatTip("还没开始下棋呢");
 		return;
 	}
-	if (comm.paceEx.length != movesIndex) {
+	if (comm.nodes[currentId].child.length != 0) {
 		showFloatTip("不是最后一步");
 		return;
 	}
@@ -913,9 +864,28 @@ comm.regret = function () {
 		for (var e = 0; movesIndex > e; e++)
 			Player.stepPlay(moves[e].src, moves[e].dst, !0);
 	}
-	comm.paceEx.pop();
 	moves.length--;
 	replayBtnUpdate();
+}
+comm.getBrachLength = function () {
+	return comm.nodes[currentId].child.length;
+}
+comm.isFirst = function () {
+	if (!comm.nodes.length) {
+		return !0;
+	}
+
+	return (comm.nodes[currentId].parter == 0);
+}
+comm.isEnd = function () {
+	if (!comm.nodes.length) {
+		return !0;
+	}
+	return (comm.nodes[currentId].child.length > 0);
+}
+comm.getMovesLength = function () {
+	moves = comm.getMoves4Server();
+	return moves.length;
 }
 /*下一步函数*/
 comm.replayNextset = function () {
@@ -924,63 +894,35 @@ comm.replayNextset = function () {
 		showFloatTip("请取消电脑思考，再点击下一步");
 		return;
 	}
-	countPath = 0;
+	
 	var nextpace = [];
-	nextid = currentId;
-	/*统计分支数*/
-	if (comm.paceEx[movesIndex]) {
-		for (j = 0; j < comm.paceEx[movesIndex].length; j++) {
-			if (comm.paceEx[movesIndex][j][2] == nextid) {
-				nextpace.push(comm.paceEx[movesIndex][j]);
-				countPath++;
-			}
-			if (movesIndex == 0 && comm.paceEx[movesIndex][j][1] == nextid) {
-				nextpace.push(comm.paceEx[movesIndex][j]);
-				countPath++;
-			}
-		}
-		if (countPath == 0) {
-			replayBtnUpdate();
-			return;
-		}
-		if (countPath == 1) {
-			currentId = nextpace[0][1];
-			movesIndex++;
-			moves = comm.getMoves4Server(1);
-			cleanChess();
-			comm.init(3, comm.cMap, !0);
-			if (movesIndex > 0) {
-				for (var e = 0; movesIndex - 1 > e; e++)
-					Player.stepPlay(moves[e].src, moves[e].dst, !0);
-				Player.stepPlay(moves[e].src, moves[e].dst);
-			}
-			replayBtnUpdate();
-			return;
-		}
+	/*统计分支数*/	
+	countPath = comm.getBrachLength();
+	if (countPath == 1) {
+		/*一条分支直接走棋*/
+		var childID = comm.nodes[currentId].child[0];
+		var step = comm.nodes[childID].step;
+		Player.serverAIPlay(step);
+	}
+	else if (countPath > 1) {
+		/*多条分支弹出提示框*/		
 		/*自动播放控制*/
 		if (autoreplayset != 0) {
 			clearInterval(autoreplayset);
 		}
 		cleanLine();
 		for (var j = 0; j < countPath; j++) {
-			drawLine(nextpace[j][0], j + 1);
+			var childID = comm.nodes[currentId].child[j];
+			var step = comm.nodes[childID].step;
+			drawLine(step, j + 1);
 			BranchPath = "BranchPath_" + j;
 			$("#nextstepdialog").prepend('<input type="button" id=' + BranchPath + ' class="chessbaseBtn chess' + j + 'Btn" value=""/>');
 			var ss = ("#BranchPath_") + j;
 			$(ss).one('click', function () {
 				inx = this.getAttribute("id").split("_")[1];
-				currentId = nextpace[inx][1];
-
-				movesIndex++;
-				moves = comm.getMoves4Server(1);
-				cleanChess();
-				comm.init(3, comm.cMap, !0);
-				if (movesIndex > 0) {
-					for (var e = 0; movesIndex - 1 > e; e++)
-						Player.stepPlay(moves[e].src, moves[e].dst, !0);
-					Player.stepPlay(moves[e].src, moves[e].dst);
-				}
-				replayBtnUpdate();
+				var childID = comm.nodes[currentId].child[inx-1];
+				var step = comm.nodes[childID].step;
+				Player.serverAIPlay(step);
 				$("#nextstepdialog").trigger("myclick");
 				/*自动播放控制*/
 				if (autoreplayset != 0) {

@@ -526,20 +526,12 @@ replayBtnUpdate = function () {
 		}, 200);
 		return;
 	}
-	moves = comm.moves || [];
-	var count = 0;
-	for (var i = 0; i < moves.length; i++) {
-		if (moves[i])
-			count++;
-	}
-	if (count == 0)
-		count = comm.paceEx.length;
+	setEnable("firstBtn", !comm.isFirst());
+	setEnable("prevBtn",  !comm.isFirst());
+	setEnable("nextBtn", !comm.isEnd());
+	setEnable("endBtn", !comm.isEnd());
 
-	0 >= movesIndex ? setEnable("firstBtn", !1) : setEnable("firstBtn", !0),
-	0 >= movesIndex ? setEnable("prevBtn", !1) : setEnable("prevBtn", !0),
-	movesIndex >= count ? setEnable("nextBtn", !1) : setEnable("nextBtn", !0),
-	movesIndex >= count ? setEnable("endBtn", !1) : setEnable("endBtn", !0);
-	if (movesIndex >= count && autoreplayset != 0)
+	if (comm.isEnd())
 		clearInterval(autoreplayset);
 	
 	if (comm.notes[currentId]) {
@@ -555,7 +547,7 @@ showThink = function () {
     	if (mode == playmode.EDITBOARD) {
     		clearInterval(showThinkset);
     	}
-    	var count = comm.paceEx.length;
+    	var count = comm.getMovesLength();
     	 /*人机对弈计时从设置完成后开始*/
     	if (timingBegins) {
     		comm.getHold() == BLACK ? playtime.black++ : playtime.red++;    		
@@ -568,7 +560,7 @@ showThink = function () {
 showThink1 = function () {
 	var count = 0;  
     var time = 0;
-    count = comm.paceEx.length;
+    count = comm.moves.length;
     if( comm.isend == 1) return;
     /*人机对弈计时从设置完成后开始*/
     if (mode == playmode.AIPLAY && !timingBegins) return;
@@ -595,4 +587,55 @@ showThink1 = function () {
         	$("#AIThink").show()
         }, 1000);
     }               	
+}
+/*弹出DIV*/
+popupDiv = function (div_id) {    
+	var $div_obj = $("#" + div_id);       
+	var windowWidth = $(window).width();          
+	var windowHeight = $(window).height();
+	var popupHeight = $div_obj.height();      
+	var popupWidth = $div_obj.width();            
+	if	(div_id == "nextstepdialog"){
+		$("<div id='bg1'></div>").width(windowWidth * 0.99)          
+							.height(windowHeight * 0.99).click(function() {           
+								hideDiv(div_id); 
+								cleanLine();								
+							}).appendTo("body").fadeIn(200);
+		$div_obj.css({  "position" : "absloute"   	})
+			.animate({    
+			left : windowWidth / 2 - popupWidth / 2,        
+			top : (windowHeight  - popupHeight ) * 0.90,        
+			opacity : "show"      
+			}, "slow");     
+	}
+	else{
+		$("<div id='bg'></div>").width(windowWidth * 0.99)          
+							.height(windowHeight * 0.99).click(function() {           
+								hideDiv(div_id);          
+							}).appendTo("body").fadeIn(200); 
+		$div_obj.css({  "position" : "absloute"   	})
+			.animate({    
+			left : windowWidth / 2 - popupWidth / 2,        
+			top : windowHeight / 2 - popupHeight / 2,        
+			opacity : "show"      
+			}, "slow");     
+	}			     
+}    
+/*隐藏弹出DIV*/    
+hideDiv = function (div_id) {     
+	if	(div_id == "nextstepdialog"){
+		$("#bg1").remove();
+		for (i=0;i<countPath;i++){
+			$(".chessbaseBtn").remove();
+		}
+	}
+	else{
+		$("#bg").remove();
+	}
+	$("#" + div_id).animate({ 
+	left : 0,        
+	top : 0,        
+	opacity : "hide"     
+	}, 
+	"slow");  	
 }

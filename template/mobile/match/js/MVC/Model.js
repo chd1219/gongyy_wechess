@@ -52,11 +52,11 @@ onRegret = function () {
 		showFloatTip("请取消电脑思考，再点击悔棋");
 		return;
 	}
-	if (comm.paceEx.length == 0) {
+	if (comm.nodes.length == 0) {
 		showFloatTip("还没开始下棋呢");
 		return;
 	}
-	if (comm.paceEx.length != movesIndex) {
+	if (comm.getBrachLength() > 0) {
 		showFloatTip("不是最后一步");
 		return;
 	}
@@ -72,7 +72,6 @@ onRegret = function () {
 		for (var e = 0; movesIndex > e; e++)
 			Player.stepPlay(comm.moves[e].src, comm.moves[e].dst, !0);
 	}
-	comm.paceEx.pop();
 	comm.moves.length--;
 	replayBtnUpdate();
 }
@@ -147,7 +146,6 @@ onAIOffensive = function () {
 	isVerticalReverse ? comm.init(3, comm.arrReverse(comm.cMap), !0) : comm.init(3, comm.cMap, !0);
 	movesIndex = 0;
 	comm.moves.length = 0;
-	comm.paceEx.length = 0;
 	replayBtnUpdate();
 }
 /*响应先后手*/
@@ -170,7 +168,6 @@ onOffensive = function () {
 	isVerticalReverse ? comm.init(3, comm.arrReverse(comm.cMap), !0) : comm.init(3, comm.cMap, !0);
 	movesIndex = 0;
 	comm.moves.length = 0;
-	comm.paceEx.length = 0;
 	replayBtnUpdate();
 }
 /*编辑棋谱*/
@@ -344,7 +341,6 @@ onReplayEnd = function () {
 	comm.init(3, comm.cMap, !0);
 
 	movesIndex = comm.moves.length;
-	currentId = comm.paceEx[movesIndex - 1][0][1];
 	for (var e = 0; e < movesIndex; e++)
 		Player.stepPlay(comm.moves[e].src, comm.moves[e].dst, !0);
 
@@ -368,7 +364,6 @@ onSave = function () {
 	comm.init(3, comm.map, !0);	
 	movesIndex = 0,
 	comm.pace = [],
-	comm.paceEx = [],
 	comm.moves = [],
 	comm.notes = [];
 	replayBtnUpdate();
