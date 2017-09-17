@@ -218,29 +218,55 @@ onEditboard = function () {
 }
 /*响应翻转按钮*/
 onReverse = function () {
-	if (b_autoset != 0 || r_autoset != 0) {
-		isComPlay = 1;
-		showFloatTip("请取消电脑思考，再点击翻转");
-		if ($("#verticalreverseTog").hasClass('mui-active')) {
-			$("#verticalreverseTog").removeClass('mui-active');
-			$("#verticalreverseTog").html('<div class="mui-switch-handle"></div>');
-		} else {
-			$("#verticalreverseTog").addClass('mui-active');
-			$("#verticalreverseTog").html('<div class="mui-switch-handle" style="transition-duration: 0.2s; transform: translate(43px, 0px);"></div>');
-		}
-		return;
+	if (mode == playmode.EDITBOARD) {
+		isVerticalReverse ? (isVerticalReverse = 0, 
+			chessBottonLayer.removeChild(verticalReverseboard), 
+			chessBottonLayer.addChild(board),
+			comm.sMap = comm.arr2Clone(sMapFull),
+			emptyMap = comm.arr2Clone(EmptyMap),
+			initMap = comm.arr2Clone(InitMap)
+			) :
+			(isVerticalReverse = 1, 
+			chessBottonLayer.removeChild(board), 
+			chessBottonLayer.addChild(verticalReverseboard),
+			comm.sMap = comm.arr2Clone(sMapFullReveser),
+			emptyMap = comm.arrReverse(EmptyMap),
+			initMap = comm.arrReverse(InitMap)
+			);
+		
+		cleanChess();
+		cleanChessEx();		
+		comm.sMapList = JSON.parse(JSON.stringify(chessMan));		
+		comm.init(3, emptyMap, !1);
+		createMansEx(comm.sMap);
+		$("#fullBtn").show();
+		$("#clearBtn").hide();
 	}
-
-	if (comm.isAnimating)		return;
-	if (waitServerPlay)		return;
-	isVerticalReverse ? (isVerticalReverse = 0, chessBottonLayer.removeChild(verticalReverseboard), chessBottonLayer.addChild(board)) :
-	(isVerticalReverse = 1, chessBottonLayer.removeChild(board), chessBottonLayer.addChild(verticalReverseboard));
-
-	comm.reverseMoves();
-	comm.map = comm.arrReverse(comm.map);
-	comm.cMap = comm.arrReverse(comm.cMap);
-	cleanChess();
-	comm.init(3, comm.map, !0);
+	else {
+		if (b_autoset != 0 || r_autoset != 0) {
+			isComPlay = 1;
+			showFloatTip("请取消电脑思考，再点击翻转");
+			if ($("#verticalreverseTog").hasClass('mui-active')) {
+				$("#verticalreverseTog").removeClass('mui-active');
+				$("#verticalreverseTog").html('<div class="mui-switch-handle"></div>');
+			} else {
+				$("#verticalreverseTog").addClass('mui-active');
+				$("#verticalreverseTog").html('<div class="mui-switch-handle" style="transition-duration: 0.2s; transform: translate(43px, 0px);"></div>');
+			}
+			return;
+		}
+	
+		if (comm.isAnimating)		return;
+		if (waitServerPlay)		return;
+		isVerticalReverse ? (isVerticalReverse = 0, chessBottonLayer.removeChild(verticalReverseboard), chessBottonLayer.addChild(board)) :
+		(isVerticalReverse = 1, chessBottonLayer.removeChild(board), chessBottonLayer.addChild(verticalReverseboard));
+	
+		comm.reverseMoves();
+		comm.map = comm.arrReverse(comm.map);
+		comm.cMap = comm.arrReverse(comm.cMap);
+		cleanChess();
+		comm.init(3, comm.map, !0);
+	}	
 }
 /*响应声音按钮*/
 onSound = function () {
@@ -403,6 +429,10 @@ onSave = function () {
 	replayBtnUpdate();
 
 	/*方便用户设置*/
+	if (isVerticalReverse) {
+		$("#verticalreverseTog").addClass('mui-active');
+		$("#verticalreverseTog").html('<div class="mui-switch-handle" style="transition-duration: 0.2s; transform: translate(43px, 0px);"></div>');
+	}
 	mui('#delete').popover('toggle');	
 	resizeCanvasAnalyse();
 }
@@ -428,7 +458,8 @@ onNote = function () {
 onCleanBroad = function (e) {
 	cleanChess();
 	cleanChessEx();
-	comm.sMap = comm.arr2Clone(sMapFull);
+	emptyMap = emptyMap || EmptyMap;
+	isVerticalReverse ? comm.sMap = comm.arr2Clone(sMapFullReveser) : comm.sMap = comm.arr2Clone(sMapFull);
 	comm.sMapList = JSON.parse(JSON.stringify(chessMan));	
 	comm.init(3, emptyMap, !1);
 	createMansEx(comm.sMap);
@@ -439,8 +470,9 @@ onCleanBroad = function (e) {
 onFullBroad = function (e) {
 	cleanChess();
 	cleanChessEx();
+	initMap = initMap || InitMap;
 	comm.sMap = comm.arr2Clone(sMapEmpty),
-	comm.sMapList = JSON.parse(JSON.stringify(emptychessMan)),
+	comm.sMapList = JSON.parse(JSON.stringify(emptychessMan)),	
 	comm.init(3, initMap, !1);
 	$("#fullBtn").hide();
 	$("#clearBtn").show();

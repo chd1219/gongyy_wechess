@@ -9,7 +9,7 @@
 var comm = comm || {};
 /*初始化*/
 comm.init = function (e, a, k) {
-    var a = a || initMap;
+    var a = a || InitMap;
     comm.cMap = comm.cMap || a;
     comm.nowMap = a,
     comm.map = comm.arr2Clone(a),

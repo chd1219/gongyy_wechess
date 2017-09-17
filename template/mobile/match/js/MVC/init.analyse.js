@@ -132,6 +132,7 @@ onload = function() {
     $("#endBtn").on('tap', onReplayEnd),
     $("#regretBtn").on('tap', onRegret),
     $("#sendBtn").on('tap', onSend),
+    $("#reveseBtn").on('tap', onReverse),    
     $("#fullBtn").on('tap', onFullBroad),
     $("#clearBtn").on('tap', onCleanBroad),               
     $("#saveBtn").on('tap', onSave);      

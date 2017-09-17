@@ -30,7 +30,7 @@ Board.resize = function(){
 }
 /*棋盘参数初始化*/
 initChess = function(e, a) {
-    var e = e || initMap;
+    var e = e || InitMap;
     fullMoves = a || [],
     fullMap = e.concat(),
     comm.moves = fullMoves.concat(),
@@ -42,7 +42,7 @@ initChess = function(e, a) {
 }
 /*扩展棋盘参数初始化*/
 initChessEx = function(e, a) {
-    var e = e || initMap;
+    var e = e || InitMap;
     fullMoves = a || [],
     fullMap = e.concat(),
     comm.moves = fullMoves.concat(),

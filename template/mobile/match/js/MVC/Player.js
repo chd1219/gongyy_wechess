@@ -70,7 +70,9 @@ Player.clickMan = function(point) {
 Player.clickPoint = function(point) {
 	if (comm.nowManKey) {
 		/*移动棋子*/
-		Player.moveMan(point);
+		var src = Player.getNowManPoint();
+		var dst = point;
+		Player.moveMan(src, dst);
 	}
 }
 /*选中棋子*/
@@ -109,15 +111,21 @@ Player.cancleSelected = function () {
 	light.visible = !1;
 }
 /*交换棋子*/						
-Player.exchangMan = function (point) {	
-	Player.moveMan(point);
-	
-	//Player.clickBoard(src);
-	//Player.clickBoard(dst);
+Player.exchangMan = function (src, dst) {	
+	/*移出棋盘*/
+	var point = {x:1,y:-1};
+	Player.moveMan(dst, point);
+	/*交换位置*/
+	Player.moveMan(src, dst);
 }
 /*获取之前选中棋子*/
 Player.getNowMan = function() {
 	return comm.mans[comm.nowManKey];
+}
+/*获取选中棋子*/
+Player.getMan = function(point) {
+	var key = comm.map[point.y][point.x];
+	return comm.mans[key];
 }
 /*获取之前选中棋子的XY坐标*/
 Player.getNowManPoint = function() {
@@ -138,7 +146,9 @@ Player.eatMan = function (point) {
 		man.isShow = !1;
 		addRemoveOnDrop(man.chess);
 		/*移动棋子*/
-		Player.moveMan(point);
+		var src = Player.getNowManPoint();
+		var dst = point;
+		Player.moveMan(src, dst);
 		if ("j0" == manKey || "J0" == manKey) {
 			comm.onGameEnd();			
 		}
@@ -149,10 +159,8 @@ Player.eatMan = function (point) {
 	Player.cancleSelected();
 }
 /*移动棋子*/
-Player.moveMan = function (point) {
+Player.moveMan = function (src, dst) {
 	try{ 
-		var src = Player.getNowManPoint();
-		var dst = point;
 		switch (Player.getMoveMode(src, dst)) {
 			case Player.MoveTpye.ERROR:
 				break;
@@ -177,11 +185,11 @@ Player.moveMan = function (point) {
 }
 /*PointIn2Out*/
 Player.PointIn2Out = function (src, dst) {	
-	var nowMan = Player.getNowMan();
+	var nowMan = Player.getMan(src);
     var maptemp = {"C": 0, "M": 1, "P": 2, "X": 3, "S": 4, "Z": 5, "c": 0, "m": 1, "p": 2, "x": 3, "s": 4, "z": 5};
 	row = maptemp[nowMan.pater];
 	if (row > -1) {
-		nowMan.my == -1  ? (dst.y = boardset.boutside, col = 0) : (dst.y = boardset.routside, col = 1);
+		nowMan.my == isVerticalReverse  ? (dst.y = boardset.boutside, col = 0) : (dst.y = boardset.routside, col = 1);
 		delete comm.map[src.y][src.x];
 		var templist = [];
 		templist = comm.sMapList[nowMan.pater];
@@ -204,6 +212,7 @@ Player.PointIn2Out = function (src, dst) {
 }
 /*PointIn2In*/
 Player.PointIn2In = function (src, dst) {
+	comm.nowManKey = comm.map[src.y][src.x];
 	if (!comm.checkMans(comm.nowManKey, dst)) {		
 		showFloatTip("摆放错误，请重试");
 		return;
@@ -212,6 +221,7 @@ Player.PointIn2In = function (src, dst) {
 		Player.AIclickPoint(dst);		
 	}
 	else {
+		var nowMan = Player.getMan(src);
 		if (Player.indexOfPs(Player.getNowMan().ps, [dst.x, dst.y])) {
 			Player.AIclickPoint(dst);
 			move = {src, dst};
@@ -221,13 +231,15 @@ Player.PointIn2In = function (src, dst) {
 }
 /*PointOutIn*/
 Player.PointOut2In = function (src, dst) {
+	src.y < 0 ? (col = 0) : (col = 1);
+	row = parseInt(src.x / boardset.outsidescale);
+	comm.nowManKey = comm.sMap[col][row];
+	
 	if (!comm.checkMans(comm.nowManKey, dst)) {		
 		showFloatTip("摆放错误，请重试");
 		return;
 	}
-	var nowMan = Player.getNowMan();
-	src.y < 0 ? (col = 0) : (col = 1);
-	row = parseInt(src.x / boardset.outsidescale);
+	var nowMan = comm.mans[comm.nowManKey];
 	delete comm.sMap[col][row];
 	stage.removeChild(chessnum[col * 6 + row]);
 	
