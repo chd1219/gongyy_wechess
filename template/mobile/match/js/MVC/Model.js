@@ -48,31 +48,24 @@ onRedPlay = function () {
 }
 /*悔棋*/
 onRegret = function () {
-	if (b_autoset != 0 || r_autoset != 0) {
-		showFloatTip("请取消电脑思考，再点击悔棋");
-		return;
-	}
 	if (comm.nodes.length == 0) {
 		showFloatTip("还没开始下棋呢");
 		return;
 	}
-	if (comm.getBrachLength() > 0) {
-		showFloatTip("不是最后一步");
-		return;
+	if (comm.isAnimating) {
+		return;		
 	}
-
-	cleanLine();
-	comm.isend = !1,
-	comm.isPlay = !0,
-	comm.moves = comm.getMoves4ServerEx(-1);
-	cleanChess();
-	isVerticalReverse ? comm.init(3, comm.arrReverse(comm.cMap), !0) : comm.init(3, comm.cMap, !0);
-	if (movesIndex > 0) {
-		movesIndex--;
-		for (var e = 0; movesIndex > e; e++)
-			Player.stepPlay(comm.moves[e].src, comm.moves[e].dst, !0);
+	waitServerPlay = !1;
+	moves = comm.getMoves4Server();
+	computerHold == comm.getHold() ? flag = 1 : flag = 2;
+	
+	if (movesIndex > 2) {
+		movesIndex -= flag;
+		comm.gotoStep(moves, movesIndex);			
+		comm.nodes.length = movesIndex+1;
+		comm.nodes[movesIndex].child = [];
+		id -= flag;
 	}
-	comm.moves.length--;
 	replayBtnUpdate();
 }
 /*发送棋谱*/
@@ -263,20 +256,77 @@ onAutoreplay = function () {
 }
 /*响应下一步按钮*/
 onReplayNext = function () {
+	if (comm.isAnimating) {
+		return;		
+	}
 	cleanChessdbDetail();
 	cleanComputerDetail();
 	if (!relayNextLock) {
 		relayNextLock = 1;
-		waitServerPlay = !1;
-		//setTimeout(comm.replayNextset, 200);
-		comm.replayNextset();
+		waitServerPlay = !0;
+		relayNextLock = 0;
+		if (b_autoset != 0 && r_autoset != 0) {
+			showFloatTip("请取消电脑思考，再点击下一步");
+			return;
+		}		
+		var nextpace = [];
+		/*统计分支数*/	
+		countPath = comm.getBrachLength();
+		if (countPath == 1) {
+			/*一条分支直接走棋*/
+			var childID = comm.nodes[currentId].child[0];
+			var step = comm.nodes[childID].step;
+			Player.stepPlay(step, !0);
+			movesIndex++;
+			currentId = childID;
+		}
+		else if (countPath > 1) {
+			/*多条分支弹出提示框*/		
+			/*自动播放控制*/
+			if (autoreplayset != 0) {
+				clearInterval(autoreplayset);
+			}
+			cleanLine();
+			for (var j = 0; j < countPath; j++) {
+				var childID = comm.nodes[currentId].child[j];
+				var step = comm.nodes[childID].step;
+				drawLine(step, j + 1);
+				BranchPath = "BranchPath_" + j;
+				$("#nextstepdialog").prepend('<input type="button" id=' + BranchPath + ' class="chessbaseBtn chess' + j + 'Btn" value=""/>');
+				var ss = ("#BranchPath_") + j;
+				$(ss).one('click', function () {
+					inx = this.getAttribute("id").split("_")[1];
+					var childID = comm.nodes[currentId].child[inx-1];
+					var step = comm.nodes[childID].step;
+					Player.stepPlay(step);
+					movesIndex++;
+					currentId = childID;
+					$("#nextstepdialog").trigger("myclick");
+					/*自动播放控制*/
+					if (autoreplayset != 0) {
+						autoreplayset = setInterval(comm.replayNext, 2000);
+					}
+				});
+			}
+			popupDiv('nextstepdialog');
+			$("#nextstepdialog").bind('myclick', function () {
+				hideDiv('nextstepdialog');
+				for (i = 0; i < countPath; i++) {
+					$(".chessbaseBtn").remove();
+				}
+				cleanLine();
+			});
+		}
 	}
 	replayBtnUpdate();
 }
 /*响应上一步按钮*/
 onReplayPrev = function () {
+	if (comm.isAnimating) {
+		return;		
+	}
 	if(mode == playmode.AIPLAY) {
-		comm.airegret();	
+		onRegret();
 		return;
 	}
 	cleanChessdbDetail();
@@ -288,17 +338,10 @@ onReplayPrev = function () {
 			relayPrevLock = 0;
 			return;
 		}
-		cleanLine();
-		comm.isend = !1;
-		comm.isPlay = !0;
-		waitServerPlay = !1;
-		comm.moves = comm.getMoves4Server();
-		cleanChess();
-		comm.init(3, comm.cMap, !0);
+		moves = comm.getMoves4Server();
 		if (movesIndex > 0) {
 			movesIndex--;
-			for (var e = 0; e < movesIndex; e++)
-				Player.stepPlay(comm.moves[e].src, comm.moves[e].dst, !0);
+			comm.gotoStep(moves, movesIndex);			
 		}
 		relayPrevLock = 0;
 	}
@@ -306,43 +349,34 @@ onReplayPrev = function () {
 }
 /*响应开局按钮*/
 onReplayFirst = function () {
+	if (comm.isAnimating) {
+		return;		
+	}
 	cleanChessdbDetail();
 	cleanComputerDetail();
 	if (b_autoset != 0 && r_autoset != 0) {
 		showFloatTip("请取消电脑思考，再点击开局");
 		return;
 	}
-	cleanLine();
-	comm.isend = !1;
-	comm.isPlay = !0;
-	waitServerPlay = !1;
-	comm.moves = comm.getMoves4ServerEx(-1);
-	cleanChess();
-	comm.init(3, comm.cMap, !0);
-
-	currentId = 0;
+	moves = comm.getMoves4Server();
 	movesIndex = 0;
+	comm.gotoStep(moves, movesIndex);
 	replayBtnUpdate();
 }
 /*响应终局按钮*/
 onReplayEnd = function () {
+	if (comm.isAnimating) {
+		return;		
+	}
 	cleanChessdbDetail();
 	cleanComputerDetail();
 	if (b_autoset != 0 && r_autoset != 0) {
 		showFloatTip("请取消电脑思考，再点击终局");
 		return;
 	}
-	cleanLine();
-	comm.isend = !1;
-	comm.isPlay = !0;
-	waitServerPlay = !1;
-	comm.moves = comm.getMoves4Server();
-	cleanChess();
-	comm.init(3, comm.cMap, !0);
-
-	movesIndex = comm.moves.length;
-	for (var e = 0; e < movesIndex; e++)
-		Player.stepPlay(comm.moves[e].src, comm.moves[e].dst, !0);
+	moves = comm.getMoves4Server();
+	movesIndex = moves.length;
+	comm.gotoStep(moves, movesIndex);
 
 	replayBtnUpdate();
 }

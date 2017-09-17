@@ -358,7 +358,8 @@ drawLine = function (e, a) {
 	stage.update();
 }
 /*划线2*/
-drawLine2 = function (m, a) {
+drawLine2 = function (e, a) {
+	m = e.split("");
 	stageshape[a - 1] = new createjs.Shape();
 	var graphics = stageshape[a - 1].graphics;
 
@@ -526,14 +527,23 @@ replayBtnUpdate = function () {
 		}, 200);
 		return;
 	}
-	setEnable("firstBtn", !comm.isFirst());
-	setEnable("prevBtn",  !comm.isFirst());
-	setEnable("nextBtn", !comm.isEnd());
-	setEnable("endBtn", !comm.isEnd());
-
-	if (comm.isEnd())
-		clearInterval(autoreplayset);
+	var isFirst = comm.isFirst();
+	var isEnd = comm.isEnd();
 	
+	if (mode == playmode.AIPLAY) {
+		setEnable("prevBtn",  !isFirst);
+	}
+	else {
+		setEnable("firstBtn", !isFirst);
+		setEnable("prevBtn",  !isFirst);
+		setEnable("nextBtn", !isEnd);
+		setEnable("endBtn", !isEnd);
+	}
+	
+	if (isEnd)
+		clearInterval(autoreplayset);
+	movesCount = comm.getMovesLength();
+	AIThinkShow();
 	if (comm.notes[currentId]) {
 		$("#noteInfo").text(comm.notes[currentId]),
 		$("#noteInfo").parent('.mui-toast-container').addClass('mui-active');
@@ -543,18 +553,23 @@ replayBtnUpdate = function () {
 }
 /*显示思考信息*/
 showThink = function () {
-    showThinkset = setInterval(function(){    	
-    	if (mode == playmode.EDITBOARD) {
-    		clearInterval(showThinkset);
-    	}
-    	var count = comm.getMovesLength();
-    	 /*人机对弈计时从设置完成后开始*/
-    	if (timingBegins) {
-    		comm.getHold() == BLACK ? playtime.black++ : playtime.red++;    		
-    	}
-    	$("#AIThink").text("第" + movesIndex + "步 / 总" + count + "步    " + "耗时: 红方 "+ playtime.red+"秒/黑方 "+playtime.black+"秒"), 
-    	$("#AIThink").show()
-    }, 1000);      
+//	if (showThinkset != 0)  return;
+//	
+//  showThinkset = setInterval(function(){    	
+//  	if (mode == playmode.EDITBOARD) {
+//  		clearInterval(showThinkset);
+//  	}
+//  	
+//  	 /*人机对弈计时从设置完成后开始*/
+//  	if (timingBegins) {
+//  		comm.getHold() == BLACK ? playtime.black++ : playtime.red++;    		
+//  	}
+//  	AIThinkShow();
+//  }, 1000);      
+}
+AIThinkShow = function () {
+	$("#AIThink").text("第" + movesIndex + "步 / 总" + movesCount + "步    " + "耗时: 红方 "+ playtime.red+"秒/黑方 "+playtime.black+"秒"), 
+    $("#AIThink").show()
 }
 /*显示思考信息*/
 showThink1 = function () {

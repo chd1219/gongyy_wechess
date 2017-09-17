@@ -30,9 +30,9 @@ Player.clickMan = function(point) {
 			if (mode == playmode.EDITBOARD) {
 				/*交换棋子*/			
 				var man = Player.getNowMan();
-				var scr = {x:man.x,y:man.y};
+				var src = {x:man.x,y:man.y};
 				var dst = point;
-				Player.exchangMan(scr, dst);	
+				Player.exchangMan(src, dst);	
 				isexchange = 0;
 			}
 			else {
@@ -112,8 +112,8 @@ Player.cancleSelected = function () {
 Player.exchangMan = function (point) {	
 	Player.moveMan(point);
 	
-	Player.clickBoard(scr);
-	Player.clickBoard(dst);
+	//Player.clickBoard(src);
+	//Player.clickBoard(dst);
 }
 /*获取之前选中棋子*/
 Player.getNowMan = function() {
@@ -214,7 +214,8 @@ Player.PointIn2In = function (src, dst) {
 	else {
 		if (Player.indexOfPs(Player.getNowMan().ps, [dst.x, dst.y])) {
 			Player.AIclickPoint(dst);
-			Player.stepEnd(src.x + "" + src.y + dst.x + dst.y);
+			move = {src, dst};
+			Player.stepEnd(move);
 		}
 	}
 }
@@ -276,17 +277,17 @@ Player.getMoveMode = function (o, e) {
 	}	
 }
 /*落子*/
-Player.stepEnd = function(e){
+Player.stepEnd = function(move){
 	if (mode == playmode.EDITBOARD) {
 		return;
 	}
 	movesIndex++;
-	comm.branch(e);
+	comm.branch(move);
 	if (isanalyse) {
 		comm.send();
 	}
 	if (mode == playmode.AIPLAY) {
-		Player.AIPlay();		
+		computerHold != comm.getHold() || Player.AIPlay();		
 	}
 	replayBtnUpdate();
 }
@@ -316,14 +317,15 @@ Player.getClickMan = function (a) {
 		return 0 > m || m > 8 || 0 > o || o > 9 ? !1 : comm.map[o][m] && "0" != comm.map[o][m] ? comm.map[o][m] : !1
 }
 /*步进*/
-Player.stepPlay = function (scr, dst, type) {
+Player.stepPlay = function (step, type) {
+	step = comm.Step2XY(step);
 	type = type || !1,
 	hideDots(),
 	light.visible = !1;
-	var o = comm.map[scr.y][scr.x];
+	var o = comm.map[step.src.y][step.src.x];
 	comm.nowManKey = o;
-	var o = comm.map[dst.y][dst.x];
-	o ? Player.AIclickMan(dst, type) : Player.AIclickPoint(dst, type)
+	var o = comm.map[step.dst.y][step.dst.x];
+	o ? Player.AIclickMan(step.dst, type) : Player.AIclickPoint(step.dst, type)
 }
 /*AI走子*/
 Player.AIPlay = function () {
@@ -369,27 +371,23 @@ Player.AIclickPoint = function (dst, type) {
 	}	
 }
 /*服务器返回自动走法*/
-Player.serverAIPlay = function(e) {		
+Player.serverAIPlay = function(step,type) {		
     if (comm.isPlay) {		
-        e = e || Player.aiPace;
-        if (!e) return void(waitServerPlay = !0);
-		
+        step = step || Player.aiPace;
         Player.aiPace = void 0;
+        if (!step) return void(waitServerPlay = !0);		
 		if(isVerticalReverse){
-			e[0] = 8-e[0];
-			e[1] = 9-e[1];
-			e[2] = 8-e[2];
-			e[3] = 9-e[3];
+			step = comm.reverseStep(step);
 		}
-		var src = {x:e[0],y:e[1]};
-		var dst = {x:e[2],y:e[3]};
-        var a = comm.map[src.y][src.x];
-        comm.nowManKey = a;
-        var a = comm.map[dst.y][dst.x];
+		move = comm.Step2XY(step);
+
+        var key = comm.map[move.src.y][move.src.x];
+        comm.nowManKey = key;
+        key = comm.map[move.dst.y][move.dst.x];
 		if (waitServerPlay){
-			a ? setTimeout(Player.AIclickMan, 1000, dst) : setTimeout(Player.AIclickPoint, 1000, dst);
+			key ? setTimeout(Player.AIclickMan, 1000, move.dst,type) : setTimeout(Player.AIclickPoint, 1000, move.dst,type);
 		}
-		Player.stepEnd(src.x + "" + src.y + dst.x + dst.y);
+		type ? 1 : Player.stepEnd(move);
 		/*锁定，等待1s后解锁*/
 		setTimeout((function(){waitServerPlay = !1;}),1000);
     }

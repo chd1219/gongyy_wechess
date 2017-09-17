@@ -117,7 +117,7 @@ function DealPosition(obj) {
 			setTimeout((function(){play.serverAIPlay();}),200);
 		}		
 	}		
-	else if (d.length > 16){
+	else if (d.match("depth ")){
 		var e = d.split(" ");
 		var depth = e[2],
 		seldepth = e[4],
@@ -174,8 +174,8 @@ function DealPosition(obj) {
 				}				
 			}
 			setting = "<td> </td>";
-			tmpStr = "<tr><td>" + (depth / 32).toFixed(2) + "</td><td>" + score + "</td><td>" + tmpStr + "</td>" + setting + "</tr>";
-			if(document.getElementById("computerDetailTbody")){ 
+			if(document.getElementById("computerDetailTbody") && tmpStr.length > 4){ 
+				tmpStr = "<tr><td>" + (depth / 32).toFixed(2) + "</td><td>" + score + "</td><td>" + tmpStr + "</td>" + setting + "</tr>";
 				document.getElementById("computerDetailTbody").innerHTML = tmpStr + document.getElementById("computerDetailTbody").innerHTML;
 			} 			
 		}

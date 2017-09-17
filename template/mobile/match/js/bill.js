@@ -1544,4 +1544,3 @@ bill.serverAIPlay = function(e) {
 		setTimeout((function(){waitServerPlay = !1;}),1000);
     }
 }
-

@@ -1,20 +1,9 @@
-/*Websocket变量*/
 var myws = null;
-/*测试Websocket变量*/
 var mywstest = null;
-/*超时计数*/
 var timeout = 0;
-/*计时器*/
 var interval = 0;
-/*判断服务器是否有数据返回*/
 var waitServer = !1;
-/*记录发送的消息*/
 var msg = "";
-/*引擎信息缓存*/
-var depthinfolist = [];
-/*云库信息缓存*/
-var cloudinfolist = [];
-/*定义Websocket类*/
 var MyWebsocket = function (url, bRec) {  
 	this.url = url;
 	var brec = bRec;
@@ -35,7 +24,8 @@ var MyWebsocket = function (url, bRec) {
 		ws.onopen = function () {
 		}
 		ws.onclose = function () {
-		}			
+		}		
+	
 		ws.onerror = function () {
 		}	
 	}
@@ -44,13 +34,6 @@ var MyWebsocket = function (url, bRec) {
 		if(e.match("position")){
 			waitServer = !0;
 			msg = e;
-			computelist = [];
-			depthinfolist = [];
-			cleanComputerDetail();
-		}else if (e.match("queryall")){
-			chessdblist = [];
-			cloudinfolist = [];
-			cleanChessdbDetail();	
 		}
     }  
 	this.mysend = function (e) {  
@@ -77,9 +60,8 @@ var MyWebsocket = function (url, bRec) {
 		timeout = 0;
 		waitServer = !1;
 	}
-}
-/*判断是否超时*/
-function CheckTimeout() {
+}; 
+function CheckReturn() {
 	if(waitServer){
 		timeout++;		
 		if(timeout%10 == 9){
@@ -89,185 +71,156 @@ function CheckTimeout() {
 		}		
 	}	
 }
-/*发送消息函数*/
 function sendMessage(e){
 	myws.Send(e);
 //	mywstest.Send(e);
 }
-/*定义引擎信息的数据结构*/
-var depthinfo = function(d){
-	var e = d.split(" ");
-	this.depth = (e[2] / 32).toFixed(2),
-	this.seldepth = e[4],
-	this.multipv = e[6],		
-	this.nodes = e[10],
-	this.nps = e[12],
-	this.tbhits = e[14],
-	this.time = e[16] / 1000;
-	this.score = parseInt(e[8]);
-	this.pv = [];
-	for (var pvseek = 17; pvseek < e.length; pvseek++) {
-		if (e[pvseek] == "pv") {
-			for (var i=pvseek+1;i<e.length; i++) {
-				this.pv[i-pvseek-1] = e[i];
-			}
-			break;
-		}
-	}
-}
-/*定义云库信息的数据结构*/
-var cloudinfo = function(d){
-	var e = d.split(",");
-	this.move = e[0],
-	this.score = parseInt(e[1]),	
-	this.rank = e[2],
-	this.note = e[3];
-}
-/*解析返回的云库信息*/
-function DealQueryall(obj) {
-	var e = (obj.result).split("|");				
-	if (e[0].match("stalemate") || e[0].match("checkmate")) {
-		showFloatTip("绝杀！");
-		//回调返回函数
-		myws.Return();
-		return;
-	}				
-	if (e[0].match("unknown") || e[0].match("invalid board")){
-		return;			
-	}
-	var tmpStr = new String();		
-	for (i=0;i<e.length && i<10;i++) {	
-		var info = new cloudinfo(e[i]);
-		cloudinfolist.push(info);
-		var tempmap = comm.arr2Clone(play.map);		
-		a = info.move.split("");			
-		n = play.transformat(a);	
-		var move = comm.createMove(tempmap,n[0],n[1],n[2],n[3]);
-		tmpStr += "<tr><td>"+ move +"</td><td>"+ info.rank +"</td><td>"+ info.score +"</td><td>"+ info.note +"</td></tr>";
-	}	
-	if(document.getElementById("chessdbDetailTbody")){ 
-		document.getElementById("chessdbDetailTbody").innerHTML = tmpStr;
-	}
-}
-/*解析返回的引擎信息*/
-function DealPosition(obj) {
-	d = obj.result;
-	if(d.match("bestmove ")){
-		var e = d.split("bestmove "); 
-		var move = e[1];
-		/*回调返回函数*/
-		myws.Return();
-		if(move.match("null") || move.match("none")){
-			play.my == 1 ? play.onGameEnd(-1) : play.onGameEnd(1);
-			bill.my = -bill.my;
-			play.my = -play.my;		
-			return;
-		}
-		
-		if(!isanalyse){
-			/*对比引擎和云库结果，取分数最大的走法*/
-			var max = 0;
-			for (var i=0;i<cloudinfolist.length && i<1;i++) {
-				var info = cloudinfolist[i];
-				if (1 == movesIndex%2) {
-					info.score = -info.score;
-				}	
-				if(max < info.score){
-					max = info.score;
-					move = info.move;
-				}			
-			}
-			for (var i=0;i<depthinfolist.length && i<1;i++) {
-				var info = depthinfolist[depthinfolist.length-1-i];
-				if(max < info.score){
-					max = info.score;
-					move = info.pv[0];
-				}				
-			}
-			var o = move.split(""); 
-			var aiPace = [];
-			aiPace = play.transformat(o);
-			play.aiPace = aiPace;
-			setTimeout((function(){play.serverAIPlay();}),200);
-		}		
-	}		
-	else if (d.length > 16){
-		var info = new depthinfo(d);
-		depthinfolist.push(info);
-		if (isOffensive == movesIndex%2) {
-			info.score = -info.score;
-		}				
-		var tempmap = comm.arr2Clone(play.map);
-		var a = [];
-		var tmpStr = "";
-		bill.cleanLine();
-		for (j = 0; j < info.pv.length && j<4; j++) {
-			if (info.pv[j]) {
-				a = info.pv[j].split("");					
-				var o = play.transformat(a);					
-				computelist.push(o);
-				var move = comm.createMove(tempmap, o[0], o[1], o[2], o[3]);
-				tmpStr = tmpStr + move + " ";
-				/*走法提示*/
-				if (isVerticalReverse) {
-					o[0] = 8-o[0];
-					o[1] = 9-o[1];
-					o[2] = 8-o[2];
-					o[3] = 9-o[3];
-				}
-				if (isanalyse && j<2) {
-					bill.drawLine2(o,j+1);
-				}
-			}				
-		}				
-		if(document.getElementById("computerDetailTbody")){ 
-			tmpStr = "<tr><td>" + info.depth + "</td><td>" + info.score + "</td><td>" + tmpStr + "</td></tr>";
-			document.getElementById("computerDetailTbody").innerHTML = tmpStr + document.getElementById("computerDetailTbody").innerHTML;
-		} 		
-	}		
-}
-/*解析返回信息*/
 function ParseMsg(obj) {
 	if(Number(obj.index) != movesIndex) return;
 	switch(obj.commandtype){
 		case "queryall":
-			DealQueryall(obj);
+			var e = (obj.result).split("|");
+			cleanChessdbDetail();		
+			if (e[0].match("stalemate") || e[0].match("checkmate")) {
+				showFloatTip("绝杀！");
+				//回调返回函数
+				myws.Return();
+				return;
+			}				
+			if (e[0].match("unknown") || e[0].match("invalid board")){
+				return;			
+			}
+			var tmpStr = new String();	
+			chessdblist = [];
+			for (i=0;i<e.length && i<10;i++) {	
+				var tempmap = comm.arr2Clone(play.map);
+				var o = e[i].split(",");
+				a = o[0].split("");			
+				n = play.transformat(a);	
+				chessdblist.push(n);
+				p = comm.createMove(tempmap,n[0],n[1],n[2],n[3]);
+				tmpStr += "<tr style=\"height:40px;\"><td>"+ p +"</td><td>"+ o[2] +"</td><td>"+ o[1] +"</td><td><input type=\"Button\" onclick='play.onmdownchessdblist(\""+i+"\")' value=\"立即出招\"></td></tr>";
+			}	
+			if(document.getElementById("chessdbDetailTbody")){ 
+				document.getElementById("chessdbDetailTbody").innerHTML = tmpStr;
+			}
 			break;
 		case "position":
-			DealPosition(obj);
+			d = obj.result;
+			if(d.match("bestmove ")){
+				var e = d.split("bestmove "); 
+				
+				if(e[1].match("null") || e[1].match("none")){
+					play.my == 1 ? play.onGameEnd(-1) : play.onGameEnd(1);
+					bill.my = -bill.my;
+					play.my = -play.my;			
+					return;
+				}
+				var o = e[1].split(""); 
+				var a = [];
+				a = play.transformat(o);			
+				play.aiPace = a;		
+				if(!isanalyse){
+					setTimeout((function(){play.serverAIPlay();}),200);
+				}		
+				//回调返回函数
+				myws.Return();
+			}		
+			else if (d.match("depth")){
+				var e = d.split(" ");
+				var depth = e[2],
+				seldepth = e[4],
+				multipv = e[6],		
+				nodes = e[10],
+				nps = e[12],
+				tbhits = e[14],
+				time = e[16] / 1000;
+				score = e[8];
+				if (isOffensive == movesIndex%2) {
+					score = -score;
+				}		
+		
+				var tempmap = comm.arr2Clone(play.map);
+				if (depth == 2) {
+					computelist = [];
+					cleanComputerDetail();
+				}
+		
+				if (depth > 1) {
+					var pv = [],
+					a = [];
+		
+					var tmpStr = new String();
+					var setting = new String();
+					for (var pvseek = 17; pvseek < e.length; pvseek++) {
+						if (e[pvseek] == "pv")
+							break;
+					}
+					bill.cleanLine();
+					for (j = 0; (j + pvseek) < e.length && j<4; j++) {
+						i = j + pvseek + 1;
+						if (e[i]) {
+							a = e[i].split("");					
+							o = play.transformat(a);					
+							computelist.push(o);
+							pv[j] = comm.createMove(tempmap, o[0], o[1], o[2], o[3]);
+							tmpStr = tmpStr + pv[j] + " ";
+							//走法提示
+							if (isVerticalReverse) {
+								o[0] = 8-o[0];
+								o[1] = 9-o[1];
+								o[2] = 8-o[2];
+								o[3] = 9-o[3];
+							}
+							if (isanalyse) {
+								if (j==0) {
+									bill.drawLine2(o,1);
+								}
+								if (j==1) {
+									bill.drawLine2(o,2);
+								}
+							}
+						}				
+					}
+					setting = "<td> </td>";
+					if(document.getElementById("computerDetailTbody") && tmpStr.length > 4){ 
+						tmpStr = "<tr><td>" + (depth / 32).toFixed(2) + "</td><td>" + score + "</td><td>" + tmpStr + "</td>" + setting + "</tr>";
+						document.getElementById("computerDetailTbody").innerHTML = tmpStr + document.getElementById("computerDetailTbody").innerHTML;
+					} 			
+				}
+				//console.log(d);
+				play.aiPace = null;	
+			}		 
 			break;
 		default:
 			break;
-	}	
+	}
+	
 }
-/*加载配置信息*/
+
 function loadConfig() {
     comm.initChess(comm.initMap);
 	bill.create();	
-	/*初始化Websocket*/
+    //初始化
     myws = new MyWebsocket('ws://120.55.37.210:9001/',!0);
     myws.initWebsocket();
-	/*启动定时器，检查超时*/
-    interval = setInterval(this.CheckTimeout, 1000);	
+    
+    interval = setInterval(this.CheckReturn, 1000);	
+//  mywstest = new MyWebsocket('ws://118.190.46.210:9011/',false);
+//  mywstest.initWebsocket();
 }
-/*初始化结构布局*/
+
 function initLayer(e) {
     initCanvas(e);
     onload(),
     loadConfig()    
 }
-/*触发分析模式*/
-function onAnalyse() {
-    isanalyse ?  closeAnalyse() : startAnalyse();
+
+function analyse() {
+    isanalyse ?  (showFloatTip("关闭分析模式"), isanalyse = 0 , bill.cleanLine()) : (checkautoplay());
 }
-/*关闭分析模式*/
-function closeAnalyse (){
-	showFloatTip("关闭分析模式"),;
-	isanalyse = 0 ;
-	bill.cleanLine()
-}
-/*开启分析模式*/
-function startAnalyse (){
+
+function checkautoplay (){
     showFloatTip("开启分析模式");
     isanalyse = 1;
     if(b_autoset){
@@ -286,7 +239,7 @@ function startAnalyse (){
     }
     bill.replayBtnUpdate();
 }
-/*预加载*/
+
 onload = function() {
     comm.dot = {
         dots: []
@@ -294,7 +247,7 @@ onload = function() {
     comm.mans = {},
 	
     $("#isOffensiveBtn").on('tap',bill.offensive),
-    $("#analyseBtn").on('tap',onAnalyse),
+    $("#analyseBtn").on('tap',analyse),
     $("#blackautoplayBtn").on('tap',bill.bPlay),
     $("#redautoplayBtn").on('tap',bill.rPlay),
     $("#soundBtn").on('tap',bill.sound),

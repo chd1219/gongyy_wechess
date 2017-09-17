@@ -9,6 +9,7 @@ var serverData = serverData || {};
 var fullMap, 
 fullMoves, 
 movesIndex = 0,
+movesCount = 0,
 computelist = [],
 movesTipsShow = !0,
 isVerticalReverse = 0,
