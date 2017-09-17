@@ -1,3 +1,9 @@
+/*
+ * init.aiplay.js
+ * 自定义初始化
+ * 2017-08-20
+ * chd
+ */
 var myws = null;
 var mywstest = null;
 var timeout = 0;

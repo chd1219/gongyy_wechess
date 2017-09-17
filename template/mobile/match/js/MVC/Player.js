@@ -117,7 +117,7 @@ Player.exchangMan = function (src, dst) {
 		Player.cancleSelected();
 		return;
 	}
-	else if (Player.getKey(src) == "J0" || Player.getKey(dst) == "j0") {
+	else if (Player.getKey(src) == "J0" || Player.getKey(src) == "j0" || Player.getKey(dst) == "J0" || Player.getKey(dst) == "j0") {
 		showFloatTip("将帅不能移出棋盘");
 		Player.cancleSelected();
 		return;

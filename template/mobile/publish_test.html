@@ -50,18 +50,13 @@
             loader.loadFile({src: CDN_PATH + "libs/md5.min.js"});
             loader.loadFile({src: CDN_PATH + "libs/reconnecting-websocket.min.js"});
             loader.loadFile({src: CDN_PATH + "js/ScaleBitmap.min.js"});
-//          loader.loadFile({src: CDN_PATH + "js/AI.js"});
-//          loader.loadFile({src: CDN_PATH + "js/play.js"});
-//          loader.loadFile({src: CDN_PATH + "js/bill.js"});
-//          loader.loadFile({src: CDN_PATH + "js/comm.js"});
-//          loader.loadFile({src: CDN_PATH + "js/init.analyse.20170806.js"});
 			loader.loadFile({src: CDN_PATH + "js/MVC/global.js"});
 			loader.loadFile({src: CDN_PATH + "js/MVC/Model.js"});
 			loader.loadFile({src: CDN_PATH + "js/MVC/View.js"});
 			loader.loadFile({src: CDN_PATH + "js/MVC/Control.js"});
 			loader.loadFile({src: CDN_PATH + "js/MVC/Player.js"});
 			loader.loadFile({src: CDN_PATH + "js/MVC/Chess.js"});
-			loader.loadFile({src: CDN_PATH + "js/MVC/init.analyse.js"});
+			loader.loadFile({src: CDN_PATH + "js/MVC/init.test.js"});
             loader.loadFile({
                 src: CDN_PATH + "assets/images/chess_slim_atlas_.json",
                 type: "spritesheet",
@@ -234,7 +229,9 @@
                                 <a class="mui-control-item mui-active" href="#computerDetailDiv">
                                     思考细节
                                 </a>
-
+								<a class="mui-control-item" href="#openbookDetailDiv">
+                                    开局库
+                                </a>
                             </div>
                             <div id="chessdbDetailDiv" class="mui-control-content">
                                 <table class="table table-bordered table-striped" id="chessdbDetail">
@@ -278,7 +275,34 @@
                                     </tbody>
                                 </table>
                             </div>
-
+							<div id="openbookDetailDiv" class="mui-control-content">
+                                <table class="table table-bordered table-striped" id="openbookDetail">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                No.
+                                            </th>
+                                            <th>
+                                                着法
+                                            </th>
+                                            <th>
+                                                分数
+                                            </th>
+                                            <th>
+                                                胜
+                                            </th>
+                                            <th>
+                                                和
+                                            </th>
+                                            <th>
+                                                负
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="openbookDetailTbody">                               
+                                    </tbody>
+                                </table>
+                            </div>
                             <div class="wgo-help" style="display: none;"></div>
                             <div class="wgo-notification" style="display: none;"></div>
                             <div class="wgo-comment-text"></div>
@@ -311,13 +335,15 @@
         <div class="mui-switch-handle"></div>
     </div>
 </li>
-<li class="mui-table-view-cell">
-    <span>分析模式</span>
+<li class="mui-table-view-cell">	
+    <span>分析模式（</span>
+    <input type="checkbox" id="arrow" checked="checked" onchange="OnshowArrow()" />
+    <span>显示箭头）</span>
     <button id="analyseBtn" style="display:none"></button>
 
     <div class="mui-switch" id='analyseTog'>
         <div class="mui-switch-handle"></div>
-    </div>          
+    </div>        
 </li>
 <li class="mui-table-view-cell">
     <span>电脑执红</span>
@@ -590,8 +616,7 @@
         if($('#delete').css('display')=='none'){
             Setting();
         }
-    })
-
+   })
 </script>
 
 </body>

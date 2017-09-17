@@ -347,11 +347,11 @@ comm.checkJiang = function () {
 	for (var e = 0; e < 3; e++)
 		for (var a = 3; a < 6; a++) {
 			var m = comm.map[e][a];
-			if (m == "J0") {
+			if (m == "J0" || m == "j0") {
 				var flag = 0;
 				for (var o = e + 1; o < comm.map.length; o++) {
 					m = comm.map[o][a];
-					if (m == "j0") {
+					if (m == "J0" || m == "j0") {
 						if (flag == 0)
 							return !1;
 					} else if (m) {
@@ -522,6 +522,29 @@ comm.cloudinfo = function(d){
 	this.rank = e[2],
 	this.note = e[3];
 }
+/*定义开局库信息的数据结构*/
+comm.openbookinfo = function(d){
+	var e = d.split(",");
+	this.move = e[0],
+	this.score = parseInt(e[1]),	
+	this.rank = e[2],
+	this.note = e[3];
+}
+/*解析返回的开局库信息*/
+comm.DealOpenbook = function (obj) {
+	var e = JSON.parse(obj.result);
+	var tmpStr = "";
+	for (i=0;i<e.length && i<10;i++) {	
+		var info = e[i];
+		var tempmap = comm.arr2Clone(comm.map);		
+		step = comm.YX2XY(comm.pad(info.vmove.toString(16)));	
+		var move = comm.createMove(tempmap,step);
+		tmpStr += "<tr><td>"+ (i+1) +"</td><td>"+ move +"</td><td>"+ info.vscore +"</td><td>"+ info.vwin +"</td><td>"+ info.vdraw +"</td><td>"+ info.vlost +"</td></tr>";
+	}	
+	if(document.getElementById("openbookDetailTbody")){ 
+		document.getElementById("openbookDetailTbody").innerHTML = tmpStr;
+	}
+}
 /*解析返回的云库信息*/
 comm.DealQueryall = function (obj) {
 	var e = (obj.result).split("|");				
@@ -628,6 +651,9 @@ comm.ParseMsg = function (e) {
 		switch(obj.commandtype){
 			case "queryall":
 				comm.DealQueryall(obj);
+				break;
+			case "openbook":
+				comm.DealOpenbook(obj);
 				break;
 			case "position":
 				comm.DealPosition(obj);
@@ -757,6 +783,16 @@ comm.Step2XY = function (e) {
 	o = {src: {x: parseInt(m[0]), y: parseInt(m[1])}, dst: {x: parseInt(m[2]), y: parseInt(m[3])}};
 	return 	o;
 }
+/*XY坐标互换*/
+comm.YX2XY = function (e) {
+	var m = e.split("");
+	var o = [];
+	o[0] = m[1];
+	o[1] = m[0];
+	o[2] = m[3];
+	o[3] = m[2];
+	return 	o.join("");
+}
 /*步法转坐标*/
 comm.XY2Step = function (move) {	
 	return 	move.src.x + "" + move.src.y + move.dst.x + move.dst.y;
@@ -828,6 +864,15 @@ comm.gotoStep = function (moves, index) {
 		currentId = moves[e].id;
 	}
 }
+/* 质朴长存法  */  
+comm.pad = function (num, n) {  
+    var len = num.toString().length;  
+    while(len < n) {  
+        num = "0" + num;  
+        len++;  
+    }  
+    return num;  
+}  
 Array.prototype.indexOf = function(val) {
     for (var i = 0; i < this.length; i++) {
         if (this[i] == val) return i;
