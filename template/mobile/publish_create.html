@@ -56,11 +56,13 @@
             loader.loadFile({src: CDN_PATH + "libs/md5.min.js"});
             loader.loadFile({src: CDN_PATH + "libs/reconnecting-websocket.min.js"});
             loader.loadFile({src: CDN_PATH + "js/ScaleBitmap.min.js"});
-            loader.loadFile({src: CDN_PATH + "js/AI.js"});
-            loader.loadFile({src: CDN_PATH + "js/play.js"});
-            loader.loadFile({src: CDN_PATH + "js/bill.js"});
-            loader.loadFile({src: CDN_PATH + "js/comm.js"});
-            loader.loadFile({src: CDN_PATH + "js/init.bill.js"});
+			loader.loadFile({src: CDN_PATH + "js/MVC/global.js"});
+			loader.loadFile({src: CDN_PATH + "js/MVC/Model.js"});
+			loader.loadFile({src: CDN_PATH + "js/MVC/View.js"});
+			loader.loadFile({src: CDN_PATH + "js/MVC/Control.js"});
+			loader.loadFile({src: CDN_PATH + "js/MVC/Player.js"});
+			loader.loadFile({src: CDN_PATH + "js/MVC/Chess.js"});
+			loader.loadFile({src: CDN_PATH + "js/MVC/init.analyse.js"});
             loader.loadFile({
                 src: CDN_PATH + "assets/images/chess_slim_atlas_.json",
                 type: "spritesheet",
@@ -68,14 +70,8 @@
             }, true);
             loader.loadFile({src: CDN_PATH + "libs/gameRes.min.v1.js"});
             loader.loadFile({src: CDN_PATH + "assets/images/f_atlas_.json", type: "spritesheet", id: "f_atlas_"}, true);
-
-            var ua = navigator.userAgent;
-            if (/Android (\d+\.\d+)/.test(ua)) {
-                loader.loadManifest([{src: CDN_PATH + "assets/images/board2.png", id: "Board"}]);
-                // 其他系统
-            } else {
-                loader.loadManifest([{src: CDN_PATH + "assets/images/board2.png", id: "Board"}]);
-            }
+			loader.loadManifest([{src: CDN_PATH + "assets/images/board2.png", id: "Board"}]);
+            loader.loadManifest([{src: CDN_PATH + "assets/images/VerticalReverse.png", id: "VerticalReverseBoard"}]);
 
         }
 

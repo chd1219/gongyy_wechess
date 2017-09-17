@@ -111,7 +111,22 @@ Player.cancleSelected = function () {
 	light.visible = !1;
 }
 /*交换棋子*/						
-Player.exchangMan = function (src, dst) {	
+Player.exchangMan = function (src, dst) {		
+	if (!comm.checkMans(Player.getKey(src), dst)) {		
+		showFloatTip("摆放错误，请重试");
+		Player.cancleSelected();
+		return;
+	}
+	else if (Player.getKey(src) == "J0" || Player.getKey(dst) == "j0") {
+		showFloatTip("将帅不能移出棋盘");
+		Player.cancleSelected();
+		return;
+	}
+	else if (Player.getMan(src).pater == Player.getMan(dst).pater) {
+		showFloatTip("棋子相同");
+		Player.cancleSelected();
+		return;
+	}
 	/*移出棋盘*/
 	var point = {x:1,y:-1};
 	Player.moveMan(dst, point);
@@ -124,8 +139,24 @@ Player.getNowMan = function() {
 }
 /*获取选中棋子*/
 Player.getMan = function(point) {
-	var key = comm.map[point.y][point.x];
+	var key = Player.getKey(point);
 	return comm.mans[key];
+}
+/*获取选中棋子*/
+Player.getKey = function(point) {
+	var key;
+	if (point.y < 0) {
+		col = 0;
+		row = parseInt(point.x / boardset.outsidescale);
+		key = comm.sMap[col][row];		
+	} else if(point.y > 9) {
+		col = 1;
+		row = parseInt(point.x / boardset.outsidescale);
+		key = comm.sMap[col][row];	
+	}else {
+		key = comm.map[point.y][point.x];		
+	}
+	return key;
 }
 /*获取之前选中棋子的XY坐标*/
 Player.getNowManPoint = function() {
@@ -160,18 +191,19 @@ Player.eatMan = function (point) {
 }
 /*移动棋子*/
 Player.moveMan = function (src, dst) {
+	var flag = true;
 	try{ 
 		switch (Player.getMoveMode(src, dst)) {
 			case Player.MoveTpye.ERROR:
 				break;
 			case Player.MoveTpye.IN_OUT:	
-				Player.PointIn2Out(src, dst);
+				flag = Player.PointIn2Out(src, dst);
 				break;
 			case Player.MoveTpye.IN_IN:
-				Player.PointIn2In(src, dst);
+				flag = Player.PointIn2In(src, dst);
 				break;
 			case Player.MoveTpye.OUT_IN:
-				Player.PointOut2In(src, dst)
+				flag = Player.PointOut2In(src, dst)
 				break;
 			case Player.MoveTpye.OUT_OUT:
 				break;
@@ -179,9 +211,11 @@ Player.moveMan = function (src, dst) {
 				break;
 		}			
 	}catch(e){
+		flag = false;
 		console.log(e);
 	}	
 	Player.cancleSelected();
+	return 
 }
 /*PointIn2Out*/
 Player.PointIn2Out = function (src, dst) {	
@@ -189,7 +223,12 @@ Player.PointIn2Out = function (src, dst) {
     var maptemp = {"C": 0, "M": 1, "P": 2, "X": 3, "S": 4, "Z": 5, "c": 0, "m": 1, "p": 2, "x": 3, "s": 4, "z": 5};
 	row = maptemp[nowMan.pater];
 	if (row > -1) {
-		nowMan.my == isVerticalReverse  ? (dst.y = boardset.boutside, col = 0) : (dst.y = boardset.routside, col = 1);
+		if (isVerticalReverse) {
+			(nowMan.my == RED)  ? (dst.y = boardset.boutside, col = 0) : (dst.y = boardset.routside, col = 1);			
+		}
+		else {
+			(nowMan.my == BLACK)  ? (dst.y = boardset.boutside, col = 0) : (dst.y = boardset.routside, col = 1);	
+		}
 		delete comm.map[src.y][src.x];
 		var templist = [];
 		templist = comm.sMapList[nowMan.pater];
@@ -208,14 +247,16 @@ Player.PointIn2Out = function (src, dst) {
 		}, 300);
 	} else {
 		showFloatTip("将帅不能移出棋盘");
+		return false;
 	}	
+	return true;
 }
 /*PointIn2In*/
 Player.PointIn2In = function (src, dst) {
 	comm.nowManKey = comm.map[src.y][src.x];
 	if (!comm.checkMans(comm.nowManKey, dst)) {		
 		showFloatTip("摆放错误，请重试");
-		return;
+		return false;
 	}
 	if (mode == playmode.EDITBOARD) {
 		Player.AIclickPoint(dst);		
@@ -228,6 +269,7 @@ Player.PointIn2In = function (src, dst) {
 			Player.stepEnd(move);
 		}
 	}
+	return true;
 }
 /*PointOutIn*/
 Player.PointOut2In = function (src, dst) {
@@ -237,7 +279,7 @@ Player.PointOut2In = function (src, dst) {
 	
 	if (!comm.checkMans(comm.nowManKey, dst)) {		
 		showFloatTip("摆放错误，请重试");
-		return;
+		return false;
 	}
 	var nowMan = comm.mans[comm.nowManKey];
 	delete comm.sMap[col][row];
@@ -260,6 +302,7 @@ Player.PointOut2In = function (src, dst) {
 	nowMan.x = dst.x,
 	nowMan.y = dst.y,
 	nowMan.animate();
+	return true;
 }
 /*定义移动类型*/
 Player.MoveTpye = {
@@ -358,8 +401,7 @@ Player.AIclickMan = function (dst, type) {
 		nowMan.x = dst.x;
 		nowMan.y = dst.y;
 		type ? nowMan.move() : nowMan.animate();
-		"j0" == nowMan.key && comm.onGameEnd(-1),
-		"J0" == nowMan.key && comm.onGameEnd(1),
+		("j0" == mankey || "J0" == mankey) && comm.onGameEnd(),
 		comm.nowManKey = !1;
 	}catch(e){
 		console.log(e);

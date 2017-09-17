@@ -87,11 +87,11 @@ function loadConfig() {
     //方便用户设置
     mui('#delete').popover('toggle');
     
-    //初始化
+    /*初始化*/
     myws = new MyWebsocket('ws://120.55.37.210:9002/',!0);
     myws.initWebsocket();
-    //启动定时器，检查超时
-    interval = setInterval(CheckReturn, 1000);	
+    /*启动定时器，检查超时*/
+    interval = setInterval(CheckReturn, 1000);	    
     mode = playmode.AIPLAY;    
 }
 
@@ -125,44 +125,8 @@ onload = function() {
 
 function Setting() {
 	if (isPlaying) return;
-	switch (power){
-		case 'level-0':
-		{
-			showFloatTip("六级棋士");
-			break;
-		}
-		case 'level-1':
-		{
-			showFloatTip("五级棋士");
-			break;
-		}
-		case 'level-2':
-		{
-			showFloatTip("四级棋士");
-			break;
-		}
-		case 'level-3':
-		{
-			showFloatTip("三级棋士");
-			break;
-		}
-		case 'level-4':
-		{
-			showFloatTip("二级棋士");
-			break;
-		}
-		case 'level-5':
-		{
-			showFloatTip("一级棋士");
-			break;
-		}
-		case 'level-6':
-		{
-			showFloatTip("棋协大师");				
-			break;
-		}
-	}
-	
+	var PlayLevel = {'level-0':"六级棋士",'level-1':"五级棋士",'level-2':"四级棋士",'level-3':"三级棋士",'level-4':"二级棋士",'level-5':"一级棋士",'level-6':"棋协大师"};
+	showFloatTip(PlayLevel[power]);	
 	showLevel(power);
     
 	if (computer == 'red') {
@@ -180,7 +144,8 @@ function Setting() {
 	
 	timingBegins = !0;
 	isPlaying = !0;
-	showThink();
+	/*棋手计时*/
+    OnTimer();
 }
 
 function showLevel(e){

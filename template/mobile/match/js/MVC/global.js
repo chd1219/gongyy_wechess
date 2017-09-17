@@ -13,12 +13,14 @@ movesCount = 0,
 computelist = [],
 movesTipsShow = !0,
 isVerticalReverse = 0,
+isShowArrow = 1,
 movesInterval,
 voicemode = 1,
 autoset,
 r_autoset = 0,
-b_autoset = 0;
-canRestart = !1;
+b_autoset = 0,
+showThinkset = 0,
+canRestart = !1,
 lastTime = 0,
 /*棋盘位置偏移*/
 boardseek = 80;

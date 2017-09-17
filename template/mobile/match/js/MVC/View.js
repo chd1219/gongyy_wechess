@@ -156,7 +156,9 @@ removeChess = function(e) {
 	try {
 		if (e) {
 			var o = comm.mans[e].chess;
-			o.parent.removeChild(o)
+			if (o.parent) {
+				o.parent.removeChild(o)				
+			}
 		}
 	}
 	catch (e) {
@@ -340,6 +342,7 @@ initCanvas = function(e){
 }
 /*划线*/
 drawLine = function (e, a) {
+	if (!isShowArrow) return;
 	var m = e.split("");
 	stageshape[a - 1] = new createjs.Shape();
 	var graphics = stageshape[a - 1].graphics;
@@ -359,6 +362,7 @@ drawLine = function (e, a) {
 }
 /*划线2*/
 drawLine2 = function (e, a) {
+	if (!isShowArrow) return;
 	m = e.split("");
 	stageshape[a - 1] = new createjs.Shape();
 	var graphics = stageshape[a - 1].graphics;
@@ -543,7 +547,7 @@ replayBtnUpdate = function () {
 	if (isEnd)
 		clearInterval(autoreplayset);
 	movesCount = comm.getMovesLength();
-	AIThinkShow();
+	showThink();
 	if (comm.notes[currentId]) {
 		$("#noteInfo").text(comm.notes[currentId]),
 		$("#noteInfo").parent('.mui-toast-container').addClass('mui-active');
@@ -551,57 +555,36 @@ replayBtnUpdate = function () {
 		$("#noteInfo").parent('.mui-toast-container').removeClass('mui-active');
 	}
 }
-/*显示思考信息*/
-showThink = function () {
-//	if (showThinkset != 0)  return;
-//	
-//  showThinkset = setInterval(function(){    	
-//  	if (mode == playmode.EDITBOARD) {
-//  		clearInterval(showThinkset);
-//  	}
-//  	
-//  	 /*人机对弈计时从设置完成后开始*/
-//  	if (timingBegins) {
-//  		comm.getHold() == BLACK ? playtime.black++ : playtime.red++;    		
-//  	}
-//  	AIThinkShow();
-//  }, 1000);      
-}
-AIThinkShow = function () {
-	$("#AIThink").text("第" + movesIndex + "步 / 总" + movesCount + "步    " + "耗时: 红方 "+ playtime.red+"秒/黑方 "+playtime.black+"秒"), 
-    $("#AIThink").show()
-}
-/*显示思考信息*/
-showThink1 = function () {
-	var count = 0;  
-    var time = 0;
-    count = comm.moves.length;
-    if( comm.isend == 1) return;
-    /*人机对弈计时从设置完成后开始*/
+/*计时*/
+OnTimer = function () {
+	if (showThinkset != 0)  return;
+	/*人机对弈计时从设置完成后开始*/
     if (mode == playmode.AIPLAY && !timingBegins) return;
     
-    if (comm.getHold() == BLACK) {       
-    	if (showThinkset != 0) {
-            clearInterval(showThinkset);
-        }
-        showThinkset = setInterval(function(){
-        	time++;
-        	playtime.black++;
-        	$("#AIThink").text("第" + movesIndex + "步 / 总" + count + "步    " + "耗时: 红方 "+ playtime.red+"秒/黑方 "+playtime.black+"秒"), 
-        	$("#AIThink").show()
-        }, 1000);                   
-    }
-    else {
-        if (showThinkset != 0) {
-            clearInterval(showThinkset);
-        }
-        showThinkset = setInterval(function(){
-        	time++;
-        	playtime.red++;
-        	$("#AIThink").text("第" + movesIndex + "步 / 总" + count + "步    " + "耗时: 红方 "+playtime.red+"秒/黑方 "+playtime.black+"秒"), 
-        	$("#AIThink").show()
-        }, 1000);
-    }               	
+    showThinkset = setInterval(function(){    	
+    	if (mode == playmode.EDITBOARD) {
+    		clearInterval(showThinkset);
+    	}
+    	
+    	 /*人机对弈计时从设置完成后开始*/
+    	if (timingBegins) {
+    		comm.getHold() == BLACK ? playtime.black++ : playtime.red++;    		
+    	}
+    	showThink();
+    }, 1000);      
+}
+/*显示思考信息*/
+showThink = function () {
+	if (mode == playmode.AIPLAY) {
+		$("#AIThink").text("第" + movesIndex + "步 / 总" + movesCount + "步    " + "耗时: 红方 "+ playtime.red+"秒/黑方 "+playtime.black+"秒");		
+	}
+	else if (mode == playmode.ANALYSE) {
+		var str;
+		comm.getHold() == BLACK ? str = "黑方思考中。。。" : str = "红方思考中。。。";   
+		$("#AIThink").text("第" + movesIndex + "步 / 总" + movesCount + "步    " + str);
+		
+	}
+    $("#AIThink").show()
 }
 /*弹出DIV*/
 popupDiv = function (div_id) {    

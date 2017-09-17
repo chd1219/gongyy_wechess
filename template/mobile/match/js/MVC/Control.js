@@ -41,11 +41,12 @@ commandhistory = function() {
 	var board;
 	var result;
 }
-Node = function(id, parter, step) {
-	this.id = id || 0;
-	this.parter = parter || 0;
+Node = function(obj) {
+	this.id = obj.id || 0;
+	this.index = obj.index || 0;
+	this.pater = obj.pater || 0;
 	this.child = [];
-	this.step = step || "";
+	this.step = obj.step || "";
 	this.getMoves = function () {
 		return comm.Step2XY(this.step);
 	}
@@ -57,7 +58,7 @@ Node = function(id, parter, step) {
 		return this.child[e];
 	}
 	this.getParterNode = function() {
-		return comm.nodes(this.parter);
+		return comm.nodes(this.pater);
 	}
 	this.getChildNode = function (e) {
 		e = e || 0;
@@ -104,16 +105,6 @@ comm.getMap4Server2 = function(e) {
     }
     return map6server
 }
-comm.getMoves4Server2 = function() {	
-	var e = "",
-		o = "";
-    for (var a = 0; a < comm.pace.length; a++) {
-        var m = comm.pace[a].split("");
-        o = " "+(parseInt(m[0])+1)+" "+(10-parseInt(m[1]))+" "+(parseInt(m[2])+1)+" "+(10-parseInt(m[3]));            
-        e += o;
-    }
-    return e
-}
 comm.getMap4Server = function(e) {
     var map4server = [];
     for (var a = 10, m = 0; m < e.length; m++) {
@@ -132,6 +123,14 @@ comm.getMap4Server = function(e) {
     }
     return map4server
 }
+comm.getMoves4Server2 = function() {	
+	var e = "";
+    for (var a = 1; a < comm.nodes.length; a++) {
+        var node = comm.nodes[a];
+        e += " "+node.step+" "+ node.id +" "+ node.pater +" "+ (node.index-1); 
+    }
+    return e
+}
 comm.getMoves4Server = function() {
 	if (!comm.nodes.length) {
 		return [];
@@ -149,9 +148,9 @@ comm.getMoves4Server = function() {
 		tempID = comm.nodes[tempID].child[0];
 	}
 	/*回溯整条路径*/
-	while(comm.nodes[tempID].parter > -1) {
+	while(comm.nodes[tempID].pater > -1) {
 		e.push(comm.nodes[tempID]);
-		tempID = comm.nodes[tempID].parter;
+		tempID = comm.nodes[tempID].pater;
 	}
 	return e.reverse();
 }
@@ -397,16 +396,18 @@ comm.branch = function (move) {
 	step = comm.XY2Step(move);
 	/*如果链表为空，插入根节点*/
 	if (!comm.nodes.length) {
-		var node = new Node();
-		node.parter = -1;
+		var obj = {id:0,pater:0,step:0,index:0};		
+		var node = new Node(obj);
+		node.pater = -1;
 		comm.nodes.push(node);
 	}
 	/*检查是否已存在*/
 	if (!comm.checkbranch(step)) {
 		id++;
-		var node = new Node(id,currentId,step);
+		var obj = {id:id,pater:currentId,step:step,index:movesIndex};		
+		var node = new Node(obj);
 		comm.nodes.push(node);
-		comm.nodes[node.parter].child.push(node.id);		
+		comm.nodes[node.pater].child.push(node.id);		
 		currentId = id;
 	}
 }
@@ -780,7 +781,8 @@ comm.onGameEnd = function () {
         clearInterval(r_autoset);
     }
     if (showThinkset != 0) {
-        clearInterval(showThinkset);        
+        clearInterval(showThinkset);
+        showThinkset = 0;
     }   	
     comm.isend = 1;
     /*锁定，等待1s后解锁*/

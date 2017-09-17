@@ -95,9 +95,9 @@ onSend = function (e) {
 	isVerticalReverse ? sendmap = comm.arrReverse(comm.cMap) : sendmap = comm.cMap;
 
 	var map = comm.getMap4Server2(sendmap);
-	var moves = comm.getMoves4ServerEx();
+	var moves = comm.getMoves4Server2();
 	var notes = comm.getNotes4Server();
-        var _json = {"map": map, "moves": moves, "notes": notes, "filename": comm.filename, "BillType": 1};
+    var _json = {"map": map, "moves": moves, "notes": notes, "filename": comm.filename, "BillType": 1};
 	$.ajax({
 		type: "POST",
 		url: saveURL,
@@ -131,19 +131,19 @@ onCreate = function () {
 }
 /*响应先后手*/
 onAIOffensive = function () {
-	if (movesIndex > 0 || 　comm.moves.length > 0) {
+	if (movesIndex > 0 || comm.nodes.length > 0) {
 		return;
 	}
 	cleanChess();
 	comm.isOffensive == 1 ? comm.isOffensive = 0 : comm.isOffensive = 1;
 	isVerticalReverse ? comm.init(3, comm.arrReverse(comm.cMap), !0) : comm.init(3, comm.cMap, !0);
 	movesIndex = 0;
-	comm.moves.length = 0;
+	comm.nodes.length = 0;
 	replayBtnUpdate();
 }
 /*响应先后手*/
 onOffensive = function () {
-	if (movesIndex > 0 ||　comm.moves.length > 0){
+	if (movesIndex > 0 ||　comm.nodes.length > 0){
 		showFloatTip("棋局已开始，请重新开始后再选择");
         isComPlay = 1;
         console.log($("#isOffensiveTog").attr('class'));
@@ -158,9 +158,10 @@ onOffensive = function () {
 	}
 	cleanChess();
 	comm.isOffensive == 1 ? comm.isOffensive = 0 : comm.isOffensive = 1;
-	isVerticalReverse ? comm.init(3, comm.arrReverse(comm.cMap), !0) : comm.init(3, comm.cMap, !0);
+	//isVerticalReverse ? comm.init(3, comm.arrReverse(comm.cMap), !0) : comm.init(3, comm.cMap, !0);
+	comm.init(3, comm.cMap, !0);
 	movesIndex = 0;
-	comm.moves.length = 0;
+	comm.nodes.length = 0;
 	replayBtnUpdate();
 }
 /*编辑棋谱*/
@@ -219,6 +220,8 @@ onEditboard = function () {
 /*响应翻转按钮*/
 onReverse = function () {
 	if (mode == playmode.EDITBOARD) {
+		cleanChess();
+		cleanChessEx();		
 		isVerticalReverse ? (isVerticalReverse = 0, 
 			chessBottonLayer.removeChild(verticalReverseboard), 
 			chessBottonLayer.addChild(board),
@@ -233,9 +236,7 @@ onReverse = function () {
 			emptyMap = comm.arrReverse(EmptyMap),
 			initMap = comm.arrReverse(InitMap)
 			);
-		
-		cleanChess();
-		cleanChessEx();		
+
 		comm.sMapList = JSON.parse(JSON.stringify(chessMan));		
 		comm.init(3, emptyMap, !1);
 		createMansEx(comm.sMap);
@@ -353,6 +354,7 @@ onReplayPrev = function () {
 	}
 	if(mode == playmode.AIPLAY) {
 		onRegret();
+		OnTimer();
 		return;
 	}
 	cleanChessdbDetail();
@@ -480,4 +482,10 @@ onFullBroad = function (e) {
 /*解析消息*/
 onMessage = function (e) {
 	comm.ParseMsg(e);
+}
+/*是否显示箭头*/
+OnshowArrow = function () {
+	isShowArrow = $("#arrow")[0].checked;
+	isShowArrow ?  comm.send() : cleanLine();
+	
 }

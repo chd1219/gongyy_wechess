@@ -14,14 +14,22 @@ switch ($op){
         include $this->template('publish_ai');
     }break;
 
-    case 'analyse':{
+    case 'test':{
+		$file = $_GPC['file'];
+		$chessid = $_GPC['chessid'];
+		//判断用户是否VIP,如果不是VIP则普通模式，如果是VIP则VIP模式，有云库、拆棋棋力高
+		$title = '拆解研究';
+        include $this->template('publish_test');
+    }break;
+	
+	case 'analyse':{
 		$file = $_GPC['file'];
 		$chessid = $_GPC['chessid'];
 		//判断用户是否VIP,如果不是VIP则普通模式，如果是VIP则VIP模式，有云库、拆棋棋力高
 		$title = '拆解研究';
         include $this->template('publish_analyse');
     }break;
-
+	
     case 'analyse_vip':{
 		$file = $_GPC['file'];
 		$chessid = $_GPC['chessid'];
@@ -144,6 +152,8 @@ switch ($op){
 		}elseif($source=='ai'){
 			$data['title'] = $_W['fans']['nickname'].'和象棋微学堂手机软件的人机对弈'.date("Y-m-d_H:i:s");
 		}elseif($source=='analyse'){
+			$data['title'] = $_W['fans']['nickname'].'的研究拆解棋谱'.date("Y-m-d_H:i:s");
+		}elseif($source=='test'){
 			$data['title'] = $_W['fans']['nickname'].'的研究拆解棋谱'.date("Y-m-d_H:i:s");
 		}
 		
