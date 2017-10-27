@@ -105,9 +105,10 @@ Player.selected = function (point) {
 	if (mode != playmode.EDITBOARD) {
 		var nowMan = Player.getNowMan();
 		hideDots();
-		nowMan.alpha = 0.6;
-		nowMan.ps = nowMan.bl();
-		comm.dot.dots = nowMan.ps;
+		if (nowMan) {
+			nowMan.ps = nowMan.bl();
+			comm.dot.dots = nowMan.ps;		
+		}
 		showDots();
 		if(!waitServerPlay) {
 			cleanComputerDetail();

@@ -504,27 +504,52 @@ OnshowArrow = function () {
 }
 /*反馈错误数据*/
 onErrordata = function() {
-	if (msg) {
-		showFloatTip("该功能针对错误数据,正确数据请勿提交!");
+	if (msg) {		
 		cleanChessdbDetail();
 		cleanComputerDetail();
 		if (mode == playmode.AIPLAY) {
+			showFloatTip("已删除错误数据,请重走!");
 			onRegret();
+			var _json = {"id": uuid, "msg": msg};
+			$.ajax({
+				type: "POST",
+				url: "http://westudy.chinaxueyun.com/addons/gongyy_wechess/template/mobile/match/deletedata.php",
+				dataType: "json",
+				data: _json,
+				success: function (data) {	
+						
+				},
+				error: function (response, status, xhr) {			
+				}
+			})			
 		}
-		var _json = {"id": uuid, "msg": msg};
-		$.ajax({
-			type: "POST",
-			url: "http://westudy.chinaxueyun.com/addons/gongyy_wechess/template/mobile/match/deletedata.php",
-			dataType: "json",
-			data: _json,
-			success: function (data) {	
-				myws.Send(msg);		
-			},
-			error: function (response, status, xhr) {			
+		else {
+			if (isanalyse) {
+				showFloatTip("重新思考中!");
+				var _json = {"id": uuid, "msg": msg};
+				$.ajax({
+					type: "POST",
+					url: "http://westudy.chinaxueyun.com/addons/gongyy_wechess/template/mobile/match/deletedata.php",
+					dataType: "json",
+					data: _json,
+					success: function (data) {	
+						myws.Send(msg);		
+					},
+					error: function (response, status, xhr) {			
+					}
+				})			
 			}
-		})					
+			else {
+				showFloatTip("请打开分析模式后再使用!");
+			}
+		}					
 	}
 	else {
-		showFloatTip("数据格式有误,请重试!");
+		if (mode == playmode.AIPLAY) {
+			showFloatTip("还未开始走棋!");
+		}
+		else {
+			showFloatTip("请打开分析模式后再使用!");
+		}
 	}
 }
