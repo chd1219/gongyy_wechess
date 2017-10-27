@@ -68,12 +68,23 @@ Player.clickMan = function(point) {
 }
 /*点击棋盘点*/
 Player.clickPoint = function(point) {
-	if (comm.nowManKey) {
-		/*移动棋子*/
-		var src = Player.getNowManPoint();
-		var dst = point;
-		Player.moveMan(src, dst);
+	if (mode == playmode.EDITBOARD) {
+		if (comm.nowManKey) {
+			/*移动棋子*/
+			var src = Player.getNowManPoint();
+			var dst = point;
+			Player.moveMan(src, dst);
+		}	
 	}
+	else {
+		if (comm.nowManKey && comm.CheckInBoard(point)) {
+			/*移动棋子*/
+			var src = Player.getNowManPoint();
+			var dst = point;
+			Player.moveMan(src, dst);
+		}	
+	}
+	
 }
 /*选中棋子*/
 Player.selected = function (point) {

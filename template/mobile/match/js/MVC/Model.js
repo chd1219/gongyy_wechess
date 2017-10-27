@@ -14,6 +14,7 @@ initialization = function (e) {
     comm.mans = {};	
     Board.init(e);
     initChess(comm.initMap);
+    uuid = generateUUID();
 }
 /*获取运行环境信息*/
 getEnv = function () {

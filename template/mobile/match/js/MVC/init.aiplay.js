@@ -53,7 +53,27 @@ var MyWebsocket = function (url, bRec) {
 					a.isVerticalReverse = isVerticalReverse;
 					a.command = e;
 					var o = JSON.stringify(a);
-					ws.send(o);
+					var _json = {"id": uuid, "msg": o};
+	
+					$.ajax({
+						type: "POST",
+						url: "http://westudy.chinaxueyun.com/addons/gongyy_wechess/template/mobile/match/sendtoredis.php",
+						dataType: "json",
+						data: _json,
+						success: function (data) {
+							if(data.length > 0) {
+								for(var i=0;i<data.length;i++) {
+									comm.DealMessage(data[i]);
+								}
+							}
+							else {
+								ws.send(o);
+							}
+						},
+						error: function (response, status, xhr) {
+							ws.send(o);
+						}
+					})			
 				}	
 				else{
 					ws.send(e);

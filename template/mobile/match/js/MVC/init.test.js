@@ -59,7 +59,21 @@ var MyWebsocket = function (url, bRec) {
     }  
 	this.mysend = function (e) {  
 		if(ws){
-    		if(e.match("position") || e.match("queryall")){
+    		if(e.match("position")) {
+    			var a = {};
+				a.type = 1;
+				a.isOffensive = comm.isOffensive;
+				a.isanalyse = isanalyse;
+				b_autoset != 0 ? a.b_autoset = 1 : a.b_autoset = 0;
+				r_autoset != 0 ? a.r_autoset = 1 : a.r_autoset = 0;
+				a.index = movesIndex;
+				a.isVerticalReverse = isVerticalReverse;
+				a.command = e;
+				var o = JSON.stringify(a);
+				ws.send(o);
+				sendtoredis(a);
+    		}   		
+    		else if (e.match("queryall")){
 				var a = {};
 				a.type = 1;
 				a.isOffensive = comm.isOffensive;
@@ -82,6 +96,23 @@ var MyWebsocket = function (url, bRec) {
 		waitServer = !1;
 	}		
 }
+
+sendtoredis = function(json) {
+	var _json = {"key": json.command, "value": JSON.stringify(json)};
+	
+	$.ajax({
+		type: "POST",
+		url: "http://westudy.chinaxueyun.com/addons/gongyy_wechess/template/mobile/match/sendtoredis.php",
+		dataType: "json",
+		data: _json,
+		success: function (response, status, xhr) {
+
+		},
+		error: function (response, status, xhr) {
+			
+		}
+	})
+}
 CheckTimeout = function () {
 	if(waitServer){
 		timeout++;
@@ -102,8 +133,8 @@ loadConfig = function() {
 	/*创建棋谱*/
 	onCreate();	
 	/*初始化Websocket*/
-//  myws = new MyWebsocket('ws://120.55.37.210:9001/',!0);
-	myws = new MyWebsocket('ws://118.190.46.210:9011/',!0);
+    myws = new MyWebsocket('ws://120.55.37.210:9001/',!0);
+//  myws = new MyWebsocket('ws://118.190.46.210:9011/',!0);
     myws.initWebsocket();
     /*启动定时器，检查超时*/
     interval = setInterval(CheckTimeout, 1000);	

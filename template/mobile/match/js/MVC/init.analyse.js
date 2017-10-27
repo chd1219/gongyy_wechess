@@ -39,7 +39,6 @@ var MyWebsocket = function (url, bRec) {
 		}	
 	}
     this.Send = function (e) {      	
-    	this.mysend(e);
 		if(e.match("position")){
 			var command = new commandhistory;
 			command.index = movesIndex;
@@ -56,6 +55,7 @@ var MyWebsocket = function (url, bRec) {
 			cloudinfolist = [];
 			cleanChessdbDetail();
 		}
+		this.mysend(e);
     }  
 	this.mysend = function (e) {  
 		if(ws){
@@ -70,7 +70,34 @@ var MyWebsocket = function (url, bRec) {
 				a.isVerticalReverse = isVerticalReverse;
 				a.command = e;
 				var o = JSON.stringify(a);
-				ws.send(o);
+				if(e.match("position")){
+					var _json = {"id": uuid, "msg": o};
+	
+					$.ajax({
+						type: "POST",
+						url: "http://westudy.chinaxueyun.com/addons/gongyy_wechess/template/mobile/match/sendtoredis.php",
+						dataType: "json",
+						data: _json,
+						success: function (data) {
+							if(data.length > 0) {
+								console.log("redis");
+								for(var i=0;i<data.length;i++) {
+									comm.DealMessage(data[i]);
+								}
+							}
+							else {
+								console.log("engineer");
+								ws.send(o);
+							}
+						},
+						error: function (response, status, xhr) {
+							ws.send(o);
+						}
+					})			
+				}
+				else {
+					ws.send(o);
+				}
 			}
 			else{
 				ws.send(e);
@@ -82,6 +109,7 @@ var MyWebsocket = function (url, bRec) {
 		waitServer = !1;
 	}		
 }
+/*检查超时*/
 CheckTimeout = function () {
 	if(waitServer){
 		timeout++;

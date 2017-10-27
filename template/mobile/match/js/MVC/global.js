@@ -54,6 +54,7 @@ var mode = 0;
 var isexchange = 0;
 var waitServerPlay = !1;
 var timingBegins = !1;
+var uuid = 0;
 /*引擎信息缓存*/
 var depthinfolist = [];
 /*云库信息缓存*/

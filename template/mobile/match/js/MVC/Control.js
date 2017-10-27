@@ -642,6 +642,56 @@ comm.DealPosition = function (obj) {
 		} 		
 	}		
 }
+/*解析返回的信息*/
+comm.DealMessage = function (d) {
+	if(d.match("bestmove ")){
+		var e = d.split("bestmove "); 
+		var move = e[1];
+		/*回调返回函数*/
+		myws.Return();
+		if(move.match("null") || move.match("none")){
+			comm.onGameEnd();
+			return;
+		}
+		
+		if(!isanalyse){			
+			Player.aiPace = comm.getBestMove(move);
+			setTimeout((function(){Player.serverAIPlay();}),200);
+		}		
+	}		
+	else {
+		if (!d.match("depth")) {
+			return;
+		}
+		var info = new comm.depthinfo(d);
+		depthinfolist.push(info);
+		if (comm.getHold() == BLACK) {
+			info.score = -info.score;
+		}				
+		var tempmap = comm.arr2Clone(comm.map);
+		var tmpStr = "";
+		cleanLine();
+		for (j = 0; j < info.pv.length && j<4; j++) {
+			if (info.pv[j]) {
+				var step = comm.transformat(info.pv[j]);					
+				var move = comm.createMove(tempmap, step);
+				tmpStr = tmpStr + move + " ";
+				/*走法提示*/
+				if (isVerticalReverse) {
+					step = comm.reverseStep(step);
+				}
+				if (isanalyse && j<2) {
+					drawLine2(step,j+1);
+				}
+			}				
+		}				
+		if(document.getElementById("computerDetailTbody") && tmpStr.length > 4){ 
+			tmpStr = "<tr><td>" + info.depth + "</td><td>" + info.score + "</td><td>" + tmpStr + "</td></tr>";
+			document.getElementById("computerDetailTbody").innerHTML = tmpStr + document.getElementById("computerDetailTbody").innerHTML;
+		} 		
+	}		
+}
+
 /*解析返回信息*/
 comm.ParseMsg = function (e) {
 	if (comm.isJSON(e)){
@@ -864,6 +914,10 @@ comm.gotoStep = function (moves, index) {
 		currentId = moves[e].id;
 	}
 }
+/*判断是否在棋盘内*/
+comm.CheckInBoard = function (point) {
+	return point.x > -1 & point.x < 9 & point.y > -1 & point.y < 10;
+}
 /* 质朴长存法  */  
 comm.pad = function (num, n) {  
     var len = num.toString().length;  
@@ -884,4 +938,13 @@ Array.prototype.remove = function(val) {
     if (index > -1) {
         this.splice(index, 1);
     }
+};
+function generateUUID() {
+	var d = new Date().getTime();
+	var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+	  	var r = (d + Math.random()*16)%16 | 0;
+		d = Math.floor(d/16);
+		return (c=='x' ? r : (r&0x3|0x8)).toString(16);
+	});
+	return uuid;
 };
