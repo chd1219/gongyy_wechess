@@ -289,6 +289,7 @@ onReplayNext = function () {
 	}
 	cleanChessdbDetail();
 	cleanComputerDetail();
+	drawLinetmp = [];
 	if (!relayNextLock) {
 		relayNextLock = 1;
 		waitServerPlay = !0;
@@ -360,6 +361,7 @@ onReplayPrev = function () {
 	}
 	cleanChessdbDetail();
 	cleanComputerDetail();
+	drawLinetmp = [];
 	if (!relayPrevLock) {
 		relayPrevLock = 1;
 		if (b_autoset != 0 && r_autoset != 0) {
@@ -383,6 +385,7 @@ onReplayFirst = function () {
 	}
 	cleanChessdbDetail();
 	cleanComputerDetail();
+	drawLinetmp = [];
 	if (b_autoset != 0 && r_autoset != 0) {
 		showFloatTip("请取消电脑思考，再点击开局");
 		return;
@@ -399,6 +402,7 @@ onReplayEnd = function () {
 	}
 	cleanChessdbDetail();
 	cleanComputerDetail();
+	drawLinetmp = [];
 	if (b_autoset != 0 && r_autoset != 0) {
 		showFloatTip("请取消电脑思考，再点击终局");
 		return;
@@ -486,7 +490,41 @@ onMessage = function (e) {
 }
 /*是否显示箭头*/
 OnshowArrow = function () {
-	isShowArrow = $("#arrow")[0].checked;
-	isShowArrow ?  comm.send() : cleanLine();
-	
+	isShowArrow = !isShowArrow;
+	if (isShowArrow) {
+		showFloatTip("显示提示");
+		for (var i=0;i<drawLinetmp.length;i++) {
+			drawLine2(drawLinetmp[i],i+1);
+		}
+	}
+	else {
+		showFloatTip("隐藏提示"),
+		cleanLine();
+	}
+}
+/*反馈错误数据*/
+onErrordata = function() {
+	if (msg) {
+		showFloatTip("该功能针对错误数据,正确数据请勿提交!");
+		cleanChessdbDetail();
+		cleanComputerDetail();
+		if (mode == playmode.AIPLAY) {
+			onRegret();
+		}
+		var _json = {"id": uuid, "msg": msg};
+		$.ajax({
+			type: "POST",
+			url: "http://westudy.chinaxueyun.com/addons/gongyy_wechess/template/mobile/match/deletedata.php",
+			dataType: "json",
+			data: _json,
+			success: function (data) {	
+				myws.Send(msg);		
+			},
+			error: function (response, status, xhr) {			
+			}
+		})					
+	}
+	else {
+		showFloatTip("数据格式有误,请重试!");
+	}
 }

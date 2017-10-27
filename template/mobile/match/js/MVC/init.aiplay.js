@@ -57,20 +57,23 @@ var MyWebsocket = function (url, bRec) {
 	
 					$.ajax({
 						type: "POST",
-						url: "http://westudy.chinaxueyun.com/addons/gongyy_wechess/template/mobile/match/sendtoredis.php",
+						url: "http://westudy.chinaxueyun.com/addons/gongyy_wechess/template/mobile/match/position.php",
 						dataType: "json",
 						data: _json,
 						success: function (data) {
 							if(data.length > 0) {
+								console.log("redis");
 								for(var i=0;i<data.length;i++) {
 									comm.DealMessage(data[i]);
 								}
 							}
 							else {
+								console.log("engineer");
 								ws.send(o);
 							}
 						},
 						error: function (response, status, xhr) {
+							console.log("response error");
 							ws.send(o);
 						}
 					})			
@@ -143,6 +146,7 @@ onload = function() {
     $("#nextBtn").on('tap', onReplayNext),
     $("#endBtn").on('tap', onReplayEnd),
     $("#regretBtn").on('tap', onRegret),
+    $("#errordataBtn").on('tap', onErrordata),
     $("#sendBtn").on('tap', onSend),
     $("#fullBtn").on('tap', onFullBroad),
     $("#clearBtn").on('tap', onCleanBroad),               

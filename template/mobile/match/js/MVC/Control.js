@@ -546,8 +546,8 @@ comm.DealOpenbook = function (obj) {
 	}
 }
 /*解析返回的云库信息*/
-comm.DealQueryall = function (obj) {
-	var e = (obj.result).split("|");				
+comm.DealQueryall = function (msg) {
+	var e = msg.split("|");				
 	if (e[0].match("stalemate") || e[0].match("checkmate")) {
 		showFloatTip("绝杀！");
 		/*回调返回函数*/
@@ -700,7 +700,7 @@ comm.ParseMsg = function (e) {
 		if(Number(obj.index) != movesIndex) return;
 		switch(obj.commandtype){
 			case "queryall":
-				comm.DealQueryall(obj);
+				comm.DealQueryall(obj.result);
 				break;
 			case "openbook":
 				comm.DealOpenbook(obj);

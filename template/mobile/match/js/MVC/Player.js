@@ -109,8 +109,10 @@ Player.selected = function (point) {
 		nowMan.ps = nowMan.bl();
 		comm.dot.dots = nowMan.ps;
 		showDots();
-		cleanComputerDetail();
-		cleanChessdbDetail();
+		if(!waitServerPlay) {
+			cleanComputerDetail();
+			cleanChessdbDetail();
+		}
 	}			
 }
 /*取消选择*/
@@ -444,16 +446,23 @@ Player.serverAIPlay = function(step,type) {
 		if(isVerticalReverse){
 			step = comm.reverseStep(step);
 		}
+		
 		move = comm.Step2XY(step);
-
+		Player.selected(move.src);
         var key = comm.map[move.src.y][move.src.x];
         comm.nowManKey = key;
         key = comm.map[move.dst.y][move.dst.x];
-		if (waitServerPlay){
+		if (waitServerPlay && Player.indexOfPs(Player.getNowMan().ps, [move.dst.x, move.dst.y])){
 			key ? setTimeout(Player.AIclickMan, 1000, move.dst,type) : setTimeout(Player.AIclickPoint, 1000, move.dst,type);
+			type ? 1 : Player.stepEnd(move);
+			/*锁定，等待1s后解锁*/
+			setTimeout((function(){waitServerPlay = !1;}),1000);			
 		}
-		type ? 1 : Player.stepEnd(move);
-		/*锁定，等待1s后解锁*/
-		setTimeout((function(){waitServerPlay = !1;}),1000);
+		else {
+			waitServer = !0;
+		}
+		setTimeout((function(){
+			Player.cancleSelected();
+		}),1000);
     }
 }

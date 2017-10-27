@@ -362,6 +362,7 @@ drawLine = function (e, a) {
 }
 /*划线2*/
 drawLine2 = function (e, a) {
+	drawLinetmp[a-1] = e;
 	if (!isShowArrow) return;
 	m = e.split("");
 	stageshape[a - 1] = new createjs.Shape();
@@ -542,6 +543,7 @@ replayBtnUpdate = function () {
 		setEnable("prevBtn",  !isFirst);
 		setEnable("nextBtn", !isEnd);
 		setEnable("endBtn", !isEnd);
+		setEnable("autoreplayBtn", isanalyse);
 	}
 	
 	if (isEnd)

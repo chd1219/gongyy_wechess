@@ -75,12 +75,12 @@ var MyWebsocket = function (url, bRec) {
 	
 					$.ajax({
 						type: "POST",
-						url: "http://westudy.chinaxueyun.com/addons/gongyy_wechess/template/mobile/match/sendtoredis.php",
+						url: "http://westudy.chinaxueyun.com/addons/gongyy_wechess/template/mobile/match/position.php",
 						dataType: "json",
 						data: _json,
 						success: function (data) {
 							if(data.length > 0) {
-								console.log("redis");
+								console.log("position-redis");
 								for(var i=0;i<data.length;i++) {
 									comm.DealMessage(data[i]);
 								}
@@ -95,9 +95,49 @@ var MyWebsocket = function (url, bRec) {
 						}
 					})			
 				}
-				else {
-					ws.send(o);
+				else {					
+					var _json = {"id": uuid, "msg": o};
+	
+					$.ajax({
+						type: "POST",
+						url: "http://westudy.chinaxueyun.com/addons/gongyy_wechess/template/mobile/match/queryall.php",
+						dataType: "json",
+						data: _json,
+						success: function (data) {
+							if(data.length > 0) {
+								console.log("queryall-redis");
+								comm.DealQueryall(data);
+							}
+							else {
+								console.log("chessdb");
+								ws.send(o);
+							}
+						},
+						error: function (response, status, xhr) {
+							ws.send(o);
+						}
+					})			
 				}
+			}
+			else{
+				ws.send(e);
+			}
+    	}        
+	}	
+	this.rebackerror = function (e) {  
+		if(ws){
+    		if(e.match("position") || e.match("queryall")){
+				var a = {};
+				a.type = 1;
+				a.isOffensive = comm.isOffensive;
+				a.isanalyse = isanalyse;
+				b_autoset != 0 ? a.b_autoset = 1 : a.b_autoset = 0;
+				r_autoset != 0 ? a.r_autoset = 1 : a.r_autoset = 0;
+				a.index = movesIndex;
+				a.isVerticalReverse = isVerticalReverse;
+				a.command = e;
+				var o = JSON.stringify(a);
+				ws.send(o);
 			}
 			else{
 				ws.send(e);
@@ -154,12 +194,13 @@ onload = function() {
     $("#noteBtn").on('tap', onNote),  
     $("#editboardBtn").on('tap', onEditboard),  
     $("#firstBtn").on('tap', onReplayFirst),
-    $("#autoreplayBtn").on('tap', onAutoreplay),
+    $("#autoreplayBtn").on('tap', OnshowArrow),
     $("#prevBtn").on('tap', onReplayPrev),
     $("#nextBtn").on('tap', onReplayNext),
     $("#endBtn").on('tap', onReplayEnd),
     $("#regretBtn").on('tap', onRegret),
     $("#sendBtn").on('tap', onSend),
+    $("#errordataBtn").on('tap', onErrordata),
     $("#reveseBtn").on('tap', onReverse),    
     $("#fullBtn").on('tap', onFullBroad),
     $("#clearBtn").on('tap', onCleanBroad),               

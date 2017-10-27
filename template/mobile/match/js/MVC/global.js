@@ -39,6 +39,7 @@ var isComPlay = 0;
 var currentId = 0;
 var id = 0;
 var chessnum = [];
+var drawLinetmp = [];
 var countPath = 0;
 var stageshape = [];
 var stagetext = [];
