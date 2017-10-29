@@ -8,9 +8,9 @@
 		$redisWrite->connect('118.190.46.210', 6379);
 		$redisWrite->auth("jiao19890228");
 		/*历史消息按日期入第一个库*/
-		$redisWrite->select(1);	
+		$redisWrite->select(0);	
 		$today = date("Ymd");    
-		$redisWrite->rpush($today, $value);
+		$redisWrite->incr($today);
 		$key = $msg->command;
 		$fen = substr($key,13,strlen($key)-13);
 		if (!empty($fen)) {
