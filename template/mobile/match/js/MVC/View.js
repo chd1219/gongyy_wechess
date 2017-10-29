@@ -342,29 +342,7 @@ initCanvas = function(e){
 }
 /*划线*/
 drawLine = function (e, a) {
-	if (!isShowArrow) return;
 	var m = e.split("");
-	stageshape[a - 1] = new createjs.Shape();
-	var graphics = stageshape[a - 1].graphics;
-
-	stagetext[a - 1] = new createjs.Text(a, "16px Arial", "blue");
-	stagetext[a - 1].x = comm.pointStartX + comm.spaceX * m[2] + 20;
-	stagetext[a - 1].y = comm.pointStartY + comm.spaceY * m[3] + 20;
-	stage.addChild(stagetext[a - 1]);
-
-	graphics.beginStroke("red");
-	graphics.setStrokeStyle(2);
-	graphics.moveTo(comm.pointStartX + comm.spaceX * m[0] + 20, comm.pointStartY + comm.spaceY * m[1] + 20);
-	graphics.lineTo(comm.pointStartX + comm.spaceX * m[2] + 20, comm.pointStartY + comm.spaceY * m[3] + 20);
-
-	stage.addChild(stageshape[a - 1]);
-	stage.update();
-}
-/*划线2*/
-drawLine2 = function (e, a) {
-	drawLinetmp[a-1] = e;
-	if (!isShowArrow) return;
-	m = e.split("");
 	stageshape[a - 1] = new createjs.Shape();
 	var graphics = stageshape[a - 1].graphics;
 
@@ -380,6 +358,43 @@ drawLine2 = function (e, a) {
 
 	stage.addChild(stageshape[a - 1]);
 	stage.update();
+}
+/*显示提示走法*/
+showTipsStep = function (e, a) {
+	drawLinetmp[a-1] = e;
+	switch(isShowArrow) {
+		case 0:
+			break;
+		case 1:
+			drawLine(e,a);
+			break;
+		case 2:
+			if (comm.getHold() == BLACK) {
+				if(a==1) {
+					drawLine(e,a);					
+				}
+			}
+			else {
+				if(a==2){
+					drawLine(e,a);					
+				}
+			}
+			break;
+		case 3:
+			if (comm.getHold() == RED) {
+				if(a==1) {
+					drawLine(e,a);					
+				}
+			}
+			else {
+				if(a==2){
+					drawLine(e,a);					
+				}
+			}
+			break;
+		default:
+			break;
+	}	
 }
 /*写字*/
 drawNum = function (i, j, n) {

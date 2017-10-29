@@ -220,6 +220,7 @@ onEditboard = function () {
 }
 /*响应翻转按钮*/
 onReverse = function () {
+	cleanLine();
 	if (mode == playmode.EDITBOARD) {
 		cleanChess();
 		cleanChessEx();		
@@ -490,17 +491,41 @@ onMessage = function (e) {
 }
 /*是否显示箭头*/
 OnshowArrow = function () {
-	isShowArrow = !isShowArrow;
-	if (isShowArrow) {
-		showFloatTip("显示提示");
-		for (var i=0;i<drawLinetmp.length;i++) {
-			drawLine2(drawLinetmp[i],i+1);
-		}
-	}
-	else {
-		showFloatTip("隐藏提示"),
-		cleanLine();
-	}
+	isShowArrow = (isShowArrow+1)%4;
+	switch(isShowArrow) {
+		case 0:
+			showFloatTip("隐藏提示"),
+			cleanLine();
+			break;
+		case 1:
+			showFloatTip("显示提示");
+			for (var i=0;i<drawLinetmp.length;i++) {
+				drawLine(drawLinetmp[i],i+1);
+			}
+			break;
+		case 2:
+			showFloatTip("隐藏红方提示"),
+			cleanLine();
+			if (comm.getHold() == BLACK) {
+				drawLine(drawLinetmp[0],1);
+			}
+			else {
+				drawLine(drawLinetmp[1],2);
+			}
+			break;
+		case 3:
+			showFloatTip("隐藏黑方提示"),
+			cleanLine();
+			if (comm.getHold() == RED) {
+				drawLine(drawLinetmp[0],1);
+			}
+			else {
+				drawLine(drawLinetmp[1],2);
+			}
+			break;
+		default:
+			break;
+	}	
 }
 /*反馈错误数据*/
 onErrordata = function() {

@@ -632,7 +632,7 @@ comm.DealPosition = function (obj) {
 					step = comm.reverseStep(step);
 				}
 				if (isanalyse && j<2) {
-					drawLine2(step,j+1);
+					showTipsStep(step,j+1);
 				}
 			}				
 		}				
@@ -681,7 +681,7 @@ comm.DealMessage = function (d) {
 					step = comm.reverseStep(step);
 				}
 				if (isanalyse && j<2) {
-					drawLine2(step,j+1);
+					showTipsStep(step,j+1);
 				}
 			}				
 		}				
