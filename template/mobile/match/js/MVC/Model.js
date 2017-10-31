@@ -554,7 +554,7 @@ onErrordata = function() {
 				var _json = {"id": uuid, "msg": msg};
 				$.ajax({
 					type: "POST",
-					url: "http://westudy.chinaxueyun.com/addons/gongyy_wechess/template/mobile/match/deletedata.php",
+					url: "http://westudy.chinaxueyun.com/addons/gongyy_wechess/template/mobile/match/php/deletedata.php",
 					dataType: "json",
 					data: _json,
 					success: function (data) {	

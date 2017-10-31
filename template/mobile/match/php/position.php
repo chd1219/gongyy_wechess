@@ -24,8 +24,10 @@
 		if (!empty($id)) {
 			/*棋盘数据入第三个库*/
 			$redisWrite->select(3);
-			$redisWrite->rpush($id, $value);			
-			if($redisWrite->llen($id) == 1) {
+			$redisWrite->incr($id);
+			//$redisWrite->rpush($id, $value);			
+			//if($redisWrite->llen($id) == 1) {
+			if($redisWrite->get($id) == 1) {
 				/*每天下了多少盘棋入第四个库*/
 				$redisWrite->select(4);
 				$redisWrite->rpush($today, $id);
@@ -34,27 +36,27 @@
 		$redisWrite->close();
 		
 		if($msg->type == 0) {
-			$power = substr($msg->power,5,1);
+			$power = $msg->power;
 			switch ($power) {
-		        case 0:
+		        case 'level-0':
 		            $depth = 3;
 		            break;
-		        case 1:
+		        case 'level-1':
 		            $depth = 6;
 		            break;
-		        case 2:
+		        case 'level-2':
 		            $depth = 9;
 		            break;
-		        case 3:
+		        case 'level-3':
 		            $depth = 12;
 		            break;
-		        case 4:
+		        case 'level-4':
 		            $depth = 15;
 		            break;
-		        case 5:
+		        case 'level-5':
 		            $depth = 16;
 		            break;
-		        case 6:
+		        case 'level-6':
 		            $depth = 17;
 		            break;
 		        default:

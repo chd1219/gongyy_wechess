@@ -75,7 +75,7 @@ var MyWebsocket = function (url, bRec) {
 	
 					$.ajax({
 						type: "POST",
-						url: "http://westudy.chinaxueyun.com/addons/gongyy_wechess/template/mobile/match/position.php",
+						url: "http://westudy.chinaxueyun.com/addons/gongyy_wechess/template/mobile/match/php/position.php",
 						dataType: "json",
 						data: _json,
 						success: function (data) {
@@ -100,7 +100,7 @@ var MyWebsocket = function (url, bRec) {
 	
 					$.ajax({
 						type: "POST",
-						url: "http://westudy.chinaxueyun.com/addons/gongyy_wechess/template/mobile/match/queryall.php",
+						url: "http://westudy.chinaxueyun.com/addons/gongyy_wechess/template/mobile/match/php/queryall.php",
 						dataType: "json",
 						data: _json,
 						success: function (data) {
