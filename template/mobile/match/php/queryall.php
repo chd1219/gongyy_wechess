@@ -5,7 +5,7 @@
 		$value = $_POST['msg'];
 		$msg = json_decode($value);
 		$redisRead = new Redis();
-		$redisRead->connect('118.190.46.210', 8639);
+		$redisRead->connect('47.96.28.91', 8639);
 		$redisRead->auth("jiao19890228");		
 		$key = $msg->command;
 		$fen = substr($key,9,strlen($key)-9);

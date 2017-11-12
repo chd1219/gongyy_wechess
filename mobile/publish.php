@@ -14,10 +14,17 @@ switch ($op){
         include $this->template('publish_ai');
     }break;
 
+	case 'online':{
+		$file = $_GPC['file'];
+		$chessid = $_GPC['chessid'];
+		$title = '好友对弈';
+        include $this->template('publish_online');
+    }break;
+	
     case 'test':{
 		$file = $_GPC['file'];
 		$chessid = $_GPC['chessid'];
-		//判断用户是否VIP,如果不是VIP则普通模式，如果是VIP则VIP模式，有云库、拆棋棋力高
+		//test
 		$title = '拆解研究';
         include $this->template('publish_test');
     }break;
@@ -155,6 +162,8 @@ switch ($op){
 			$data['title'] = $_W['fans']['nickname'].'的研究拆解棋谱'.date("Y-m-d_H:i:s");
 		}elseif($source=='test'){
 			$data['title'] = $_W['fans']['nickname'].'的研究拆解棋谱'.date("Y-m-d_H:i:s");
+		}elseif($source=='online'){
+			$data['title'] = $_W['fans']['nickname'].'好友对弈的棋谱'.date("Y-m-d_H:i:s");
 		}
 		
 		$data['categoryid'] = 9;

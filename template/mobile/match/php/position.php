@@ -5,7 +5,7 @@
 		$value = $_POST['msg'];
 		$msg = json_decode($value);
 		$redisWrite = new Redis();
-		$redisWrite->connect('118.190.46.210', 6379);
+		$redisWrite->connect('47.96.28.91', 6379);
 		$redisWrite->auth("jiao19890228");
 		/*历史消息按日期入第一个库*/
 		$redisWrite->select(0);	
@@ -68,7 +68,7 @@
 			 $depth = 17;
 		}
 		$redisRead = new Redis();
-		$redisRead->connect('118.178.228.206', 8641);
+		$redisRead->connect('47.96.28.91', 8641);
 		$redisRead->auth("jiao19890228");	
 	    $json_arr = $redisRead->lrange($fen,0,$depth-1);
 		$arrlen = sizeof($json_arr);

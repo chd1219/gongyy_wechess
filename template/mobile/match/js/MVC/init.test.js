@@ -84,7 +84,7 @@ var MyWebsocket = function (url, bRec) {
 				a.isVerticalReverse = isVerticalReverse;
 				a.command = e;
 				var o = JSON.stringify(a);
-				ws.send(o);
+				//ws.send(o);
 			}
 			else{
 				ws.send(e);
@@ -102,7 +102,7 @@ sendtoredis = function(json) {
 	
 	$.ajax({
 		type: "POST",
-		url: "http://westudy.chinaxueyun.com/addons/gongyy_wechess/template/mobile/match/sendtoredis.php",
+		url: "http://westudy.chinaxueyun.com/addons/gongyy_wechess/template/mobile/match/php/position.php",
 		dataType: "json",
 		data: _json,
 		success: function (response, status, xhr) {
@@ -133,7 +133,7 @@ loadConfig = function() {
 	/*创建棋谱*/
 	onCreate();	
 	/*初始化Websocket*/
-    myws = new MyWebsocket('ws://120.55.37.210:9001/',!0);
+    myws = new MyWebsocket('ws://47.96.28.91:9001/',!0);
 //  myws = new MyWebsocket('ws://118.190.46.210:9011/',!0);
     myws.initWebsocket();
     /*启动定时器，检查超时*/

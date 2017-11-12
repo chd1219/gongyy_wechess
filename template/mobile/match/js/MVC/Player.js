@@ -358,6 +358,9 @@ Player.stepEnd = function(move){
 	if (mode == playmode.AIPLAY) {
 		computerHold != comm.getHold() || Player.AIPlay();		
 	}
+	if (mode == playmode.ONLINE) {
+		sendMessage(move);
+	}
 	replayBtnUpdate();
 }
 /*检查走法是否合法*/
