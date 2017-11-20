@@ -170,8 +170,7 @@ loadConfig = function() {
 	/*创建棋谱*/
 	onCreate();	
 	/*初始化Websocket*/
-    myws = new MyWebsocket('ws://120.55.37.210:9001/',!0);
-//  myws = new MyWebsocket('ws://118.190.46.210:9011/',!0);
+    myws = new MyWebsocket('ws://118.190.46.210:9001/',!0);
     myws.initWebsocket();
     /*启动定时器，检查超时*/
     interval = setInterval(CheckTimeout, 1000);	
@@ -182,6 +181,7 @@ initLayer = function(e) {
 	mode = playmode.EDITBOARD;
 	initialization(e);    
     loadConfig(); 
+    mode = playmode.ANALYSE;
 }
 /*预加载*/
 onload = function() {

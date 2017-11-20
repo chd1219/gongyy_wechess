@@ -427,7 +427,7 @@ onSave = function () {
 	comm.cMap = comm.arr2Clone(comm.map),
 	cleanChess(),
 	cleanChessEx();
-	mode = playmode.ANALYSE;
+	mode = mode || playmode.ANALYSE;
 	Board.init();
 	comm.init(3, comm.map, !0);	
 	movesIndex = 0,
@@ -551,6 +551,7 @@ onErrordata = function() {
 		else {
 			if (isanalyse) {
 				showFloatTip("重新思考中!");
+				cleanLine();
 				var _json = {"id": uuid, "msg": msg};
 				$.ajax({
 					type: "POST",

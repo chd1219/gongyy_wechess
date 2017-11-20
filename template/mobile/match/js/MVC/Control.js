@@ -476,6 +476,9 @@ comm.send = function () {
 		setTimeout(function () {
 			sendMessage(comm.queryall());
 		}, 1000);
+		setTimeout(function () {
+			sendMessage(comm.openbook());
+		}, 1000);
 	}
 	if (isanalyse) {
 		cleanLine();
@@ -799,6 +802,13 @@ comm.queryall = function(){
 	var board = comm.getBoard();
 	result += board;
 	return result;    
+}
+comm.openbook = function(){
+	var result = "openbook:";
+	var board = comm.getBoard();
+	result += board + " - - 0 1";
+	if (result.indexOf("k") != -1 && result.indexOf("K") != -1) return result;    
+	return "";
 }
 /*判断字符串是否为JSON格式*/
 comm.isJSON = function (str) {
