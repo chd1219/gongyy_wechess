@@ -49,6 +49,10 @@ onRedPlay = function () {
 }
 /*悔棋*/
 onRegret = function () {
+	if(waitServerPlay) {
+		showFloatTip("电脑思考中,请稍后重试");
+		return;
+	}
 	if (comm.nodes.length == 0) {
 		showFloatTip("还没开始下棋呢");
 		return;
@@ -191,7 +195,9 @@ onEditboard = function () {
 		$("#redautoplayTog").removeClass('mui-active');
 		$("#redautoplayTog").html('<div class="mui-switch-handle"></div>');
 	}
-    $(".mode4").hide(),
+    $(".mode4").hide(),    
+    $(".mode5").show();
+    $("#clearBtn").hide();
     mode = playmode.EDITBOARD;
     Board.init();
     
@@ -202,6 +208,7 @@ onEditboard = function () {
     board.y = 100;    
     cleanChess();
     comm.init(3, comm.map, !1); 
+
     for (x in comm.sMapList) {
         m = parseInt(ss/6);
         n = ss%6;
@@ -285,6 +292,10 @@ onAutoreplay = function () {
 }
 /*响应下一步按钮*/
 onReplayNext = function () {
+	if(waitServerPlay) {
+		showFloatTip("电脑思考中,请稍后重试");
+		return;
+	}
 	if (comm.isAnimating) {
 		return;		
 	}
@@ -352,6 +363,10 @@ onReplayNext = function () {
 }
 /*响应上一步按钮*/
 onReplayPrev = function () {
+	if(waitServerPlay) {
+		showFloatTip("电脑思考中,请稍后重试");
+		return;
+	}
 	if (comm.isAnimating) {
 		return;		
 	}
@@ -381,6 +396,10 @@ onReplayPrev = function () {
 }
 /*响应开局按钮*/
 onReplayFirst = function () {
+	if(waitServerPlay) {
+		showFloatTip("电脑思考中,请稍后重试");
+		return;
+	}
 	if (comm.isAnimating) {
 		return;		
 	}
@@ -398,6 +417,10 @@ onReplayFirst = function () {
 }
 /*响应终局按钮*/
 onReplayEnd = function () {
+	if(waitServerPlay) {
+		showFloatTip("电脑思考中,请稍后重试");
+		return;
+	}
 	if (comm.isAnimating) {
 		return;		
 	}
@@ -427,7 +450,7 @@ onSave = function () {
 	comm.cMap = comm.arr2Clone(comm.map),
 	cleanChess(),
 	cleanChessEx();
-	mode = mode || playmode.ANALYSE;
+	mode = playmode.ANALYSE;
 	Board.init();
 	comm.init(3, comm.map, !0);	
 	movesIndex = 0,
@@ -551,7 +574,6 @@ onErrordata = function() {
 		else {
 			if (isanalyse) {
 				showFloatTip("重新思考中!");
-				cleanLine();
 				var _json = {"id": uuid, "msg": msg};
 				$.ajax({
 					type: "POST",

@@ -365,20 +365,22 @@ comm.checkJiang = function () {
 }
 /*获取棋盘数据*/
 comm.getsMap = function () {
-    var MapEx = {
-        "C": ["C0", "C1"],
-        "M": ["M0", "M1"],
-        "P": ["P0", "P1"],
-        "X": ["X0", "X1"],
-        "S": ["S0", "S1"],
-        "Z": ["Z0", "Z1", "Z2", "Z3", "Z4"],
+    isVerticalReverse ? MapEx = {
         "c": ["c0", "c1"],
         "m": ["m0", "m1"],
         "p": ["p0", "p1"],
         "x": ["x0", "x1"],
         "s": ["s0", "s1"],
-        "z": ["z0", "z1", "z2", "z3", "z4"]
-    };
+        "z": ["z0", "z1", "z2", "z3", "z4"],
+        "C": ["C0", "C1"],
+        "M": ["M0", "M1"],
+        "P": ["P0", "P1"],
+        "X": ["X0", "X1"],
+        "S": ["S0", "S1"],
+        "Z": ["Z0", "Z1", "Z2", "Z3", "Z4"]        
+    }:MapEx = {"C": ["C0", "C1"],"M": ["M0", "M1"],"P": ["P0", "P1"],"X": ["X0", "X1"],"S": ["S0", "S1"],"Z": ["Z0", "Z1", "Z2", "Z3", "Z4"],
+        "c": ["c0", "c1"],"m": ["m0", "m1"],"p": ["p0", "p1"],"x": ["x0", "x1"],"s": ["s0", "s1"],"z": ["z0", "z1", "z2", "z3", "z4"]} ; 
+
     for (var i = 0; i < comm.map.length; i++) {
         for (var j = 0; j < comm.map[i].length ; j++) {
             var temp = comm.map[i][j];
@@ -476,9 +478,9 @@ comm.send = function () {
 		setTimeout(function () {
 			sendMessage(comm.queryall());
 		}, 1000);
-		setTimeout(function () {
-			sendMessage(comm.openbook());
-		}, 1000);
+//		setTimeout(function () {
+//			sendMessage(comm.openbook());
+//		}, 1000);
 	}
 	if (isanalyse) {
 		cleanLine();
@@ -535,14 +537,21 @@ comm.openbookinfo = function(d){
 }
 /*解析返回的开局库信息*/
 comm.DealOpenbook = function (obj) {
-	var e = JSON.parse(obj.result);
-	var tmpStr = "";
-	for (i=0;i<e.length && i<10;i++) {	
-		var info = e[i];
+	if(document.getElementById("openbookDetailTbody")){ 
+		document.getElementById("openbookDetailTbody").innerHTML = "";
+	}
+	var e = obj.result;
+	if(e.length == 0) return;
+	
+	var list = e.split("|");
+	tmpStr = "";
+	for (i=list.length-2;i > 0;i--) {	
+		var info = list[i].split(",");
+		
 		var tempmap = comm.arr2Clone(comm.map);		
-		step = comm.YX2XY(comm.pad(info.vmove.toString(16)));	
+		step = comm.YX2XY(comm.pad((parseInt(info[0])-13107).toString(16)));	
 		var move = comm.createMove(tempmap,step);
-		tmpStr += "<tr><td>"+ (i+1) +"</td><td>"+ move +"</td><td>"+ info.vscore +"</td><td>"+ info.vwin +"</td><td>"+ info.vdraw +"</td><td>"+ info.vlost +"</td></tr>";
+		tmpStr += "</td><td>"+ move +"</td><td>"+ info[1] +"</td><td>"+ info[2] +"</td><td>"+ info[3] +"</td><td>"+ info[4] +"</td></tr>";
 	}	
 	if(document.getElementById("openbookDetailTbody")){ 
 		document.getElementById("openbookDetailTbody").innerHTML = tmpStr;
@@ -644,6 +653,52 @@ comm.DealPosition = function (obj) {
 			document.getElementById("computerDetailTbody").innerHTML = tmpStr + document.getElementById("computerDetailTbody").innerHTML;
 		} 		
 	}		
+}
+
+/*解析返回的引擎信息*/
+comm.DealPosition1 = function (result) {
+	var infos = result.split("|");	
+	for (j = 0; j < infos.length ; j++) {
+		info = infos[j].split(",");
+		depth = info[0];
+		score = info[1];
+		pv = info[2].split(" ");
+		
+		if (comm.getHold() == BLACK) {
+			score = -score;
+		}				
+		var tempmap = comm.arr2Clone(comm.map);
+		var tmpStr = "";
+		cleanLine();
+		for (j = 0; j < pv.length && j<4; j++) {
+			if (pv[j]) {
+				var step = comm.transformat(pv[j]);					
+				var move = comm.createMove(tempmap, step);
+				tmpStr = tmpStr + move + " ";
+				/*走法提示*/
+				if (isVerticalReverse) {
+					step = comm.reverseStep(step);
+				}
+				if (isanalyse && j<2) {
+					showTipsStep(step,j+1);
+				}
+			}				
+		}				
+		if(document.getElementById("computerDetailTbody") && tmpStr.length > 4){ 
+			tmpStr = "<tr><td>" + depth + "</td><td>" + score + "</td><td>" + tmpStr + "</td></tr>";
+			document.getElementById("computerDetailTbody").innerHTML = tmpStr + document.getElementById("computerDetailTbody").innerHTML;
+		} 	
+	}	
+	
+	var move = pv[0];
+	/*回调返回函数*/
+	myws.Return();
+
+	if(!isanalyse){			
+		Player.aiPace = comm.getBestMove(move);
+		setTimeout((function(){Player.serverAIPlay();}),200);
+	}		
+	
 }
 /*解析返回的信息*/
 comm.DealMessage = function (d) {
@@ -915,7 +970,7 @@ comm.gotoStep = function (moves, index) {
 	cleanLine();
 	comm.isend = !1;
 	comm.isPlay = !0;
-	waitServerPlay = !0;
+	waitServerPlay = !1;
 	cleanChess();
 	comm.init(3, comm.cMap, !0);
 	currentId = 0;

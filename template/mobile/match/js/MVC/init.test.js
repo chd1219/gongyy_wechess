@@ -59,8 +59,9 @@ var MyWebsocket = function (url, bRec) {
     }  
 	this.mysend = function (e) {  
 		if(ws){
-    		if(e.match("position")) {
-    			var a = {};
+			
+			var a = {};
+    			a.id = uuid;
 				a.type = 1;
 				a.isOffensive = comm.isOffensive;
 				a.isanalyse = isanalyse;
@@ -69,34 +70,15 @@ var MyWebsocket = function (url, bRec) {
 				a.index = movesIndex;
 				a.isVerticalReverse = isVerticalReverse;
 				a.command = e;
-				var o = JSON.stringify(a);
+			var o = JSON.stringify(a);
+    		if(e.match("position")) {    			
 				ws.send(o);
 				sendtoredis(a);
     		}   		
     		else if (e.match("queryall")){
-				var a = {};
-				a.type = 1;
-				a.isOffensive = comm.isOffensive;
-				a.isanalyse = isanalyse;
-				b_autoset != 0 ? a.b_autoset = 1 : a.b_autoset = 0;
-				r_autoset != 0 ? a.r_autoset = 1 : a.r_autoset = 0;
-				a.index = movesIndex;
-				a.isVerticalReverse = isVerticalReverse;
-				a.command = e;
-				var o = JSON.stringify(a);
 				ws.send(o);
 			}
     		else if (e.match("openbook")){
-				var a = {};
-				a.type = 1;
-				a.isOffensive = comm.isOffensive;
-				a.isanalyse = isanalyse;
-				b_autoset != 0 ? a.b_autoset = 1 : a.b_autoset = 0;
-				r_autoset != 0 ? a.r_autoset = 1 : a.r_autoset = 0;
-				a.index = movesIndex;
-				a.isVerticalReverse = isVerticalReverse;
-				a.command = e;
-				var o = JSON.stringify(a);
 				ws.send(o);
 			}
 			else{
@@ -147,7 +129,6 @@ loadConfig = function() {
 	onCreate();	
 	/*初始化Websocket*/
     myws = new MyWebsocket('ws://47.96.26.54:9001/',!0);
- // myws = new MyWebsocket('ws://118.190.46.210:9011/',!0);
     myws.initWebsocket();
     /*启动定时器，检查超时*/
     interval = setInterval(CheckTimeout, 1000);	

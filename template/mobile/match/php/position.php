@@ -11,6 +11,9 @@
 		$redisWrite->select(0);	
 		$today = date("Ymd");    
 		$redisWrite->incr($today);
+		$type = $msg->type;
+		$redisWrite->select(6);
+		$redisWrite->incr($today."_count_".$type);
 		$key = $msg->command;
 		$fen = substr($key,13,strlen($key)-13);
 		if (!empty($fen)) {
@@ -25,15 +28,23 @@
 			/*棋盘数据入第三个库*/
 			$redisWrite->select(3);
 			$redisWrite->incr($id);
+			
 			//$redisWrite->rpush($id, $value);			
 			//if($redisWrite->llen($id) == 1) {
-			if($redisWrite->get($id) == 1) {
-				/*每天下了多少盘棋入第四个库*/
+			if($redisWrite->get($id) == 2) {
+				/*每天下了多少盘棋入第四个库*/				
 				$redisWrite->select(4);
 				$redisWrite->rpush($today, $id);
+				$redisWrite->select(6);
+				$redisWrite->incr($today."_board_".$type);
 			}
-		}
-		$redisWrite->close();
+			
+			/*棋盘数据入第一个库*/
+			$redisWrite->select(1);
+			if(!$redisWrite->exists($id)) {
+				$redisWrite->set($id,$value,60);
+			}			
+		}		
 		
 		if($msg->type == 0) {
 			$power = $msg->power;
@@ -75,8 +86,12 @@
 		
 		if($arrlen > 0) {
 			$json_arr[$arrlen] = "bestmove ".substr( strstr($json_arr[$arrlen-1], ' pv '), 4, 4);
+			$redisWrite->select(6);	
+			$redisWrite->incr($today."_redis_".$type);
 		}
 		$json_obj = json_encode($json_arr);
+		
+		$redisWrite->close();
 		$redisRead->close();
 		echo $json_obj;
 	}

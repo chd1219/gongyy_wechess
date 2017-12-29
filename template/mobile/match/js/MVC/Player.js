@@ -8,8 +8,10 @@
 var Player = Player || {};
 /*点击Canvas*/
 Player.clickCanvas = function (e) {
-	var point = Player.getClickPoint(e);
-	Player.clickBoard(point);
+	if(!waitServerPlay){
+		var point = Player.getClickPoint(e);
+		Player.clickBoard(point);
+	}	
 }
 /*点击棋盘*/
 Player.clickBoard = function(point) {
@@ -125,22 +127,25 @@ Player.cancleSelected = function () {
 	light.visible = !1;
 }
 /*交换棋子*/						
-Player.exchangMan = function (src, dst) {		
-	if (!comm.checkMans(Player.getKey(src), dst)) {		
-		showFloatTip("摆放错误，请重试");
-		Player.cancleSelected();
-		return;
+Player.exchangMan = function (src, dst) {	
+	if(dst.y > 0 && dst.y < 10) {
+		if (!comm.checkMans(Player.getKey(src), dst)) {		
+			showFloatTip("摆放错误，请重试");
+			Player.cancleSelected();
+			return;
+		}
+		else if (Player.getKey(src) == "J0" || Player.getKey(src) == "j0" || Player.getKey(dst) == "J0" || Player.getKey(dst) == "j0") {
+			showFloatTip("将帅不能移出棋盘");
+			Player.cancleSelected();
+			return;
+		}
+		else if (Player.getMan(src).pater == Player.getMan(dst).pater) {
+			showFloatTip("棋子相同");
+			Player.cancleSelected();
+			return;
+		}
 	}
-	else if (Player.getKey(src) == "J0" || Player.getKey(src) == "j0" || Player.getKey(dst) == "J0" || Player.getKey(dst) == "j0") {
-		showFloatTip("将帅不能移出棋盘");
-		Player.cancleSelected();
-		return;
-	}
-	else if (Player.getMan(src).pater == Player.getMan(dst).pater) {
-		showFloatTip("棋子相同");
-		Player.cancleSelected();
-		return;
-	}
+	
 	/*移出棋盘*/
 	var point = {x:1,y:-1};
 	Player.moveMan(dst, point);
@@ -443,7 +448,7 @@ Player.AIclickPoint = function (dst, type) {
 }
 /*服务器返回自动走法*/
 Player.serverAIPlay = function(step,type) {		
-    if (comm.isPlay) {		
+    if (comm.isPlay && waitServerPlay) {		
         step = step || Player.aiPace;
         Player.aiPace = void 0;
         if (!step) return void(waitServerPlay = !0);		
@@ -463,7 +468,7 @@ Player.serverAIPlay = function(step,type) {
 			setTimeout((function(){waitServerPlay = !1;}),1000);			
 		}
 		else {
-			waitServer = !0;
+			waitServerPlay = !0;
 		}
 		setTimeout((function(){
 			Player.cancleSelected();

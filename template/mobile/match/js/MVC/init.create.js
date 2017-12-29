@@ -16,7 +16,6 @@ initLayer = function(e) {
 	mode = playmode.EDITBOARD;
 	initialization(e);    
     loadConfig(); 
-    mode = playmode.CREATE;
 }
 /*预加载*/
 onload = function() {

@@ -9,7 +9,7 @@
 //	$redisWrite->del($fen);
 //	$redisWrite->close();	
 	$redisRead = new Redis();
-	$redisRead->connect('47.96.28.91', 8641);
+	$redisRead->connect('47.96.28.91', 8640);
 	$redisRead->auth("jiao19890228");	
     $redisRead->del($fen);
 	$redisRead->close();

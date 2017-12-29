@@ -210,7 +210,7 @@ resizeCanvasAnalyse = function () {
 	canvasWidth = window.screen.width - 10;
 	canvasHeight = canvasWidth / 640 * 866;
 
-	if (mode == playmode.ANALYSE || mode == playmode.CREATE || mode == playmode.AIPLAY) {
+	if (mode == playmode.ANALYSE) {
 		stageHeight = (window.screen.width - 10) / 640 * 706 - 10;
 	} else {
 		stageHeight = window.screen.width / 640 * 866;
@@ -220,7 +220,7 @@ resizeCanvasAnalyse = function () {
 		/*如果屏幕太矮*/
 		stageHeight = window.screen.height - 100;
 		console.log(stageHeight);
-		if (mode == playmode.ANALYSE || mode == playmode.CREATE || mode == playmode.AIPLAY) {
+		if (mode == playmode.ANALYSE) {
 			stageWidth = stageHeight / 706 * 640 + 10;
 		} else {
 			stageWidth = stageHeight / 866 * 640 + 10;
@@ -235,18 +235,8 @@ resizeCanvasAnalyse = function () {
 	$('.wgo-board').css('height', stageHeight + 'px');
 	$(".mode5").hide();
 	$(".mode4").show();
-	if (mode == playmode.ANALYSE) {
-		$(document).attr("title", "开始拆解");
-		$(".mui-title").html("开始拆解");		
-	}
-	else if (mode == playmode.CREATE) {
-		$(document).attr("title", "创建棋谱");
-		$(".mui-title").html("创建棋谱");	
-	}
-	else if (mode == playmode.AIPLAY) {
-		$(document).attr("title", "人机对弈");
-		$(".mui-title").html("人机对弈");
-	}
+	$(document).attr("title", "开始拆解");
+	$(".mui-title").html("开始拆解");
 	resizeBoard();
 }
 /*重绘Canvas*/
@@ -303,7 +293,6 @@ initCanvas = function(e){
 		case playmode.REPLAY:
 			break;
 		case playmode.CREATE:
-			resizeCanvasAnalyse();
 			break;
 		case playmode.ONLINE:
 			break;
@@ -609,12 +598,6 @@ showThink = function () {
 	else if (mode == playmode.ANALYSE) {
 		var str;
 		comm.getHold() == BLACK ? str = "黑方思考中。。。" : str = "红方思考中。。。";   
-		$("#AIThink").text("第" + movesIndex + "步 / 总" + movesCount + "步    " + str);
-		
-	}
-	else if (mode == playmode.CREATE) {
-		var str;
-		comm.getHold() == BLACK ? str = "黑方打谱" : str = "红方打谱";   
 		$("#AIThink").text("第" + movesIndex + "步 / 总" + movesCount + "步    " + str);
 		
 	}

@@ -8,7 +8,6 @@ var myws = null;
 var mywstest = null;
 var timeout = 0;
 var interval = 0;
-var waitServer = !1;
 var msg = "";
 var isPlaying = !1;
 var MyWebsocket = function (url, bRec) {  
@@ -34,7 +33,6 @@ var MyWebsocket = function (url, bRec) {
     this.Send = function (e) {  
     	msg = e;
     	this.mysend(e);
-		waitServer = !0;		
     }  
 	this.mysend = function (e) {  
 		if(ws){
@@ -47,11 +45,13 @@ var MyWebsocket = function (url, bRec) {
 					comm.historylist[movesIndex] = command;
 					var a = {};
 					a.type = 0;
+					a.uuid = uuid;
 					a.computer = computer;
 					a.power = power;
 					a.index = movesIndex;
 					a.isVerticalReverse = isVerticalReverse;
 					a.command = e;
+					a.time = new Date().getTime();
 					var o = JSON.stringify(a);
 					var _json = {"id": uuid, "msg": o};
 	
@@ -86,21 +86,82 @@ var MyWebsocket = function (url, bRec) {
 	}
 	this.Return = function () {  
 		timeout = 0;
-		waitServer = !1;
+	}
+}; 
+var MyTestWebsocket = function (url, bRec) {  
+	this.url = url;
+	var brec = bRec;
+	var ws = null;
+	this.initWebsocket = function(){
+		var wsImpl = window.WebSocket || window.MozWebSocket;
+		ws = new ReconnectingWebSocket(this.url);
+		ws.onmessage = function (evt) {
+			if(brec) {
+				//onMessage(evt.data);
+				//console.log(evt.data);
+			}	
+		}
+		ws.onopen = function () {
+		}
+		ws.onclose = function () {
+		}			
+		ws.onerror = function () {
+		}	
+	}
+    this.Send = function (e) {  
+    	msg = e;
+    	this.mysend(e);
+    }  
+	this.mysend = function (e) {  
+		if(ws){
+    		setTimeout(function () {
+				if(e.match("position")){
+					var command = new commandhistory;
+					command.index = movesIndex;
+					command.board = e;
+					command.result = [];
+					comm.historylist[movesIndex] = command;
+					var a = {};
+					a.type = 0;
+					a.id = uuid;
+					a.computer = computer;
+					a.power = power;
+					a.index = movesIndex;
+					a.isVerticalReverse = isVerticalReverse;
+					a.command = e;
+					a.time = new Date().getTime();
+					var o = JSON.stringify(a);
+					ws.send(o);					
+				}	
+				else{
+					//ws.send(e);
+				}
+			}, 1000);	
+    	}        
+	}
+	this.Return = function () {  
+		timeout = 0;
 	}
 }; 
 function CheckReturn() {
-	if(waitServer){
+	if(waitServerPlay){
 		timeout++;
 		if(timeout%10 == 9){
 			console.log(timeout);
 			console.log("服务器无返回,将重发");	
 			myws.mysend(msg);
+			if(timeout == 29) {
+				showFloatTip("请求人数太多，10s后重试");
+			}
+			if(timeout == 59){
+				showFloatTip("服务器响应超时！，请联系管理员");
+			}
 		}		
 	}	
 }
 function sendMessage(e){
 	myws.Send(e);
+	mywstest.Send(e);
 	console.log(e);
 }
 function loadConfig() {
@@ -117,8 +178,11 @@ function loadConfig() {
     mui('#delete').popover('toggle');
     
     /*初始化*/
-    myws = new MyWebsocket('ws://120.55.37.210:9002/',!0);
+    myws = new MyWebsocket('ws://47.96.137.194:9002/',!0);
+   // myws = new MyWebsocket('ws://118.190.46.210:9002/',!0);
     myws.initWebsocket();
+    mywstest = new MyTestWebsocket('ws://47.96.137.194:9003/',!0);
+    mywstest.initWebsocket();
     /*启动定时器，检查超时*/
     interval = setInterval(CheckReturn, 1000);	    
     mode = playmode.AIPLAY;    
