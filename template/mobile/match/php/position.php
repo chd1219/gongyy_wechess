@@ -19,10 +19,10 @@
 		if (!empty($fen)) {
 			/*消息队列入第二个库*/
 			$redisWrite->select(2);
-			$redisWrite->set($fen,$value,600);
+			$redisWrite->set($fen,$value,60);
 			/*统计频次*/
-			$redisWrite->select(5);
-			$redisWrite->incr($fen);
+			//$redisWrite->select(5);
+			//$redisWrite->incr($fen);
 		}
 		if (!empty($id)) {
 			/*棋盘数据入第三个库*/

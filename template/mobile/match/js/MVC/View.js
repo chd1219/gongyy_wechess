@@ -139,6 +139,12 @@ initLight = function () {
 setEnable = function (e, a) {
     1 == a ? ($("#" + e).removeAttr("disabled"), $("#" + e).addClass(e), $("#" + e).removeClass(e + "Disable")) : ($("#" + e).attr("disabled", "disabled"), $("#" + e).addClass(e + "Disable"), $("#" + e).removeClass(e))
 }
+/*清除显示信息*/
+cleanDetail = function() {
+	cleanComputerDetail();     
+	cleanChessdbDetail();
+	cleanOpenBookDetail();
+}
 /*清除引擎信息*/
 cleanComputerDetail = function() {
 	if (document.getElementById("computerDetailTbody")) {
@@ -149,6 +155,12 @@ cleanComputerDetail = function() {
 cleanChessdbDetail = function() {
 	if (document.getElementById("chessdbDetailTbody")) {
 		document.getElementById("chessdbDetailTbody").innerHTML = "";
+	}        
+}
+/*清除开局库信息*/
+cleanOpenBookDetail = function() {
+	if (document.getElementById("openbookDetailTbody")) {
+		document.getElementById("openbookDetailTbody").innerHTML = "";
 	}        
 }
 /*删除棋子*/

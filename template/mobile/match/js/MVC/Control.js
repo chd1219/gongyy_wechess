@@ -536,20 +536,17 @@ comm.openbookinfo = function(d){
 	this.note = e[3];
 }
 /*解析返回的开局库信息*/
-comm.DealOpenbook = function (obj) {
+comm.DealOpenbook = function (list) {
 	if(document.getElementById("openbookDetailTbody")){ 
 		document.getElementById("openbookDetailTbody").innerHTML = "";
 	}
-	var e = obj.result;
-	if(e.length == 0) return;
-	
-	var list = e.split("|");
+
 	tmpStr = "";
-	for (i=list.length-2;i > 0;i--) {	
+	for (i=list.length-1;i>=0;i--) {	
 		var info = list[i].split(",");
 		
 		var tempmap = comm.arr2Clone(comm.map);		
-		step = comm.YX2XY(comm.pad((parseInt(info[0])-13107).toString(16)));	
+		step = comm.YX2XY(info[0]);	
 		var move = comm.createMove(tempmap,step);
 		tmpStr += "</td><td>"+ move +"</td><td>"+ info[1] +"</td><td>"+ info[2] +"</td><td>"+ info[3] +"</td><td>"+ info[4] +"</td></tr>";
 	}	
@@ -658,12 +655,12 @@ comm.DealPosition = function (obj) {
 /*解析返回的引擎信息*/
 comm.DealPosition1 = function (result) {
 	var infos = result.split("|");	
-	for (j = 0; j < infos.length ; j++) {
-		info = infos[j].split(",");
-		depth = info[0];
+	for (i = 0; i < infos.length-1 ; i++) {
+		info = infos[i].split(",");
+		depth = (info[0]/32).toFixed(2);
 		score = info[1];
 		pv = info[2].split(" ");
-		
+
 		if (comm.getHold() == BLACK) {
 			score = -score;
 		}				

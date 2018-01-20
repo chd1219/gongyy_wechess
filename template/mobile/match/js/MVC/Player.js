@@ -113,8 +113,7 @@ Player.selected = function (point) {
 		}
 		showDots();
 		if(!waitServerPlay) {
-			cleanComputerDetail();
-			cleanChessdbDetail();
+			cleanDetail();
 		}
 	}			
 }

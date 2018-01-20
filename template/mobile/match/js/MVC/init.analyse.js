@@ -7,7 +7,6 @@
 
 /*Websocket变量*/
 var myws = null;
-var mywstest = null;
 /*超时计数*/
 var timeout = 0;
 /*记录发送的消息*/
@@ -85,6 +84,7 @@ var MyWebsocket = function (url, bRec) {
 								for(var i=0;i<data.length;i++) {
 									comm.DealMessage(data[i]);
 								}
+								//waitServerPlay = !1;
 							}
 							else {
 								console.log("engineer");
@@ -98,7 +98,7 @@ var MyWebsocket = function (url, bRec) {
 				}
 				else {					
 					var _json = {"id": uuid, "msg": o};
-	
+					/*查询云库*/
 					$.ajax({
 						type: "POST",
 						url: "http://westudy.chinaxueyun.com/addons/gongyy_wechess/template/mobile/match/php/queryall.php",
@@ -150,95 +150,6 @@ var MyWebsocket = function (url, bRec) {
 		timeout = 0;
 	}		
 }
-var MyTestWebsocket = function (url, bRec) {
-	/*服务器地址*/
-	this.url = url;
-	/*是否解析返回数据*/
-	var brec = bRec;
-	/*Websocket实例*/
-	var ws = null;		
-	  
-	this.initWebsocket = function(){
-		var wsImpl = window.WebSocket || window.MozWebSocket;
-		ws = new ReconnectingWebSocket(this.url);
-		ws.onmessage = function (evt) {
-			if(brec) {
-				//onMessage(evt.data);
-				//console.log(evt.data);
-			}			
-		}
-		ws.onopen = function () {
-		}
-		ws.onclose = function () {
-		}			
-		ws.onerror = function () {
-		}	
-	}
-    this.Send = function (e) {      	
-		if(e.match("position")){
-			var command = new commandhistory;
-			command.index = movesIndex;
-			command.board = e;
-			command.result = [];
-			comm.historylist[movesIndex] = command;
-			msg = e;
-			computelist = [];
-			depthinfolist = [];
-			cleanComputerDetail();
-		}else if (e.match("queryall")) {
-			chessdblist = [];
-			cloudinfolist = [];
-			cleanChessdbDetail();
-		}
-		this.mysend(e);
-    }  
-	this.mysend = function (e) {  
-		if(ws){
-    		if(e.match("position") ){
-				var a = {};
-				a.id = uuid;
-				a.type = 1;
-				a.isOffensive = comm.isOffensive;
-				a.isanalyse = isanalyse;
-				b_autoset != 0 ? a.b_autoset = 1 : a.b_autoset = 0;
-				r_autoset != 0 ? a.r_autoset = 1 : a.r_autoset = 0;
-				a.index = movesIndex;
-				a.isVerticalReverse = isVerticalReverse;
-				a.command = e;
-				a.time = new Date().getTime();
-				var o = JSON.stringify(a);
-				ws.send(o);				
-			}
-			else{
-				//ws.send(e);
-			}
-    	}        
-	}	
-	this.rebackerror = function (e) {  
-		if(ws){
-    		if(e.match("position") || e.match("queryall")){
-				var a = {};
-				a.type = 1;
-				a.isOffensive = comm.isOffensive;
-				a.isanalyse = isanalyse;
-				b_autoset != 0 ? a.b_autoset = 1 : a.b_autoset = 0;
-				r_autoset != 0 ? a.r_autoset = 1 : a.r_autoset = 0;
-				a.index = movesIndex;
-				a.isVerticalReverse = isVerticalReverse;
-				a.command = e;
-				a.time = new Date().getTime();
-				var o = JSON.stringify(a);
-				ws.send(o);
-			}
-			else{
-				ws.send(e);
-			}
-    	}        
-	}	
-	this.Return = function () {  
-		timeout = 0;
-	}		
-}
 /*检查超时*/
 CheckTimeout = function () {
 	if(waitServerPlay){
@@ -259,7 +170,6 @@ CheckTimeout = function () {
 /*发送消息函数*/
 sendMessage = function(e){
 	myws.Send(e);
-	mywstest.Send(e);
 	console.log(e);
 }
 /*加载配置信息,根据模块自定义*/
@@ -267,11 +177,8 @@ loadConfig = function() {
 	/*创建棋谱*/
 	onCreate();	
 	/*初始化Websocket*/
-    //myws = new MyWebsocket('ws://118.190.46.210:9001/',!0);
     myws = new MyWebsocket('ws://47.96.137.194:9001/',!0);
     myws.initWebsocket();
-    mywstest = new MyTestWebsocket('ws://47.96.137.194:9003/',!0);
-    mywstest.initWebsocket();
     /*启动定时器，检查超时*/
     interval = setInterval(CheckTimeout, 1000);	
 }

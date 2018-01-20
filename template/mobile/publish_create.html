@@ -286,10 +286,12 @@
             <div class="mui-switch  mui-active" id="soundTog">
                 <div class="mui-switch-handle"></div>
             </div>
-        </li>
-
+        </li>		
     </ul>
     <ul class="mui-table-view">
+    	<li class="mui-table-view-cell">
+            <a id="new" href="#">新建棋谱</a>
+        </li>
         <li class="mui-table-view-cell">
             <a href="#delete"><b>关闭</b></a>
         </li>
@@ -308,16 +310,9 @@
         <li class="mui-table-view-cell">
             <a id="sendBtn" href="#">保存棋谱</a>
         </li>
-
+        
         <li class="mui-table-view-cell">
-
-            <a id="new" href="#">新建棋谱</a>
-
-        </li>
-        <li class="mui-table-view-cell">
-
             <a id="index" href="#">返回首页</a>
-
         </li>
     </ul>
     <ul class="mui-table-view">
@@ -411,7 +406,7 @@
 
                 note = e.value;
                 if (note) {
-                    bill.notes[currentId] = note;
+                    comm.notes[currentId] = note;
                     $("#noteInfo").text(note);
                     $("#noteInfo").show();
                 }

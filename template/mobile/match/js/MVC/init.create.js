@@ -32,7 +32,7 @@ onload = function() {
     $("#prevBtn").on('tap', onReplayPrev),
     $("#nextBtn").on('tap', onReplayNext),
     $("#endBtn").on('tap', onReplayEnd),
-    $("#regretBtn").on('tap', onRegret),
+    $("#regretBtn").on('tap', onCreateRegret),
     $("#sendBtn").on('tap', onSend),
     $("#errordataBtn").on('tap', onErrordata),
     $("#reveseBtn").on('tap', onReverse),    

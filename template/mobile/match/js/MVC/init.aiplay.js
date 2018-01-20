@@ -5,7 +5,6 @@
  * chd
  */
 var myws = null;
-var mywstest = null;
 var timeout = 0;
 var interval = 0;
 var msg = "";
@@ -62,7 +61,7 @@ var MyWebsocket = function (url, bRec) {
 						data: _json,
 						success: function (data) {
 							if(data.length > 0) {
-								console.log("redis");
+								console.log("redis");								
 								for(var i=0;i<data.length;i++) {
 									comm.DealMessage(data[i]);
 								}
@@ -80,61 +79,6 @@ var MyWebsocket = function (url, bRec) {
 				}	
 				else{
 					ws.send(e);
-				}
-			}, 1000);	
-    	}        
-	}
-	this.Return = function () {  
-		timeout = 0;
-	}
-}; 
-var MyTestWebsocket = function (url, bRec) {  
-	this.url = url;
-	var brec = bRec;
-	var ws = null;
-	this.initWebsocket = function(){
-		var wsImpl = window.WebSocket || window.MozWebSocket;
-		ws = new ReconnectingWebSocket(this.url);
-		ws.onmessage = function (evt) {
-			if(brec) {
-				//onMessage(evt.data);
-				//console.log(evt.data);
-			}	
-		}
-		ws.onopen = function () {
-		}
-		ws.onclose = function () {
-		}			
-		ws.onerror = function () {
-		}	
-	}
-    this.Send = function (e) {  
-    	msg = e;
-    	this.mysend(e);
-    }  
-	this.mysend = function (e) {  
-		if(ws){
-    		setTimeout(function () {
-				if(e.match("position")){
-					var command = new commandhistory;
-					command.index = movesIndex;
-					command.board = e;
-					command.result = [];
-					comm.historylist[movesIndex] = command;
-					var a = {};
-					a.type = 0;
-					a.id = uuid;
-					a.computer = computer;
-					a.power = power;
-					a.index = movesIndex;
-					a.isVerticalReverse = isVerticalReverse;
-					a.command = e;
-					a.time = new Date().getTime();
-					var o = JSON.stringify(a);
-					ws.send(o);					
-				}	
-				else{
-					//ws.send(e);
 				}
 			}, 1000);	
     	}        
@@ -161,7 +105,6 @@ function CheckReturn() {
 }
 function sendMessage(e){
 	myws.Send(e);
-	mywstest.Send(e);
 	console.log(e);
 }
 function loadConfig() {
@@ -179,10 +122,7 @@ function loadConfig() {
     
     /*初始化*/
     myws = new MyWebsocket('ws://47.96.137.194:9002/',!0);
-   // myws = new MyWebsocket('ws://118.190.46.210:9002/',!0);
     myws.initWebsocket();
-    mywstest = new MyTestWebsocket('ws://47.96.137.194:9003/',!0);
-    mywstest.initWebsocket();
     /*启动定时器，检查超时*/
     interval = setInterval(CheckReturn, 1000);	    
     mode = playmode.AIPLAY;    

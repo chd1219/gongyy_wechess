@@ -73,6 +73,17 @@ onRegret = function () {
 	}
 	replayBtnUpdate();
 }
+/*悔棋*/
+onCreateRegret = function () {
+	if (movesIndex > 0) {
+		movesIndex -= 1;
+		comm.gotoStep(moves, movesIndex);			
+		comm.nodes.length = movesIndex+1;
+		comm.nodes[movesIndex].child = [];
+		id -= 1;
+	}
+	replayBtnUpdate();
+}
 /*发送棋谱*/
 onSend = function (e) {
 	var a = {};
@@ -292,6 +303,10 @@ onAutoreplay = function () {
 }
 /*响应下一步按钮*/
 onReplayNext = function () {
+	cleanChessdbDetail();
+	setTimeout(replayNextset, 200);
+}
+replayNextset = function () {
 	if(waitServerPlay) {
 		showFloatTip("电脑思考中,请稍后重试");
 		return;
@@ -299,15 +314,13 @@ onReplayNext = function () {
 	if (comm.isAnimating) {
 		return;		
 	}
-	cleanChessdbDetail();
-	cleanComputerDetail();
+	cleanDetail();
 	drawLinetmp = [];
 	if (!relayNextLock) {
-		relayNextLock = 1;
-		waitServerPlay = !0;
-		relayNextLock = 0;
+		relayNextLock = 1;		
 		if (b_autoset != 0 && r_autoset != 0) {
 			showFloatTip("请取消电脑思考，再点击下一步");
+			relayNextLock = 0;
 			return;
 		}		
 		var nextpace = [];
@@ -337,11 +350,12 @@ onReplayNext = function () {
 				var ss = ("#BranchPath_") + j;
 				$(ss).one('click', function () {
 					inx = this.getAttribute("id").split("_")[1];
-					var childID = comm.nodes[currentId].child[inx-1];
+					var childID = comm.nodes[currentId].child[inx];
 					var step = comm.nodes[childID].step;
 					Player.stepPlay(step);
 					movesIndex++;
 					currentId = childID;
+					replayBtnUpdate();
 					$("#nextstepdialog").trigger("myclick");
 					/*自动播放控制*/
 					if (autoreplayset != 0) {
@@ -358,6 +372,7 @@ onReplayNext = function () {
 				cleanLine();
 			});
 		}
+		relayNextLock = 0;
 	}
 	replayBtnUpdate();
 }
@@ -375,8 +390,7 @@ onReplayPrev = function () {
 		OnTimer();
 		return;
 	}
-	cleanChessdbDetail();
-	cleanComputerDetail();
+	cleanDetail();
 	drawLinetmp = [];
 	if (!relayPrevLock) {
 		relayPrevLock = 1;
@@ -403,8 +417,7 @@ onReplayFirst = function () {
 	if (comm.isAnimating) {
 		return;		
 	}
-	cleanChessdbDetail();
-	cleanComputerDetail();
+	cleanDetail();
 	drawLinetmp = [];
 	if (b_autoset != 0 && r_autoset != 0) {
 		showFloatTip("请取消电脑思考，再点击开局");
@@ -424,8 +437,7 @@ onReplayEnd = function () {
 	if (comm.isAnimating) {
 		return;		
 	}
-	cleanChessdbDetail();
-	cleanComputerDetail();
+	cleanDetail();
 	drawLinetmp = [];
 	if (b_autoset != 0 && r_autoset != 0) {
 		showFloatTip("请取消电脑思考，再点击终局");
