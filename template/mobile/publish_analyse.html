@@ -49,12 +49,8 @@
             loader.loadFile({src: CDN_PATH + "libs/jquery-2.1.0.min.js"});
             loader.loadFile({src: CDN_PATH + "libs/md5.min.js"});
             loader.loadFile({src: CDN_PATH + "libs/reconnecting-websocket.min.js"});
+            loader.loadFile({src: CDN_PATH + "libs/mobile-detect.min.js"});
             loader.loadFile({src: CDN_PATH + "js/ScaleBitmap.min.js"});
-//          loader.loadFile({src: CDN_PATH + "js/AI.js"});
-//          loader.loadFile({src: CDN_PATH + "js/play.js"});
-//          loader.loadFile({src: CDN_PATH + "js/bill.js"});
-//          loader.loadFile({src: CDN_PATH + "js/comm.js"});
-//          loader.loadFile({src: CDN_PATH + "js/init.analyse.20170806.js"});
 			loader.loadFile({src: CDN_PATH + "js/MVC/global.js"});
 			loader.loadFile({src: CDN_PATH + "js/MVC/Model.js"});
 			loader.loadFile({src: CDN_PATH + "js/MVC/View.js"});
@@ -221,7 +217,9 @@
                                 <a class="mui-control-item mui-active" href="#computerDetailDiv">
                                     思考细节
                                 </a>
-
+								<a class="mui-control-item" href="#openbookDetailDiv">
+                                    开局库
+                                </a>
                             </div>
                             <div id="chessdbDetailDiv" class="mui-control-content">
                                 <table class="table table-bordered table-striped" id="chessdbDetail">
@@ -265,7 +263,31 @@
                                     </tbody>
                                 </table>
                             </div>
-
+							<div id="openbookDetailDiv" class="mui-control-content">
+                                <table class="table table-bordered table-striped" id="openbookDetail">
+                                    <thead>
+                                        <tr>                                            
+                                            <th>
+                                                着法
+                                            </th>
+                                            <th>
+                                                分数
+                                            </th>
+                                            <th>
+                                                胜
+                                            </th>
+                                            <th>
+                                                和
+                                            </th>
+                                            <th>
+                                                负
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="openbookDetailTbody">                               
+                                    </tbody>
+                                </table>
+                            </div>
                             <div class="wgo-help" style="display: none;"></div>
                             <div class="wgo-notification" style="display: none;"></div>
                             <div class="wgo-comment-text"></div>
@@ -302,7 +324,7 @@
     <span>分析模式</span>
     <button id="analyseBtn" style="display:none"></button>
 
-    <div class="mui-switch" id='analyseTog'>
+    <div class="mui-switch mui-active" id='analyseTog'>
         <div class="mui-switch-handle"></div>
     </div>          
 </li>
@@ -356,11 +378,11 @@
     </div>
     <div id="forward" class="mui-popover mui-popover-action mui-popover-bottom" style="display: none;">
         <ul class="mui-table-view">
-
+			<!--
 			<li class="mui-table-view-cell">
                 <a id="errordataBtn" href="#">重新计算</a>
             </li>
-            
+            -->
             <li class="mui-table-view-cell">
                 <a id="promptBtn" href="#">注释</a>
             </li>

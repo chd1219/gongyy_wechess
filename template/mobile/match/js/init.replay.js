@@ -98,21 +98,23 @@ function initLayer(e) {
     loadConfig()
 }
 function analyse() {
-	initWebsocket();
-	mode = 5;
-	isanalyse = 1;
-	playmode = 4;
-	tmpmovesIndex = movesIndex;
-	tmpId = currentId;
-	tmppaceEx = comm.arr2Clone(bill.paceEx);
- 	$("#board").css({"top":"50px"});
-	$("#analyse").hide();
-	$("#exit_analyse").show();
-	$("#liveroom-info").hide();
-	$("#mui-toast-container").hide();	 
-	$(".wgo-commentbox").hide();	 
-	$(".mode4").show();
-	bill.replayBtnUpdate();
+	
+	window.location.href="http://westudy.chinaxueyun.com/app/index.php?i=5&c=entry&op=analyse&do=publish&m=gongyy_wechess&fen="+comm.getBoard()+"&reverse="+comm.getReverse();
+//	initWebsocket();
+//	mode = 5;
+//	isanalyse = 1;
+//	playmode = 4;
+//	tmpmovesIndex = movesIndex;
+//	tmpId = currentId;
+//	tmppaceEx = comm.arr2Clone(bill.paceEx);
+// 	$("#board").css({"top":"50px"});
+//	$("#analyse").hide();
+//	$("#exit_analyse").show();
+//	$("#liveroom-info").hide();
+//	$("#mui-toast-container").hide();	 
+//	$(".wgo-commentbox").hide();	 
+//	$(".mode4").show();
+//	bill.replayBtnUpdate();
 }
 function exitanalyse() {
 	if (ws) {

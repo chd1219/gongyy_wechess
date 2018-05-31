@@ -693,7 +693,7 @@ comm.replayBtnUpdate = function() {
     $("#tipsInfo").text("第" + movesIndex + "步 / 总" + moves.length + "步"),	
     $("#tipsInfo").show();
 	if(comm.notes[movesIndex]){
-		$("#noteInfo").text(comm.notes[movesIndex]),
+		$("#noteInfo").text(comm.unescapeHTM(comm.notes[movesIndex])),
 		$("#noteInfo").show()
 	}else{
 		$("#noteInfo").hide()
@@ -1062,6 +1062,59 @@ comm.getTips = function(e) {
     o.addChild(e),
     o
 };
+/*获取棋盘取反状态*/
+comm.getReverse = function () {
+	for (var i=0;i<3;i++) {
+		for (var j=3;j<6;j++) {
+			if (bill.map[i][j] == "J0") {
+				return !1;
+			}
+		}
+	}
+	return !0;
+}
+/*getFenKey*/
+comm.getFenKey = function (e) {
+	var key={"J0":"k","X0":"b","X1":"b","S0":"a","S1":"a","Z0":"p","Z1":"p","Z2":"p","Z3":"p","Z4":"p","C0":"r","C1":"r","M0":"n","M1":"n","P0":"c","P1":"c","j0":"K","x0":"B","x1":"B","s0":"A","s1":"A","z0":"P","z1":"P","z2":"P","z3":"P","z4":"P","c0":"R","c1":"R","m0":"N","m1":"N","p0":"C","p1":"C"}[e] || "";
+	return key;
+}
+/*将棋盘数组转化成FEN格式*/
+comm.getBoard= function (){
+	comm.getReverse() ? map = comm.arrReverse(bill.map) : map = comm.arr2Clone(bill.map);
+	var key = "";
+	var coutZero = 0;
+	var board = "";
+	for(var i=0;i<10;i++){
+		coutZero = 0;
+		for(var j=0;j<9;j++){
+			key = map[i][j];
+		
+			if(!key){
+				coutZero++;
+				continue;
+			}			
+			if(coutZero > 0){
+				board += ""+coutZero;
+				coutZero = 0;
+			}					
+			board += comm.getFenKey(key);
+		}
+		if(coutZero > 0){
+			board += ""+coutZero;
+			coutZero = 0;
+		}
+		if(i < (map.length-1)){			
+			board += "/";
+		}		
+	}
+	board += " w";
+	return board;
+}
+//unescapeHTML 还原html脚本
+comm.unescapeHTML = function(a){
+    a = "" + a;
+    return a.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&apos;/g, "'");
+}
 //把坐标生成着法
 comm.createMove = function (map,x,y,newX,newY){
     var h="";   

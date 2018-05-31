@@ -724,7 +724,7 @@ bill.cleanLine = function () {
             note = $('#notetext').val();
             if (note) {
                 bill.notes[currentId] = note;
-                $("#noteInfo").text(note);
+                $("#noteInfo").text(comm.unescapeHTM(note));
                 //$("#noteInfo").show();
                 $("#noteInfo").parent('.mui-toast-container').addClass('mui-active');
             }
@@ -777,6 +777,10 @@ bill.cleanLine = function () {
 		}
 		
     },
+    bill.unescapeHTML = function(a){
+	    a = "" + a;
+	    return a.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&apos;/g, "'");
+	},
     bill.replayNextset = function () {
         if (b_autoset != 0 || r_autoset != 0) {
             showFloatTip("请取消电脑思考，再点击下一步");	
@@ -943,7 +947,7 @@ bill.cleanLine = function () {
         $("#tipsInfo").text("第" + movesIndex + "步 / 总" + count + "步"),
             $("#tipsInfo").show();
         if (bill.notes[currentId]) {
-            $("#noteInfo").text(bill.notes[currentId]),
+            $("#noteInfo").text(bill.unescapeHTML(bill.notes[currentId])),
                 //$("#noteInfo").show()
                 $("#noteInfo").parent('.mui-toast-container').addClass('mui-active');
         } else {

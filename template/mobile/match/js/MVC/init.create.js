@@ -38,7 +38,7 @@ onload = function() {
     $("#reveseBtn").on('tap', onReverse),    
     $("#fullBtn").on('tap', onFullBroad),
     $("#clearBtn").on('tap', onCleanBroad),               
-    $("#saveBtn").on('tap', onSave);      
+    $("#saveBtn").on('tap', onSaveCreate);      
 }
 function Setting() {
 	timingBegins = !0;

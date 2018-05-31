@@ -6,7 +6,7 @@
 		$msg = json_decode($value);
 		$key = $msg->command;
 		$fen = substr($key,13,strlen($key)-13);
-		
+		$vkey = myext_helloworld($fen);	
 		if($msg->type == 0) {
 			$power = $msg->power;
 			switch ($power) {
@@ -42,10 +42,10 @@
 		$redisRead = new Redis();
 		$redisRead->connect('47.96.26.54', 8641);
 		$redisRead->auth("jiao19890228");	
-	    if($redisRead->exists($fen)) {
-	    	$len = $redisRead->lSize($fen);
+	    if($redisRead->exists($vkey)) {
+	    	$len = $redisRead->lSize($vkey);
 			$index = rand(0, $len);
-			$json_arr = $redisRead->lGet($fen,$index);
+			$json_arr = $redisRead->lGet($vkey,$index);
 			$json_obj = json_encode($json_arr);
 	    }
 		else {

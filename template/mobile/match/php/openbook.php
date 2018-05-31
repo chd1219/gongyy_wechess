@@ -7,7 +7,7 @@
 		$key = $msg->command;
 		$fen = substr($key,9,strlen($key)-9);
 		$redisRead2 = new Redis();
-		$redisRead2->connect('47.96.26.54', 8643);
+		$redisRead2->connect('47.96.28.91', 8642);
 		$redisRead2->auth("jiao19890228");	
 		$vkey = myext_helloworld($fen);		
 		if($redisRead2->exists($vkey)) {

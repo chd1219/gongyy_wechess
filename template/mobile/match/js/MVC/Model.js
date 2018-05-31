@@ -194,10 +194,6 @@ onEditboard = function () {
 		clearInterval(r_autoset),
 		r_autoset = 0;
 	}
-	if ($("#analyseTog").hasClass('mui-active')) {
-		$("#analyseTog").removeClass('mui-active');
-		$("#analyseTog").html('<div class="mui-switch-handle"></div>');
-	}
 	if ($("#blackautoplayTog").hasClass('mui-active')) {
 		$("#blackautoplayTog").removeClass('mui-active');
 		$("#blackautoplayTog").html('<div class="mui-switch-handle"></div>');
@@ -477,7 +473,34 @@ onSave = function () {
 		$("#verticalreverseTog").html('<div class="mui-switch-handle" style="transition-duration: 0.2s; transform: translate(43px, 0px);"></div>');
 	}
 	mui('#delete').popover('toggle');	
-	resizeCanvasAnalyse();
+	resizeCanvasAnalyse();	
+	onAnalyse();
+}
+/*保存棋盘*/
+onSaveCreate = function () {
+	if (comm.checkJiang() == !1) {
+		showFloatTip("开局不能将");
+		return;
+	}
+	comm.cMap = comm.arr2Clone(comm.map),
+	cleanChess(),
+	cleanChessEx();
+	mode = playmode.CREATE;
+	Board.init();
+	comm.init(3, comm.map, !0);	
+	movesIndex = 0,
+	comm.pace = [],
+	comm.moves = [],
+	comm.notes = [];
+	replayBtnUpdate();
+
+	/*方便用户设置*/
+	if (isVerticalReverse) {
+		$("#verticalreverseTog").addClass('mui-active');
+		$("#verticalreverseTog").html('<div class="mui-switch-handle" style="transition-duration: 0.2s; transform: translate(43px, 0px);"></div>');
+	}
+	mui('#delete').popover('toggle');	
+	resizeCanvasCreate();
 }
 /*注释*/
 onNote = function () {
@@ -522,7 +545,7 @@ onFullBroad = function (e) {
 }
 /*解析消息*/
 onMessage = function (e) {
-	comm.ParseMsg(e);
+	comm.ParseMsg(e);	
 }
 /*是否显示箭头*/
 OnshowArrow = function () {
@@ -562,6 +585,22 @@ OnshowArrow = function () {
 			break;
 	}	
 }
+/*是否显示提示*/
+OnshowAIInfo = function () {
+	isShowArrow = (isShowArrow+1)%2;
+	if(isShowArrow){
+		showFloatTip("隐藏提示");
+		$("#chessdbDetailTbody").hide();		
+		$("#computerDetailTbody").hide();		
+		$("#openbookDetailTbody").hide();		
+	}
+	else {
+		showFloatTip("显示提示");
+		$("#chessdbDetailTbody").show();		
+		$("#computerDetailTbody").show();		
+		$("#openbookDetailTbody").show();
+	}	
+}
 /*反馈错误数据*/
 onErrordata = function() {
 	if (msg) {		
@@ -570,34 +609,36 @@ onErrordata = function() {
 		if (mode == playmode.AIPLAY) {
 			showFloatTip("已删除错误数据,请重走!");
 			onRegret();
-			var _json = {"id": uuid, "msg": msg};
-			$.ajax({
-				type: "POST",
-				url: "http://westudy.chinaxueyun.com/addons/gongyy_wechess/template/mobile/match/deletedata.php",
-				dataType: "json",
-				data: _json,
-				success: function (data) {	
-						
-				},
-				error: function (response, status, xhr) {			
-				}
-			})			
+			comm.reCompute();
+//			var _json = {"id": uuid, "msg": msg};
+//			$.ajax({
+//				type: "POST",
+//				url: "http://westudy.chinaxueyun.com/addons/gongyy_wechess/template/mobile/match/deletedata.php",
+//				dataType: "json",
+//				data: _json,
+//				success: function (data) {	
+//						
+//				},
+//				error: function (response, status, xhr) {			
+//				}
+//			})			
 		}
 		else {
 			if (isanalyse) {
 				showFloatTip("重新思考中!");
-				var _json = {"id": uuid, "msg": msg};
-				$.ajax({
-					type: "POST",
-					url: "http://westudy.chinaxueyun.com/addons/gongyy_wechess/template/mobile/match/php/deletedata.php",
-					dataType: "json",
-					data: _json,
-					success: function (data) {	
-						myws.Send(msg);		
-					},
-					error: function (response, status, xhr) {			
-					}
-				})			
+				comm.reCompute();
+//				var _json = {"id": uuid, "msg": msg};
+//				$.ajax({
+//					type: "POST",
+//					url: "http://westudy.chinaxueyun.com/addons/gongyy_wechess/template/mobile/match/php/deletedata.php",
+//					dataType: "json",
+//					data: _json,
+//					success: function (data) {	
+//						myws.Send(msg);		
+//					},
+//					error: function (response, status, xhr) {			
+//					}
+//				})			
 			}
 			else {
 				showFloatTip("请打开分析模式后再使用!");

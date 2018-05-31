@@ -58,6 +58,7 @@
             loader.loadFile({src: CDN_PATH + "libs/jquery-2.1.0.min.js"});
             loader.loadFile({src: CDN_PATH + "libs/md5.min.js"});
             loader.loadFile({src: CDN_PATH + "libs/reconnecting-websocket.min.js"});
+            loader.loadFile({src: CDN_PATH + "libs/mobile-detect.min.js"});
             loader.loadFile({src: CDN_PATH + "js/ScaleBitmap.min.js"});
 			loader.loadFile({src: CDN_PATH + "js/MVC/global.js"});
 			loader.loadFile({src: CDN_PATH + "js/MVC/Model.js"});
@@ -139,7 +140,6 @@
             text-align: center;
             color: #333;
             font-size: 0.75em;
-            margin-top:20px;
         }
 
         table tr{
@@ -213,10 +213,44 @@
                 <div class="mode4 wgo-commentbox" style="display:none;">
                     <div class="wgo-box-wrapper wgo-comments-wrapper" id="wgo-box-bottom" style="height: 292px;">
                         <div class="downloadDDiv" id="btn_download">
-                            <p id="AIThink" style="text-align:center;top:2px"></p></div>
-                            <div class="wgo-comments-content" style="top: 1.2rem;">
+                            <p id="AIThink" style="text-align:center;top:2px"></p>
+                        </div>
+               
+                        <div class="wgo-comments-content" style="top: 1.2rem;">
+                            <div id="segmentedControl"
+                                class="mui-segmented-control mui-segmented-control-inverted mui-segmented-control-primary">
+                                <a class="mui-control-item" href="#chessdbDetailDiv">
+                                    云库信息
+                                </a>
+                                <a class="mui-control-item mui-active" href="#computerDetailDiv">
+                                    思考细节
+                                </a>
+								<a class="mui-control-item" href="#openbookDetailDiv">
+                                    开局库
+                                </a>
                             </div>
-
+                            <div id="chessdbDetailDiv" class="mui-control-content">
+                                <table class="table table-bordered table-striped" id="chessdbDetail">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                着法
+                                            </th>
+                                            <th>
+                                                排序
+                                            </th>
+                                            <th>
+                                                分数
+                                            </th>
+                                            <th>
+                                                备注
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="chessdbDetailTbody" style="display:none;">                               
+                                    </tbody>
+                                </table>
+                            </div>
                             <div id="computerDetailDiv" class="mui-control-content  mui-active">
                                 <table class="table table-bordered table-striped mui-active" id="computerDetail">
                                     <thead>
@@ -233,14 +267,40 @@
                                             </th>
                                         </tr>
                                     </thead>
-                                    <tbody id="computerDetailTbody">                               
+                                    <tbody id="computerDetailTbody" style="display:none;">                               
                                     </tbody>
                                 </table>
                             </div>
+							<div id="openbookDetailDiv" class="mui-control-content">
+                                <table class="table table-bordered table-striped" id="openbookDetail">
+                                    <thead>
+                                        <tr>                                            
+                                            <th>
+                                                着法
+                                            </th>
+                                            <th>
+                                                分数
+                                            </th>
+                                            <th>
+                                                胜
+                                            </th>
+                                            <th>
+                                                和
+                                            </th>
+                                            <th>
+                                                负
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="openbookDetailTbody" style="display:none;">                               
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="wgo-help" style="display: none;"></div>
+                            <div class="wgo-notification" style="display: none;"></div>
+                            <div class="wgo-comment-text"></div>
                         </div>
                     </div>
-
-
                 </div>
             </div>
         </div>
@@ -256,11 +316,11 @@
         <form class="mui-input-group">
             <div class="mui-input-row mui-radio" id="red">
                 <label>电脑执红</label>
-                <input name="computer" type="radio" value="red" checked>
+                <input name="computer" type="radio" value="red">
             </div>
             <div class="mui-input-row mui-radio" id="black">
                 <label>电脑执黑</label>
-                <input name="computer" type="radio" value="black" >
+                <input name="computer" type="radio" value="black" checked>
             </div>
 
         </form>
@@ -323,15 +383,15 @@
     </div>
     <div id="forward" class="mui-popover mui-popover-action mui-popover-bottom" style="display: none;">
         <ul class="mui-table-view">
-
+			<!--
 			<li class="mui-table-view-cell">
                 <a id="errordataBtn" href="#">重新计算</a>
             </li>
-            
+            -->
             <li class="mui-table-view-cell">
                 <a id="sendBtn" href="#">保存棋谱</a>
             </li>
-
+			
 
             <li class="mui-table-view-cell">
 

@@ -282,8 +282,10 @@ Player.PointIn2In = function (src, dst) {
 	else {
 		var nowMan = Player.getMan(src);
 		if (Player.indexOfPs(Player.getNowMan().ps, [dst.x, dst.y])) {
-			Player.AIclickPoint(dst);
 			move = {src, dst};
+			step = comm.XY2Step(move);
+			comm.showStep(step);			
+			Player.AIclickPoint(dst);
 			Player.stepEnd(move);
 		}
 	}
@@ -460,6 +462,8 @@ Player.serverAIPlay = function(step,type) {
         var key = comm.map[move.src.y][move.src.x];
         comm.nowManKey = key;
         key = comm.map[move.dst.y][move.dst.x];
+		comm.showStep(step);		
+			
 		if (waitServerPlay && Player.indexOfPs(Player.getNowMan().ps, [move.dst.x, move.dst.y])){
 			key ? setTimeout(Player.AIclickMan, 1000, move.dst,type) : setTimeout(Player.AIclickPoint, 1000, move.dst,type);
 			type ? 1 : Player.stepEnd(move);

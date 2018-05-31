@@ -79,16 +79,19 @@
 			 $depth = 17;
 		}
 		$redisRead = new Redis();
-		$redisRead->connect('47.96.28.91', 8641);
-		$redisRead->auth("jiao19890228");	
-	    $json_arr = $redisRead->lrange($fen,0,$depth-1);
-		$arrlen = sizeof($json_arr);
-		
-		if($arrlen > 0) {
-			$json_arr[$arrlen] = "bestmove ".substr( strstr($json_arr[$arrlen-1], ' pv '), 4, 4);
+		$redisRead->connect('47.96.26.54', 8641);
+		$redisRead->auth("jiao19890228");			
+		if($redisRead->exists($fen)) {
 			$redisWrite->select(6);	
 			$redisWrite->incr($today."_redis_".$type);
 		}
+		$json_arr = '';
+//		$json_arr = $redisRead->lrange($fen,0,$depth-1);
+//		$arrlen = sizeof($json_arr);
+//		if($arrlen > 0) {
+//			$json_arr[$arrlen] = "bestmove ".substr( strstr($json_arr[$arrlen-1], ' pv '), 4, 4);			
+//		}
+
 		$json_obj = json_encode($json_arr);
 		
 		$redisWrite->close();

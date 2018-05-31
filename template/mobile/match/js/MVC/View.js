@@ -215,6 +215,34 @@ resizeCanvas = function(){
 	$('.wgo-board').css('height',stageHeight+'px');			
 }
 /*重绘Canvas*/
+resizeCanvasCreate = function () {
+	canvas = document.getElementById("chess");
+	stageWidth = window.screen.width;
+	stageHeight = 0;
+	canvasWidth = window.screen.width - 10;
+	canvasHeight = canvasWidth / 640 * 866;
+	stageHeight = (window.screen.width - 10) / 640 * 706 - 10;	
+
+	if (stageHeight + 100 > window.screen.height) {
+		/*如果屏幕太矮*/
+		stageHeight = window.screen.height - 100;
+		console.log(stageHeight);
+		stageWidth = stageHeight / 706 * 640 + 10;		
+		canvasWidth = stageWidth - 10;
+		canvasHeight = canvasWidth / 640 * 866;
+	}
+
+	canvas.style.width = canvasWidth + 'px';
+	canvas.style.height = canvasHeight + 'px';
+	$('.wgo-board').css('width', stageWidth + 'px');
+	$('.wgo-board').css('height', stageHeight + 'px');
+	$(".mode5").hide();
+	$(".mode4").show();
+	$(document).attr("title", "创建棋谱");
+	$(".mui-title").html("创建棋谱");
+	resizeBoard();
+}
+/*重绘Canvas*/
 resizeCanvasAnalyse = function () {
 	canvas = document.getElementById("chess");
 	stageWidth = window.screen.width;
@@ -259,24 +287,13 @@ resizeCanvasAI = function () {
 
 	canvasWidth = window.screen.width - 10;
 	canvasHeight = canvasWidth / 640 * 866;
-
-	if (mode == playmode.AIPLAY) {
-		stageHeight = (window.screen.width - 10) / 640 * 706 - 10;
-	} else {
-		stageHeight = window.screen.width / 640 * 866;
-	}
+	stageHeight = (window.screen.width - 10) / 640 * 706 - 10;
 
 	if (stageHeight + 100 > window.screen.height) {
 		//如果屏幕太矮
 		stageHeight = window.screen.height - 100;
 		console.log(stageHeight);
-		if (mode == playmode.AIPLAY) {
-
-			stageWidth = stageHeight / 706 * 640 + 10;
-
-		} else {
-			stageWidth = stageHeight / 866 * 640 + 10;
-		}
+		stageWidth = stageHeight / 706 * 640 + 10;
 		canvasWidth = stageWidth - 10;
 		canvasHeight = canvasWidth / 640 * 866;
 	}
@@ -305,6 +322,7 @@ initCanvas = function(e){
 		case playmode.REPLAY:
 			break;
 		case playmode.CREATE:
+			resizeCanvasCreate();
 			break;
 		case playmode.ONLINE:
 			break;
@@ -564,6 +582,7 @@ replayBtnUpdate = function () {
 	
 	if (mode == playmode.AIPLAY) {
 		setEnable("prevBtn",  !isFirst);
+		setEnable("autoreplayBtn", true);
 	}
 	else {
 		setEnable("firstBtn", !isFirst);
@@ -573,9 +592,43 @@ replayBtnUpdate = function () {
 		setEnable("autoreplayBtn", isanalyse);
 	}
 	
-	if (isEnd)
+	if (isEnd) {
 		clearInterval(autoreplayset);
-	movesCount = comm.getMovesLength();
+	}
+	
+	if (mode == playmode.CREATE) {
+		moves = comm.getMoves4Server1();
+		movesCount = moves.length-1;
+		if (movesCount < 0) {
+			movesCount = 0;
+		}
+		if(document.getElementById("chessDetailTbody")){ 
+			chessDetail = '';			
+			for (var a=0;a<movesCount;a++) {
+				changestep = '';	
+				childs = moves[a].child;
+				if(childs.length>1){
+					for (var b=0;b<childs.length;b++){
+						if (childs[b] == moves[a+1].id) {
+							changestep = childs.length+String.fromCharCode((65+b));
+							break;
+						}
+					}			
+				}
+				if(a%2 == 0) {			
+					chessDetail += "<tr><td>" + (parseInt(a/2)+1) + "</td><td>" + moves[a+1].stepcn + "</td><td>" + changestep + "</td></tr>";
+				}		
+				else {
+					chessDetail += "<tr><td>" + "</td><td>" + moves[a+1].stepcn + "</td><td>" + changestep + "</td></tr>";
+				}
+			}		
+			document.getElementById("chessDetailTbody").innerHTML = chessDetail;
+		}
+	}
+	else {
+		movesCount = comm.getMovesLength();
+	}	
+	
 	showThink();
 	if (comm.notes[currentId]) {
 		$("#noteInfo").text(comm.notes[currentId]),
@@ -607,9 +660,9 @@ showThink = function () {
 	if (mode == playmode.AIPLAY) {
 		$("#AIThink").text("第" + movesIndex + "步 / 总" + movesCount + "步    " + "耗时: 红方 "+ playtime.red+"秒/黑方 "+playtime.black+"秒");		
 	}
-	else if (mode == playmode.ANALYSE) {
+	else if (mode == playmode.ANALYSE || mode == playmode.CREATE) {
 		var str;
-		comm.getHold() == BLACK ? str = "黑方思考中。。。" : str = "红方思考中。。。";   
+		comm.getHold() == BLACK ? str = "黑方行棋" : str = "红方行棋";   
 		$("#AIThink").text("第" + movesIndex + "步 / 总" + movesCount + "步    " + str);
 		
 	}
