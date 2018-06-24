@@ -30,7 +30,7 @@ var dot;
 var isanalyse = isanalyse || 0;
 var boardset = {boutside:-1.1, routside:10.3, outsidescale:1.58};
 var playtime = {red:0, black:0};
-var playmode = {AIPLAY:0, EDITBOARD:1, ANALYSE:2, REPLAY:3, CREATE:4, ONLINE:5};
+var playmode = {AIPLAY:0, EDITBOARD:1, ANALYSE:2, REPLAY:3, CREATE:4, ONLINE:5, TEST:6};
 var RED = 1;
 var BLACK = -1;
 var showThinkset = 0;

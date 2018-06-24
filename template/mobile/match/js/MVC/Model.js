@@ -455,6 +455,7 @@ onSave = function () {
 		showFloatTip("开局不能将");
 		return;
 	}
+
 	comm.cMap = comm.arr2Clone(comm.map),
 	cleanChess(),
 	cleanChessEx();
@@ -475,6 +476,35 @@ onSave = function () {
 	mui('#delete').popover('toggle');	
 	resizeCanvasAnalyse();	
 	onAnalyse();
+}
+/*保存棋盘*/
+onSaveTest = function () {
+	if (comm.checkJiang() == !1) {
+		showFloatTip("开局不能将");
+		return;
+	}
+	if(mode == playmode.EDITBOARD){
+		str = '&fen='+comm.getBoard()+'&reverse='+Boolean(isVerticalReverse);
+		//showFloatTip(str);
+		console.log(str);
+		var _json = {"fen": encodeURIComponent(comm.getBoard()) , "reverse": Boolean(isVerticalReverse)};
+		$.ajax({
+			type: "POST",
+			url: saveTestURL,
+			dataType: "text",
+			data: _json,
+			success: function (response, status, xhr) {
+				if(response==1){
+					window.parent.location.href = replayTestURL; 
+					console.log(_json);
+				}
+			},
+			error: function (response, status, xhr) {
+				alert(status);
+			}
+		})
+		
+	}
 }
 /*保存棋盘*/
 onSaveCreate = function () {

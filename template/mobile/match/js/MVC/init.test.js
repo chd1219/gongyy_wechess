@@ -162,19 +162,57 @@ function sendMessage(e){
 	console.log(e);
 }
 function loadConfig() {
-	setEnable("prevBtn", !1);
-	setEnable("nextBtn", !1);
-	setEnable("firstBtn", !1);
-	setEnable("endBtn", !1);
-
-	comm.pace = [];
-	resizeCanvasAI();
-	comm.isPlay = !0;
-	movesIndex = 0
-    //方便用户设置
-    mui('#delete').popover('toggle');   
+	fen = comm.getUrlParam("fen");	
     
-    mode = playmode.AIPLAY;    
+    if(comm.VerifyFEN(fen)){
+    	if ( comm.getUrlParam("create") === "true") {
+    		/*创建棋谱*/
+			onCreate();			
+	    	isVerticalReverse = comm.getUrlParam("reverse")==="false" ? false : true;  
+	    	comm.map = comm.board2map(fen);
+	    	cleanChessEx();
+	    	onEditboard();
+	    	mode = playmode.EDITBOARD;
+    	} 
+    	else{    		
+    		cleanChess();
+			cleanChessEx();
+	    	isVerticalReverse = comm.getUrlParam("reverse")==="false" ? false : true;  
+	    	comm.map = comm.board2map(fen);
+	    	comm.cMap = comm.arr2Clone(comm.map);			
+			Board.init();
+			comm.init(3, comm.map, !0);	
+			movesIndex = 0,
+			comm.pace = [],
+			comm.moves = [],
+			comm.notes = [];
+			replayBtnUpdate();
+	    	setEnable("prevBtn", !1);
+			setEnable("nextBtn", !1);
+			setEnable("firstBtn", !1);
+			setEnable("endBtn", !1);		
+			resizeCanvasAI();
+			comm.isPlay = !0;
+		    //方便用户设置
+		    mui('#delete').popover('toggle');   		    
+		    mode = playmode.AIPLAY;
+    	}     	
+    }
+    else {
+    	setEnable("prevBtn", !1);
+		setEnable("nextBtn", !1);
+		setEnable("firstBtn", !1);
+		setEnable("endBtn", !1);
+	
+		comm.pace = [];
+		resizeCanvasAI();
+		comm.isPlay = !0;
+		movesIndex = 0
+	    //方便用户设置
+	    mui('#delete').popover('toggle');   
+	    
+	    mode = playmode.AIPLAY;    
+    }	
 }
 
 function initLayer(e) {
@@ -201,9 +239,10 @@ onload = function() {
     $("#regretBtn").on('tap', onRegret),
     $("#errordataBtn").on('tap', onErrordata),
     $("#sendBtn").on('tap', onSend),
+    $("#reveseBtn").on('tap', onReverse),   
     $("#fullBtn").on('tap', onFullBroad),
     $("#clearBtn").on('tap', onCleanBroad),               
-    $("#saveBtn").on('tap', onSave);      	
+    $("#saveBtn").on('tap', onSaveTest);      	
 };
 
 function Setting() {
