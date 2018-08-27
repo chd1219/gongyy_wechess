@@ -114,20 +114,31 @@ createManEx = function (e, a, m) {
 }
 /*创建多个棋子*/
 createMansEx = function (e) {
-	for (var m = 0; m < e[0].length; m++) {
-		var o = e[0][m];
-		if (o) {
-			createManEx(o, boardset.boutside, m * boardset.outsidescale);
-			m == 5 ? drawNum(0, m, 5) : drawNum(0, m, 2);
+	var outside = 0;
+	for(var n=0;n<2;n++){
+		n==0? outside = boardset.boutside : outside = boardset.routside;
+		for (var m = 0; m < e[n].length; m++) {
+			var o = e[n][m];
+			if (o) {
+				createManEx(o, outside, m * boardset.outsidescale);
+				drawNum(n, m, comm.sMapList[o.slice(0, 1)].length);
+			}
 		}
 	}
-	for (var m = 0; m < e[1].length; m++) {
-		var o = e[1][m];
-		if (o) {
-			createManEx(o, boardset.routside, m * boardset.outsidescale);
-			m == 5 ? drawNum(1, m, 5) : drawNum(1, m, 2);
-		}
-	}
+//	for (var m = 0; m < e[0].length; m++) {
+//		var o = e[0][m];
+//		if (o) {
+//			createManEx(o, boardset.boutside, m * boardset.outsidescale);
+//			m == 5 ? drawNum(0, m, 5) : drawNum(0, m, 2);
+//		}
+//	}
+//	for (var m = 0; m < e[1].length; m++) {
+//		var o = e[1][m];
+//		if (o) {
+//			createManEx(o, boardset.routside, m * boardset.outsidescale);
+//			m == 5 ? drawNum(1, m, 5) : drawNum(1, m, 2);
+//		}
+//	}
 }
 /*添加棋子*/
 addChess = function (e) {

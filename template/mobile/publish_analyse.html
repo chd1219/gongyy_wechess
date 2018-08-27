@@ -9,10 +9,10 @@
 
 
     <script type="text/javascript" src="{MODULE_URL}template/mobile/js/zepto.js"></script>
-    <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script src="{MODULE_URL}template/mobile/lib/jweixin-1.0.0.js"></script>
     <script type="text/javascript" src="{MODULE_URL}template/mobile/js/mui.min.js"></script>
     <link href="{MODULE_URL}template/mobile/match/css/chess.css" rel="stylesheet" type="text/css">
-    <script src="{MODULE_URL}template/mobile/match/js/settings.js"></script>
+    <script src="{MODULE_URL}template/mobile/match/js/settings.js?version={$version}"></script>
     <script src="{MODULE_URL}template/mobile/match/libs/preloadjs-0.6.1.min.js"></script>
 
     <script type="application/javascript">
@@ -36,41 +36,55 @@
 
             var date = new Date();
             startLoadTime = date.getTime();
-
+			var ua = navigator.userAgent;
             var loader = new createjs.LoadQueue(false, null, "");
 
             loader.addEventListener("fileload", handleFileLoad);
             loader.addEventListener("complete", handleComplete);
 
-            loader.loadFile({src: CDN_PATH + "libs/easeljs-0.8.1." + JS_VER + ".js"});
-            loader.loadFile({src: CDN_PATH + "libs/tweenjs-0.6.1." + JS_VER + ".js"});
-            loader.loadFile({src: CDN_PATH + "libs/movieclip-0.8.1." + JS_VER + ".js"});
-            loader.loadFile({src: CDN_PATH + "libs/soundjs-0.6.1." + JS_VER + ".js"});
-            loader.loadFile({src: CDN_PATH + "libs/jquery-2.1.0.min.js"});
-            loader.loadFile({src: CDN_PATH + "libs/md5.min.js"});
-            loader.loadFile({src: CDN_PATH + "libs/reconnecting-websocket.min.js"});
-            loader.loadFile({src: CDN_PATH + "libs/mobile-detect.min.js"});
-            loader.loadFile({src: CDN_PATH + "js/ScaleBitmap.min.js"});
-			loader.loadFile({src: CDN_PATH + "js/MVC/global.js"});
-			loader.loadFile({src: CDN_PATH + "js/MVC/Model.js"});
-			loader.loadFile({src: CDN_PATH + "js/MVC/View.js"});
-			loader.loadFile({src: CDN_PATH + "js/MVC/Control.js"});
-			loader.loadFile({src: CDN_PATH + "js/MVC/Player.js"});
-			loader.loadFile({src: CDN_PATH + "js/MVC/Chess.js"});
-			loader.loadFile({src: CDN_PATH + "js/MVC/init.analyse.js"});
+            loader.loadFile({src: CDN_PATH + "libs/easeljs-0.8.1." + JS_VER + ".js"+'?version={$version}'});
+            loader.loadFile({src: CDN_PATH + "libs/tweenjs-0.6.1." + JS_VER + ".js"+'?version={$version}'});
+            loader.loadFile({src: CDN_PATH + "libs/movieclip-0.8.1." + JS_VER + ".js"+'?version={$version}'});
+            loader.loadFile({src: CDN_PATH + "libs/soundjs-0.6.1." + JS_VER + ".js"+'?version={$version}'});
+            loader.loadFile({src: CDN_PATH + "libs/jquery-2.1.0.min.js"+'?version={$version}'});
+            loader.loadFile({src: CDN_PATH + "libs/md5.min.js"+'?version={$version}'});
+            loader.loadFile({src: CDN_PATH + "libs/reconnecting-websocket.min.js"+'?version={$version}'});
+            loader.loadFile({src: CDN_PATH + "libs/mobile-detect.min.js"+'?version={$version}'});
+            loader.loadFile({src: CDN_PATH + "js/ScaleBitmap.min.js"+'?version={$version}'});
+			loader.loadFile({src: CDN_PATH + "js/MVC/global.js"+'?version={$version}'});
+			loader.loadFile({src: CDN_PATH + "js/MVC/Model.js"+'?version={$version}'});
+			loader.loadFile({src: CDN_PATH + "js/MVC/View.js"+'?version={$version}'});
+			loader.loadFile({src: CDN_PATH + "js/MVC/ZobristTable.js"+'?version={$version}'});
+			if(ua.indexOf('WindowsWechat') > 0){
+            	loader.loadFile({src: CDN_PATH + "js/MVC/Control.old.js"+'?version={$version}'});
+				loader.loadFile({src: CDN_PATH + "js/MVC/Player.old.js"+'?version={$version}'});				
+            }
+			else{
+				loader.loadFile({src: CDN_PATH + "js/MVC/Control.js"+'?version={$version}'});
+				loader.loadFile({src: CDN_PATH + "js/MVC/Player.js"+'?version={$version}'});
+			}			
+			loader.loadFile({src: CDN_PATH + "js/MVC/Chess.js"+'?version={$version}'});
+			loader.loadFile({src: CDN_PATH + "js/MVC/init.analyse.js"+'?version={$version}'});
             loader.loadFile({
                 src: CDN_PATH + "assets/images/chess_slim_atlas_.json",
                 type: "spritesheet",
                 id: "chess_slim_atlas_"
             }, true);
-            loader.loadFile({src: CDN_PATH + "libs/gameRes.min.v1.js"});
+            loader.loadFile({src: CDN_PATH + "libs/gameRes.min.v1.js"+'?version={$version}'});
             loader.loadFile({src: CDN_PATH + "assets/images/f_atlas_.json", type: "spritesheet", id: "f_atlas_"}, true);
 			loader.loadManifest([{src: CDN_PATH + "assets/images/board2.png", id: "Board"}]);
             loader.loadManifest([{src: CDN_PATH + "assets/images/VerticalReverse.png", id: "VerticalReverseBoard"}]);
-            var ua = navigator.userAgent;
+            
             
         }
 
+		/*获取URL参数*/
+		function getUrlParam(e) {
+		    var a = new RegExp("(^|&)" + e + "=([^&]*)(&|$)"),
+		    m = window.location.search.substr(1).match(a);
+		    return null != m ? unescape(m[2]) : null
+		}
+		
         function handleFileLoad(evt) {
             fileLoaded(evt);
 
@@ -80,6 +94,7 @@
         }
 
         function handleComplete(evt) {
+        	
             var now = new Date();
 
             fullLoadTime = now.getTime() - startLoadTime;
@@ -87,9 +102,9 @@
 
             console.log('fullLoadTime', fullLoadTime);
             //showTip('全部加载完毕。耗时ms：'+duration);
-
+			
             initLayer(evt);
-
+			
             var isIP4 = window.screen.height == 480;
 
             if (isIP4) {
@@ -113,12 +128,12 @@
 //          }
         }
 
-        var fileTotal = 17;
+        var fileTotal = 21;
         var fileCurrent = 0;
 
         function fileLoaded(event) {
             fileCurrent++;
-
+			
             var per = Math.min(Math.round(fileCurrent / fileTotal * 100), 100);
             document.getElementById('percent').innerText = ('加载中...' + per + '%');
 
@@ -378,11 +393,10 @@
     </div>
     <div id="forward" class="mui-popover mui-popover-action mui-popover-bottom" style="display: none;">
         <ul class="mui-table-view">
-			<!--
-			<li class="mui-table-view-cell">
+
+			<li class="mui-table-view-cell" id="errordata" style="display:none">
                 <a id="errordataBtn" href="#">重新计算</a>
             </li>
-            -->
             <li class="mui-table-view-cell">
                 <a id="promptBtn" href="#">注释</a>
             </li>

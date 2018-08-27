@@ -1,758 +1,758 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>{if !empty($title)}{$title} - {/if}{$setting['sitename']} - {$_W['uniaccount']['name']}</title>
-    {php echo register_jssdk(false);}
-    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
-    <script type="text/javascript" src="{MODULE_URL}template/mobile/lib/flexible/flexible_new.js"></script>
-    
-    <link rel="stylesheet" href="{MODULE_URL}template/mobile/css/mui.css">
-    <script type="text/javascript" src="{MODULE_URL}template/mobile/js/zepto.js"></script>
-    <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
-    <script type="text/javascript" src="{MODULE_URL}template/mobile/js/mui.min.js"></script>
-    <link rel="stylesheet" href="{MODULE_URL}template/mobile/css/extraico.css">
-    <link href="{MODULE_URL}template/mobile/match/css/chess.css" rel="stylesheet" type="text/css">
-    <link href="{MODULE_URL}template/mobile/css/header.css" rel="stylesheet" type="text/css">
-    <script src="{MODULE_URL}template/mobile/match/js/settings.js"></script>
-    <script src="{MODULE_URL}template/mobile/match/libs/preloadjs-0.6.1.min.js"></script>
-
-    <script type="application/javascript">
-        var canvas, stage, exportRoot;
-        var chessLayer,chessTopLayer,chessBottonLayer;
-        var chessdata = $.parseJSON('{$chessdata}');
-
-        var MODE_PLAY = 1;
-        var MODE_REPLAY = 2;
-        var MODE_BILL = 3;
-        var MODE_BILLREPLAY = 4;
-        var mode = 2;
-        var playmode = 1;
-        var file,level_id = -1;
-        var chapterTitle = '';
-        
-        var CDN_PATH = "{MODULE_URL}template/mobile/match/";
-        var JS_VER_COMBINED = 'combined';
-        var JS_VER_MIN = 'min';
-        var JS_VER = JS_VER_MIN;
-        var baseURL = '{MODULE_URL}template/mobile/match/';
-        var REPLAY_GET_URL = 'save/';
-
-        var startLoadTime = 0;
-        var fullLoadTime = 0;
-
-        function init() {
-
-            var date = new Date();
-            startLoadTime = date.getTime();
-
-            var loader = new createjs.LoadQueue(false,null,"");
-
-            loader.addEventListener("fileload", handleFileLoad);
-            loader.addEventListener("complete", handleComplete);
-
-            loader.loadFile({src:CDN_PATH+"libs/easeljs-0.8.1."+JS_VER+".js"});
-            loader.loadFile({src:CDN_PATH+"libs/tweenjs-0.6.1."+JS_VER+".js"});
-            loader.loadFile({src:CDN_PATH+"libs/movieclip-0.8.1."+JS_VER+".js"});
-            loader.loadFile({src:CDN_PATH+"libs/soundjs-0.6.1."+JS_VER+".js"});
-            loader.loadFile({src:CDN_PATH+"libs/jquery-2.1.0.min.js"});
-            loader.loadFile({src:CDN_PATH+"libs/md5.min.js"});
-            loader.loadFile({src:CDN_PATH+"libs/reconnecting-websocket.min.js"});
-            loader.loadFile({src:CDN_PATH+"js/ScaleBitmap.min.js"});
-            loader.loadFile({src:CDN_PATH+"js/AI.js"});
-            loader.loadFile({src:CDN_PATH+"js/bill.replay.js"});
-            loader.loadFile({src:CDN_PATH+"js/play.replay.js"});
-            loader.loadFile({src:CDN_PATH+"js/comm.replay.js"});
-            loader.loadFile({src:CDN_PATH+"js/init.replay.js"});
-            loader.loadFile({src:CDN_PATH+"assets/images/chess_slim_atlas_.json", type:"spritesheet", id:"chess_slim_atlas_"}, true);
-            loader.loadFile({src:CDN_PATH+"libs/gameRes.min.v1.js"});
-            loader.loadFile({src:CDN_PATH+"assets/images/f_atlas_.json", type:"spritesheet", id:"f_atlas_"}, true);
-            var ua = navigator.userAgent;
-            if (/Android (\d+\.\d+)/.test(ua)){
-                loader.loadManifest([{src:CDN_PATH+"assets/images/board2.png", id:"Board"}]);
-				// 其他系统
-			} else {
-				loader.loadManifest([{src:CDN_PATH+"assets/images/board2.png", id:"Board"}]);
-			}
-        }
-
-        function handleFileLoad(evt)
-        {
-            fileLoaded(evt);
-
-            if (evt.item.type == "image") { images[evt.item.id] = evt.result; }
-        }
-
-        function handleComplete(evt)
-        {
-            var now = new Date();
-
-            fullLoadTime = now.getTime() - startLoadTime;
-            fullLoadTime = (fullLoadTime/1000).toFixed(1);
-
-            console.log('fullLoadTime',fullLoadTime);
-            //showTip('全部加载完毕。耗时ms：'+duration);
-
-            initLayer(evt);
-
-            var isIP4 = window.screen.height==480;
-
-            if(isIP4)
-            {
-                if(getEnv() == 'qq')
-                {
-                    $('#chessBox').css('bottom','-10px');
-                    $('#AIThink').css('top','0px');
-                }else if(getEnv() == 'weixin')
-                {
-                    $('#AIThink').css('top','2%');
-                    $('#chessBox').css('bottom','0.2%');
-                }
-            }else{
-                if(getEnv() == 'qq')
-                {
-                    $('#chessBox').css('bottom','3%');
-                    $('#AIThink').css('top','5%');
-                }
-            }
-        }
-
-        var fileTotal = 16;
-        var fileCurrent = 0;
-
-        function fileLoaded(event)
-        {
-            fileCurrent++;
-
-            var per = Math.min(Math.round(fileCurrent/fileTotal*100),100);
-            document.getElementById('percent').innerText = ('加载中...'+per+'%');
-
-        }
-
-    </script>
-    
-</head>
-<body onload="init()">
-    <style>
-        .table {
-            width:100%;
-            text-align: center;
-            color: #333;
-            font-size: 0.75em;
-        }
-
-        table tr{
-            border-top:1px  #0a0a0a solid;
-            border-bottom:1px  #0a0a0a solid;
-        }
-
-        table td{
-            padding:2px;
-        }
-
-        table th{
-            padding:2px;
-        }
-
-    </style>
-    <div class="mui-toast-container"><div class="mui-toast-message"  id="noteInfo">欢迎体验来到象棋微学堂</div></div>
-    <div class="follow_topbar" style="display: none;">
-        <div class="headimg"><img src="{$_W['attachurl']}{$setting['qrcode']}"></div>
-        <div class="info">
-            <div class="i">{$_W['account']['name']}</div>
-            <div class="i">关注公众号，享海量课程</div>
-        </div>
-        <div class="sub" onclick="location.href='{php echo $this->createMobileUrl('follow');}'">立即关注</div>
-    </div>
-    <header id="header" class="mui-bar mui-bar-nav">
-        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
-        <h5 class="mui-title">{$title}</h5>
-        <a class="mui-icon mui-icon-compose mui-pull-right" id="analyse" ></a>
-        <a class="mui-icon mui-icon-closeempty mui-pull-right" id="exit_analyse" style="display: none;"></a>
-    </header>
-
-    <div id="loading" class="loading">
-      <div class="loadingInfo">
-         <div class="logo">
-         </div>
-         <span id="percent" class="percent">
-            加载中...
-        </span>
-    </div>
-</div>
-<div id="nextstepdialog" class="nextstepdialog" style="display: none;">		
-</div>
-
-<div id="liveroom-info" style="margin-top:45px;overflow:hidden">
-
-    <div id="online-player" class="online-player">
-
-        <div class="info_container">
-            <div class="player_info black" data-id="99">
-                <span class="chess"></span>
-                <img src="{$chess['redimg']}">
-                <div class="info_con">
-                    <p class="achieve">红方棋手</p>
-                    <p class="username">
-                        {$chess['redname']}
-                    </p>
-
-                    <span class="support iconfont icon-shouzanhover ">{$chess['redfollowsum']}</span>
-                </div>
-            </div>
-            <div class="player_info iconfont icon-vs73">&nbsp;</div>
-            <div class="player_info white" data-id="16">
-                <span class="chess"></span>
-                <img src="{$chess['blackimg']}">
-                <div class="info_con">
-                    <p class="achieve">黑方棋手</p>
-                    <p class="username">
-                        {$chess['blackname']}
-                    </p>
-
-                    <span class="support iconfont icon-shouzanhover ">{$chess['blackfollowsum']}</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-</div>
-<div id="board" style="width: 100%; max-width: 640px; margin-bottom: 45px; height: 621px;" class="wgo-player-main">
-    <div class="wgo-player-left" style="display: none; height: 525px;">
-        <div class="wgo-player-left-wrapper"></div>
-    </div>
-    <div class="wgo-player-center">
-        <div class="wgo-player-top" style="display: none;">
-            <div class="wgo-player-top-wrapper"></div>
-        </div>
-        <div class="wgo-player-board" style="height: auto;">
-            <div class="wgo-board"
-            style="position: relative;">
-            <canvas id="chess" width="640" height="706"></canvas>
-        </div>
-    </div>
-    <div class="wgo-player-bottom" style="display: block;">
-        <div class="wgo-player-bottom-wrapper">
-            <div class="wgo-player-control">
-                <div class="wgo-control-wrapper">
-                    <div class="wgo-ctrlgroup wgo-ctrlgroup-control">
-                        <a class="mui-tab-item mui-active" href="#delete">
-                            <span class="mui-icon mui-icon-bars"  title="First"></span>
-                        </a>
-
-
-                        <button class="wgo-button wgo-button-multiprev" id="firstBtn" ></button>
-                        <button class="wgo-button wgo-button-previous" id="prevBtn" ></button>
-                        <button class="wgo-button wgo-button-marks"  id="autoreplayBtn"></button>
-                        <button class="wgo-button wgo-button-next" id="nextBtn"></button>
-                        <button class="wgo-button wgo-button-multinext" id="endBtn"></button>
-                        <a class="mui-tab-item mui-active" href="#forward">
-                            <span class="mui-icon mui-icon-more" title="First"></span>
-                        </a>
-
-
-                    </div>
-                </div>
-            </div>
-            <div class="wgo-commentbox">
-
-                <div class="wgo-box-wrapper wgo-comments-wrapper" id="wgo-box-bottom" style="height: 292px;">
-                    <div class="downloadDDiv" id="btn_download"><p id="tipsInfo" style="text-align:center"></p></div>
-                    <ul class="mui-table-view" style="margin-top: 1.2rem;">
-
-
-                        <li class="mui-table-view-cell mui-media" style="padding-right: 0;">
-                            <a href="javascript:;" class="">
-                                <img class="mui-media-object mui-pull-left" style="width: 42px;height: 42px;border-radius: 50%" src="{$thumb}">
-                                <div class="mui-media-body">
-                                    <span class="mui-ellipsis" style="width: 200px;">{$memberinfo['nickname']}</span>
-
-                                    <span style="position:absolute;top:-3px;right:15px;display:none;color:red;">+1</span>
-                                    <span style="position:absolute;top:-3px;right:15px;display:none;color:red;">-1</span>
-                                    <span class="mui-icon-extra mui-icon-extra-like prize" style="float:right; font-size:16px;margin-right: 50px;{if $this->isprized($_W['openid'],$chess['id'])==1}color:red;"{else}color:#999999;"{/if}  type='0'>{$chess['prizesum']}</span>
-                                    <p class="mui-ellipsis" style="margin-top: 5px;"><span>上传于{php echo $this->timeago($chess['addtime']);} </span>| <span class="mui-icon-extra mui-icon-extra-phone" style="font-size:14px;">{$chess['clicksum']}</span> | <span class="mui-icon-extra mui-icon-extra-share" style="font-size:14px;">{$chess['sharesum']}</span></p>    
-                                </div>
-                            </a>
-                        </li>
-
-                    </ul>
-                    <div class="wgo-comments-content">
-
-                        <div class="wgo-comment-text" style="padding: 2px 15px; "></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="mode4 wgo-commentbox" style="display:none;">
-                <div class="wgo-box-wrapper wgo-comments-wrapper" id="wgo-box-bottom" style="height: 292px;">
-                    <div class="downloadDDiv" id="btn_download">
-                        <p id="AIThink" style="text-align:center;top:2px"></p>
-                    </div>
-                    <div class="wgo-comments-content" style="top: 1.2rem;">
-                    </div>
-                    <div id="segmentedControl"
-                    class="mui-segmented-control mui-segmented-control-inverted mui-segmented-control-primary">
-                    <a class="mui-control-item" href="#chessdbDetailDiv">
-                        云库信息
-                    </a>
-                    <a class="mui-control-item mui-active" href="#computerDetailDiv">
-                        思考细节
-                    </a>
-
-                </div>
-                <div id="chessdbDetailDiv" class="mui-control-content">
-                    <table class="table table-bordered table-striped" id="chessdbDetail">
-                        <thead>
-                            <tr>
-                                <th>
-                                    着法
-                                </th>
-                                <th>
-                                    排序
-                                </th>
-                                <th>
-                                    分数
-                                </th>
-                                <th>
-                                    设置
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody id="chessdbDetailTbody">                                
-                        </tbody>
-                    </table>
-                </div>
-                <div id="computerDetailDiv" class="mui-control-content  mui-active">
-                    <table class="table table-bordered table-striped mui-active" id="computerDetail">
-                        <thead>
-                            <tr>
-                                <th>
-                                    深度
-                                </th>
-
-                                <th>
-                                    红方分数
-                                </th>
-                                <th>
-                                    主要变例
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody id="computerDetailTbody">                               
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-</div>
-</div>
-</div>
-<div class="wgo-player-right" style="display: none; height: 525px;">
-    <div class="wgo-player-right-wrapper"></div>
-</div>
-</div>
-
-<div id="delete" class="mui-popover mui-popover-action mui-popover-bottom">
- <ul class="mui-table-view">
-
-    <li class="mui-table-view-cell">
-        <span>上下翻转</span>
-        <button id="verticalreverseBtn" style="display:none"></button>
-        <div class="mui-switch" id="verticalreverseTog">
-            <div class="mui-switch-handle"></div>
-        </div>
-    </li>
-                <!--<li class="mui-table-view-cell">
-                        <span>左右翻转</span>
-                        <button id="horizontalreverseBtn" style="display:none"></button>
-                        <div class="mui-switch" id="horizontalreverseTog">
-                            <div class="mui-switch-handle"></div>
-                        </div>
-                    </li>-->
-                    <li class="mui-table-view-cell">
-                        <span>棋谱音效</span>
-                        <button id="soundBtn" style="display:none"></button>
-                        <div class="mui-switch mui-active" id="soundTog">
-                            <div class="mui-switch-handle"></div>
-                        </div>
-                    </li>
-
-                </ul>
-                <ul class="mui-table-view">
-                    <li class="mui-table-view-cell">
-                       <a href="#delete"><b>关闭</b></a>
-                   </li>
-               </ul>
-           </div>
-           <div id="forward" class="mui-popover mui-popover-action mui-popover-bottom" style="display: none;">
-             <ul class="mui-table-view">
-            	<!--<li class="mui-table-view-cell">
-					<a id="ohmygodBtn" href="#">悔棋</a>
-				</li>-->
-
-
-                <!--怀东：如果点击拆解研究就跳转到相应页面，注意保存当前局面 -->
-
-
-                <li class="mui-table-view-cell" id="li-comment">
-
-                    <a id="comment" href="{php echo $this->createMobileUrl('comment', array('chessid'=>$id));}">评论</a>
-                    
-                </li> 
-
-
-
-
-                
-
-                
-                <li class="mui-table-view-cell" id="li-collect">
-                    {if $this->iscollected($file,$openid) == '1'}
-                    <a id="collect" href="#">已收藏</a>
-                    {else}
-                    <a id="collect" href="#">收藏棋谱</a>
-                    {/if}
-                </li>
-                
-                {if $this->ispublished($file,$openid) == '1'}
-                <li class="mui-table-view-cell">
-
-                   <a id="edit" href="#">编辑信息</a>
-
-               </li>
-               {/if}
-
-               {if $this->ispublished($file,$openid) == '1'}
-               <li class="mui-table-view-cell">
-
-                   <a id="publish" href="#">发布棋谱</a>
-
-               </li>
-               {/if}
-
-               <li class="mui-table-view-cell" id="li-new">
-
-                   <a id="new" href="#">新建棋谱</a>
-
-               </li>
-
-               <li class="mui-table-view-cell" id="li-index">
-
-                <a id="index" href="#">返回首页</a>
-
-            </li>
-
-        </ul>
-        <ul class="mui-table-view">
-            <li class="mui-table-view-cell">
-               <a href="#forward" class="" ><b>取消</b></a>
-           </li>
-       </ul>
-   </div>
-
-
-   <link rel="stylesheet" href="{MODULE_URL}template/mobile/css/mui.min.css">
-   <link rel="stylesheet" type="text/css" href="{MODULE_URL}template/mobile/lib/ggo/ggo.player.css">
-   <link rel="stylesheet" href="{MODULE_URL}template/mobile/css/iconfont.css">
-   <link rel="stylesheet" href="{MODULE_URL}template/mobile/css/wgo_redefine_new.css">
-   <style>
-    .mui-toast-container{
-        width:80%;
-        z-index:20;
-    }
-</style>
-
-
-<script type="text/javascript">
-    wx.ready(function () {
-        var shareData = {
-            title: "{$title}-{$setting['sitename']}-{$_W['account']['name']}",
-            desc: "{$sharedesc}",
-            link: "{$sharechessurl}",
-            imgUrl: "{php echo $sharelogo;}",
-            trigger: function (res) {
-            },
-            complete: function (res) {
-            },
-
-            cancel: function (res) {
-                console.log('cancel');
-            },
-            fail: function (res) {
-            }
-        };
-        wx.onMenuShareTimeline(shareData);
-        wx.onMenuShareAppMessage(shareData);
-        wx.onMenuShareQQ(shareData);
-        wx.onMenuShareWeibo(shareData);
-        wx.onMenuShareQZone(shareData);
-/*        {if !empty($_GPC['u'])}
-            var url = "{php echo $this->createMobileUrl('chess', array('op' => 'click'));}";
-            var chess_openid = "{php echo $_GPC['uid']}";
-            $.post(url,{chess_openid:chess_openid,filename:"{php echo $chess['filename'];}"}, function(dat){
-                console.log($.parseJSON(dat));
-            });
-            {/if}*/
-            shareData.success = function(){
-                var url = "{php echo $this->createMobileUrl('chess', array('op' => 'share'));}";
-                $.post(url,{chess_openid:"{php echo $chess['openid'];}",filename:"{php echo $chess['filename'];}"},function(dat){});
-            }
-
-        });
-    </script>
-
-
-
-    <script>
-
-
-      mui.init({
-
-        gestureConfig:{
-            swipe:false, //启用右滑关闭功能
-        }
-
-    });
-/*        var subWebview = mui.preload({
-                url:"{php echo $this->createMobileUrl('comment', array('chessid'=>$id));}",
-                id:'comment',//默认使用当前页面的url作为id
-                styles:{},//窗口参数
-                extras:{}//自定义扩展参数
-            });*/
-          /*  window.addEventListener("swipeleft",function(){
-              mui.openWindow({
-                url:"{php echo $this->createMobileUrl('comment', array('chessid'=>$id));}",
-                id:'comment'
-            });*/
-        /*var ws=plus.webview.currentWebview();
-        console.log( "窗口标识: "+ws.id );
-        subWebview.show();*/
-
-
-            /*mui.openWindow({
-                id: 'comment',
-                url: "{php echo $this->createMobileUrl('comment', array('chessid'=>$id));}",
-            });*/
-
-           /* var state = {
-                title: 'chess',
-                url:location.href
-            };
-           window.history.pushState(state, 'chess', "{php echo $this->createMobileUrl('comment', array('chessid'=>$id));}");
-           console.log(history.state);
-           //history.go(1);
-           location.reload();*/
-
-
-           mui('body').on('tap', '.mui-popover-action li>a', function() {
-             var a = this,
-             parent;
-			//根据点击按钮，反推当前是哪个actionsheet
-			for (parent = a.parentNode; parent != document.body; parent = parent.parentNode) {
-				if (parent.classList.contains('mui-popover-action')) {
-					break;
-				}
-			}
-			//关闭actionsheet
-			mui('#' + parent.id).popover('toggle');
-			
-		})
-
-
-
-           document.getElementById("collect").addEventListener('tap', function(e) {
-            var myButton  = mui(this);
-            var myButtonforJS =$(this);
-
-            var ajaxurl = "{php echo $this->createMobileUrl('chess', array('op'=>'edit_collect','file'=>$file));}";
-            $.ajax({
-               type:'post',
-               url:ajaxurl,
-               data:{},
-               dataType:'json',     
-               success:function(data){
-
-                  if(data['result']=='2'){
-                     mui.toast("已取消");
-                     myButtonforJS.html('收藏棋谱');
-
-                 }else if(data['result']=='1'){
-
-                     mui.toast("已收藏");
-                     myButtonforJS.html('取消收藏');
-
-                 }
-
-             }
-
-         });
-
-
-
-        });
-           {if $this->ispublished($file,$openid) == '1'}	
-           document.getElementById("publish").addEventListener('tap', function(e) {
-               mui.openWindow({
-                   id: "{php echo $this->createMobileUrl('publish',array('op'=>'release','chessid'=>$chess['id']));}",
-                   url: "{php echo $this->createMobileUrl('publish',array('op'=>'release','chessid'=>$chess['id']));}",
-                   waiting: {
-						autoShow: true,//自动显示等待框，默认为true
-						title: '正在加载...',//等待对话框上显示的提示内容
-
-					}
-				});
-
-           });
-
-           document.getElementById("edit").addEventListener('tap', function(e) {
-               mui.openWindow({
-                   id: "{php echo $this->createMobileUrl('publish',array('op'=>'edit','chessid'=>$chess['id']));}",
-                   url: "{php echo $this->createMobileUrl('publish',array('op'=>'edit','chessid'=>$chess['id']));}",
-                   waiting: {
-						autoShow: true,//自动显示等待框，默认为true
-						title: '正在加载...',//等待对话框上显示的提示内容
-
-					}
-				});
-
-           });
-           {/if}
-
-           document.getElementById("new").addEventListener('tap', function(e) {
-
-               mui.openWindow({
-                   id: "{php echo $this->createMobileUrl('publish',array('op'=>'create'));}",
-                   url: "{php echo $this->createMobileUrl('publish',array('op'=>'create'));}",
-                   waiting: {
-						autoShow: true,//自动显示等待框，默认为true
-						title: '正在加载...',//等待对话框上显示的提示内容
-
-					}
-				});
-
-           });
-           
-
-
-           document.getElementById("comment").addEventListener('tap', function(e) {
-             mui('#forward').popover('hide');
-             mui.openWindow({
-                id: this.href,
-                url: this.href,
-                waiting: {
-                    autoShow: true,//自动显示等待框，默认为true
-                    title: '正在加载...',//等待对话框上显示的提示内容
-
-                }
-            });
-
-         });
-
-           document.getElementById("index").addEventListener('tap', function (e) {
-            mui.openWindow({
-                id: "{php echo $this->createMobileUrl('index');}",
-                url: "{php echo $this->createMobileUrl('index');}",
-                waiting: {
-                autoShow: true,//自动显示等待框，默认为true
-                title: '正在加载...',//等待对话框上显示的提示内容
-
-            }
-        });
-
-        });
-
-
-         /*   document.getElementById("analyse").addEventListener('tap', function(e) {
-               mui.openWindowWithTitle({
-                url:'{php echo $this->createMobileUrl('player',array('op'=>'display'));}',
-                id:'detail'
-            },{
-                title:{//标题配置
-                text:"商品详情",//标题文字
-            },
-            back:{//左上角返回箭头
-                image:{
-                    base64Data:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAMAAABg3Am1AAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAb1BMVEUAAAAAev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8AAACubimgAAAAI3RSTlMAGfUTGfQTGPMSGPIYGhgaGBsXGxcbFxwXHBccFhwWHRYdHWufDPQAAAABYktHRACIBR1IAAAAB3RJTUUH4QETEBwooeTlkQAAAJVJREFUSMft1EkSgkAQRNFGUXFWHBDBibr/HTUwD5B/48Ig1y+io7u6MqUhf5hsNEY+j5hMgZ/FJ8Xc9ovos3T96utjbfqN/Nb0O/m96Uv5g+mP8ifTn+Ur01/ka9Nf5RvTt/I309/lH6Z/yr9Mn+Q71/MT8B34K/E58Enzv8R/K98HvnF8p3lr8F7izce7lbf3kJ/lDQp9HdBhgg3PAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDE3LTAxLTE5VDE2OjI4OjQwKzA4OjAwpTDFwQAAACV0RVh0ZGF0ZTptb2RpZnkAMjAxNy0wMS0xOVQxNjoyODo0MCswODowMNRtfX0AAAAASUVORK5CYII='
-                }
-            }
-            })
-
-         });
-         */
-		//触发	
-
-		
-		document.getElementById("verticalreverseTog").addEventListener("toggle",function(event){
-
-			var btn = document.getElementById("verticalreverseBtn");
-			mui.trigger(btn,'tap');
-
-		});	
-		
-		document.getElementById("soundTog").addEventListener("toggle",function(event){
-
-			var btn = document.getElementById("soundBtn");
-			mui.trigger(btn,'tap');
-
-		});		
-
-       {if $setting['isfollow']==1 && !empty($fans) && $fans['follow']==0}
-       $('.follow_topbar').show();
-       $('header').css('top','44px');
-       $('#liveroom-info').css('margin-top','89px');
-       {else}
-       $('.follow_topbar').hide();
-       $('#liveroom-info').css('top','45px');
-       {/if}
-
-    //点赞
-    mui(document).on('tap', ".prize", function () { 
-        var $this = $(this);
-        var type = $(this).attr('type');
-        var url = "{php echo $this->createMobileUrl('chess', array('op' => 'prize','chessid'=>$chess['id']));}";
-        mui.post(url, {type:type}, function(data, textStatus, xhr) {
-            var data =  eval('(' + data + ')');
-            if(data.type==0){
-                if(data.ptype==1){
-                    $this.html(String(data.prizesum));
-                    $this.prev().css('display','inline');
-                    $this.prev().fadeOut(1000);
-                    $this.css('color','#999999');
-                }
-                if(data.ptype==0){
-                   $this.html(String(data.prizesum));
-                   $this.prev().prev().css('display','inline');
-                   $this.prev().prev().fadeOut(1000);
-                   $this.css('color','red');
-               }
-           }
- /*    踩   
- if(data.type==1){
-            if(data.ttype==1){
-             $this.next().html(String(data.treadsum));
-             $this.prev().css('display','inline');
-             $this.prev().fadeOut(1000);
-             $this.css('color','#999999');
-            }
-            if(data.ttype==0){
-             $this.next().html(String(data.treadsum));
-             $this.prev().prev().css('display','inline');
-             $this.prev().prev().fadeOut(1000);
-             $this.css('color','red');
-            }
-        }*/
-        
-    });
-
-    })
-
-</script>
-
-<script type="text/javascript">
-
-
-</script>
-</body>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>{if !empty($title)}{$title} - {/if}{$setting['sitename']} - {$_W['uniaccount']['name']}</title>
+    {php echo register_jssdk(false);}
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+    <script type="text/javascript" src="{MODULE_URL}template/mobile/lib/flexible/flexible_new.js"></script>
+    
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/css/mui.css">
+    <script type="text/javascript" src="{MODULE_URL}template/mobile/js/zepto.js"></script>
+    <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script type="text/javascript" src="{MODULE_URL}template/mobile/js/mui.min.js"></script>
+    <link rel="stylesheet" href="{MODULE_URL}template/mobile/css/extraico.css">
+    <link href="{MODULE_URL}template/mobile/match/css/chess.css" rel="stylesheet" type="text/css">
+    <link href="{MODULE_URL}template/mobile/css/header.css" rel="stylesheet" type="text/css">
+    <script src="{MODULE_URL}template/mobile/match/js/settings.js"+'?version={$version}'></script>
+    <script src="{MODULE_URL}template/mobile/match/libs/preloadjs-0.6.1.min.js"></script>
+
+    <script type="application/javascript">
+        var canvas, stage, exportRoot;
+        var chessLayer,chessTopLayer,chessBottonLayer;
+        var chessdata = $.parseJSON('{$chessdata}');
+
+        var MODE_PLAY = 1;
+        var MODE_REPLAY = 2;
+        var MODE_BILL = 3;
+        var MODE_BILLREPLAY = 4;
+        var mode = 2;
+        var playmode = 1;
+        var file,level_id = -1;
+        var chapterTitle = '';
+        
+        var CDN_PATH = "{MODULE_URL}template/mobile/match/";
+        var JS_VER_COMBINED = 'combined';
+        var JS_VER_MIN = 'min';
+        var JS_VER = JS_VER_MIN;
+        var baseURL = '{MODULE_URL}template/mobile/match/';
+        var REPLAY_GET_URL = 'save/';
+
+        var startLoadTime = 0;
+        var fullLoadTime = 0;
+
+        function init() {
+
+            var date = new Date();
+            startLoadTime = date.getTime();
+
+            var loader = new createjs.LoadQueue(false,null,"");
+
+            loader.addEventListener("fileload", handleFileLoad);
+            loader.addEventListener("complete", handleComplete);
+
+            loader.loadFile({src:CDN_PATH+"libs/easeljs-0.8.1."+JS_VER+".js"+'?version={$version}'});
+            loader.loadFile({src:CDN_PATH+"libs/tweenjs-0.6.1."+JS_VER+".js"+'?version={$version}'});
+            loader.loadFile({src:CDN_PATH+"libs/movieclip-0.8.1."+JS_VER+".js"+'?version={$version}'});
+            loader.loadFile({src:CDN_PATH+"libs/soundjs-0.6.1."+JS_VER+".js"+'?version={$version}'});
+            loader.loadFile({src:CDN_PATH+"libs/jquery-2.1.0.min.js"+'?version={$version}'});
+            loader.loadFile({src:CDN_PATH+"libs/md5.min.js"+'?version={$version}'});
+            loader.loadFile({src:CDN_PATH+"libs/reconnecting-websocket.min.js"+'?version={$version}'});
+            loader.loadFile({src:CDN_PATH+"js/ScaleBitmap.min.js"+'?version={$version}'});
+            loader.loadFile({src:CDN_PATH+"js/AI.js"+'?version={$version}'});
+            loader.loadFile({src:CDN_PATH+"js/bill.replay.js"+'?version={$version}'});
+            loader.loadFile({src:CDN_PATH+"js/play.replay.js"+'?version={$version}'});
+            loader.loadFile({src:CDN_PATH+"js/comm.replay.js"+'?version={$version}'});
+            loader.loadFile({src:CDN_PATH+"js/init.replay.js"+'?version={$version}'});
+            loader.loadFile({src:CDN_PATH+"assets/images/chess_slim_atlas_.json", type:"spritesheet", id:"chess_slim_atlas_"}, true);
+            loader.loadFile({src:CDN_PATH+"libs/gameRes.min.v1.js"+'?version={$version}'});
+            loader.loadFile({src:CDN_PATH+"assets/images/f_atlas_.json", type:"spritesheet", id:"f_atlas_"}, true);
+            var ua = navigator.userAgent;
+            if (/Android (\d+\.\d+)/.test(ua)){
+                loader.loadManifest([{src:CDN_PATH+"assets/images/board2.png", id:"Board"}]);
+				// 其他系统
+			} else {
+				loader.loadManifest([{src:CDN_PATH+"assets/images/board2.png", id:"Board"}]);
+			}
+        }
+
+        function handleFileLoad(evt)
+        {
+            fileLoaded(evt);
+
+            if (evt.item.type == "image") { images[evt.item.id] = evt.result; }
+        }
+
+        function handleComplete(evt)
+        {
+            var now = new Date();
+
+            fullLoadTime = now.getTime() - startLoadTime;
+            fullLoadTime = (fullLoadTime/1000).toFixed(1);
+
+            console.log('fullLoadTime',fullLoadTime);
+            //showTip('全部加载完毕。耗时ms：'+duration);
+
+            initLayer(evt);
+
+            var isIP4 = window.screen.height==480;
+
+            if(isIP4)
+            {
+                if(getEnv() == 'qq')
+                {
+                    $('#chessBox').css('bottom','-10px');
+                    $('#AIThink').css('top','0px');
+                }else if(getEnv() == 'weixin')
+                {
+                    $('#AIThink').css('top','2%');
+                    $('#chessBox').css('bottom','0.2%');
+                }
+            }else{
+                if(getEnv() == 'qq')
+                {
+                    $('#chessBox').css('bottom','3%');
+                    $('#AIThink').css('top','5%');
+                }
+            }
+        }
+
+        var fileTotal = 16;
+        var fileCurrent = 0;
+
+        function fileLoaded(event)
+        {
+            fileCurrent++;
+
+            var per = Math.min(Math.round(fileCurrent/fileTotal*100),100);
+            document.getElementById('percent').innerText = ('加载中...'+per+'%');
+
+        }
+
+    </script>
+    
+</head>
+<body onload="init()">
+    <style>
+        .table {
+            width:100%;
+            text-align: center;
+            color: #333;
+            font-size: 0.75em;
+        }
+
+        table tr{
+            border-top:1px  #0a0a0a solid;
+            border-bottom:1px  #0a0a0a solid;
+        }
+
+        table td{
+            padding:2px;
+        }
+
+        table th{
+            padding:2px;
+        }
+
+    </style>
+    <div class="mui-toast-container"><div class="mui-toast-message"  id="noteInfo">欢迎体验来到象棋微学堂</div></div>
+    <div class="follow_topbar" style="display: none;">
+        <div class="headimg"><img src="{$_W['attachurl']}{$setting['qrcode']}"></div>
+        <div class="info">
+            <div class="i">{$_W['account']['name']}</div>
+            <div class="i">关注公众号，享海量课程</div>
+        </div>
+        <div class="sub" onclick="location.href='{php echo $this->createMobileUrl('follow');}'">立即关注</div>
+    </div>
+    <header id="header" class="mui-bar mui-bar-nav">
+        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+        <h5 class="mui-title">{$title}</h5>
+        <a class="mui-icon mui-icon-compose mui-pull-right" id="analyse" ></a>
+        <a class="mui-icon mui-icon-closeempty mui-pull-right" id="exit_analyse" style="display: none;"></a>
+    </header>
+
+    <div id="loading" class="loading">
+      <div class="loadingInfo">
+         <div class="logo">
+         </div>
+         <span id="percent" class="percent">
+            加载中...
+        </span>
+    </div>
+</div>
+<div id="nextstepdialog" class="nextstepdialog" style="display: none;">		
+</div>
+
+<div id="liveroom-info" style="margin-top:45px;overflow:hidden">
+
+    <div id="online-player" class="online-player">
+
+        <div class="info_container">
+            <div class="player_info black" data-id="99">
+                <span class="chess"></span>
+                <img src="{$chess['redimg']}">
+                <div class="info_con">
+                    <p class="achieve">红方棋手</p>
+                    <p class="username">
+                        {$chess['redname']}
+                    </p>
+
+                    <span class="support iconfont icon-shouzanhover ">{$chess['redfollowsum']}</span>
+                </div>
+            </div>
+            <div class="player_info iconfont icon-vs73">&nbsp;</div>
+            <div class="player_info white" data-id="16">
+                <span class="chess"></span>
+                <img src="{$chess['blackimg']}">
+                <div class="info_con">
+                    <p class="achieve">黑方棋手</p>
+                    <p class="username">
+                        {$chess['blackname']}
+                    </p>
+
+                    <span class="support iconfont icon-shouzanhover ">{$chess['blackfollowsum']}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div id="board" style="width: 100%; max-width: 640px; margin-bottom: 45px; height: 621px;" class="wgo-player-main">
+    <div class="wgo-player-left" style="display: none; height: 525px;">
+        <div class="wgo-player-left-wrapper"></div>
+    </div>
+    <div class="wgo-player-center">
+        <div class="wgo-player-top" style="display: none;">
+            <div class="wgo-player-top-wrapper"></div>
+        </div>
+        <div class="wgo-player-board" style="height: auto;">
+            <div class="wgo-board"
+            style="position: relative;">
+            <canvas id="chess" width="640" height="706"></canvas>
+        </div>
+    </div>
+    <div class="wgo-player-bottom" style="display: block;">
+        <div class="wgo-player-bottom-wrapper">
+            <div class="wgo-player-control">
+                <div class="wgo-control-wrapper">
+                    <div class="wgo-ctrlgroup wgo-ctrlgroup-control">
+                        <a class="mui-tab-item mui-active" href="#delete">
+                            <span class="mui-icon mui-icon-bars"  title="First"></span>
+                        </a>
+
+
+                        <button class="wgo-button wgo-button-multiprev" id="firstBtn" ></button>
+                        <button class="wgo-button wgo-button-previous" id="prevBtn" ></button>
+                        <button class="wgo-button wgo-button-marks"  id="autoreplayBtn"></button>
+                        <button class="wgo-button wgo-button-next" id="nextBtn"></button>
+                        <button class="wgo-button wgo-button-multinext" id="endBtn"></button>
+                        <a class="mui-tab-item mui-active" href="#forward">
+                            <span class="mui-icon mui-icon-more" title="First"></span>
+                        </a>
+
+
+                    </div>
+                </div>
+            </div>
+            <div class="wgo-commentbox">
+
+                <div class="wgo-box-wrapper wgo-comments-wrapper" id="wgo-box-bottom" style="height: 292px;">
+                    <div class="downloadDDiv" id="btn_download"><p id="tipsInfo" style="text-align:center"></p></div>
+                    <ul class="mui-table-view" style="margin-top: 1.2rem;">
+
+
+                        <li class="mui-table-view-cell mui-media" style="padding-right: 0;">
+                            <a href="javascript:;" class="">
+                                <img class="mui-media-object mui-pull-left" style="width: 42px;height: 42px;border-radius: 50%" src="{$memberinfo['avatar']}">
+                                <div class="mui-media-body">
+                                    <span class="mui-ellipsis" style="width: 200px;">{$memberinfo['nickname']}</span>
+
+                                    <span style="position:absolute;top:-3px;right:15px;display:none;color:red;">+1</span>
+                                    <span style="position:absolute;top:-3px;right:15px;display:none;color:red;">-1</span>
+                                    <span class="mui-icon-extra mui-icon-extra-like prize" style="float:right; font-size:16px;margin-right: 50px;{if $this->isprized($_W['member']['uid'],$chess['id'])==1}color:red;"{else}color:#999999;"{/if}  type='0'>{$chess['prizesum']}</span>
+                                    <p class="mui-ellipsis" style="margin-top: 5px;"><span>上传于{php echo $this->timeago($chess['addtime']);} </span>| <span class="mui-icon-extra mui-icon-extra-phone" style="font-size:14px;">{$chess['clicksum']}</span> | <span class="mui-icon-extra mui-icon-extra-share" style="font-size:14px;">{$chess['sharesum']}</span></p>    
+                                </div>
+                            </a>
+                        </li>
+
+                    </ul>
+                    <div class="wgo-comments-content">
+
+                        <div class="wgo-comment-text" style="padding: 2px 15px; "></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mode4 wgo-commentbox" style="display:none;">
+                <div class="wgo-box-wrapper wgo-comments-wrapper" id="wgo-box-bottom" style="height: 292px;">
+                    <div class="downloadDDiv" id="btn_download">
+                        <p id="AIThink" style="text-align:center;top:2px"></p>
+                    </div>
+                    <div class="wgo-comments-content" style="top: 1.2rem;">
+                    </div>
+                    <div id="segmentedControl"
+                    class="mui-segmented-control mui-segmented-control-inverted mui-segmented-control-primary">
+                    <a class="mui-control-item" href="#chessdbDetailDiv">
+                        云库信息
+                    </a>
+                    <a class="mui-control-item mui-active" href="#computerDetailDiv">
+                        思考细节
+                    </a>
+
+                </div>
+                <div id="chessdbDetailDiv" class="mui-control-content">
+                    <table class="table table-bordered table-striped" id="chessdbDetail">
+                        <thead>
+                            <tr>
+                                <th>
+                                    着法
+                                </th>
+                                <th>
+                                    排序
+                                </th>
+                                <th>
+                                    分数
+                                </th>
+                                <th>
+                                    设置
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="chessdbDetailTbody">                                
+                        </tbody>
+                    </table>
+                </div>
+                <div id="computerDetailDiv" class="mui-control-content  mui-active">
+                    <table class="table table-bordered table-striped mui-active" id="computerDetail">
+                        <thead>
+                            <tr>
+                                <th>
+                                    深度
+                                </th>
+
+                                <th>
+                                    红方分数
+                                </th>
+                                <th>
+                                    主要变例
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="computerDetailTbody">                               
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</div>
+</div>
+<div class="wgo-player-right" style="display: none; height: 525px;">
+    <div class="wgo-player-right-wrapper"></div>
+</div>
+</div>
+
+<div id="delete" class="mui-popover mui-popover-action mui-popover-bottom">
+ <ul class="mui-table-view">
+
+    <li class="mui-table-view-cell">
+        <span>上下翻转</span>
+        <button id="verticalreverseBtn" style="display:none"></button>
+        <div class="mui-switch" id="verticalreverseTog">
+            <div class="mui-switch-handle"></div>
+        </div>
+    </li>
+                <!--<li class="mui-table-view-cell">
+                        <span>左右翻转</span>
+                        <button id="horizontalreverseBtn" style="display:none"></button>
+                        <div class="mui-switch" id="horizontalreverseTog">
+                            <div class="mui-switch-handle"></div>
+                        </div>
+                    </li>-->
+                    <li class="mui-table-view-cell">
+                        <span>棋谱音效</span>
+                        <button id="soundBtn" style="display:none"></button>
+                        <div class="mui-switch mui-active" id="soundTog">
+                            <div class="mui-switch-handle"></div>
+                        </div>
+                    </li>
+
+                </ul>
+                <ul class="mui-table-view">
+                    <li class="mui-table-view-cell">
+                       <a href="#delete"><b>关闭</b></a>
+                   </li>
+               </ul>
+           </div>
+           <div id="forward" class="mui-popover mui-popover-action mui-popover-bottom" style="display: none;">
+             <ul class="mui-table-view">
+            	<!--<li class="mui-table-view-cell">
+					<a id="ohmygodBtn" href="#">悔棋</a>
+				</li>-->
+
+
+                <!--怀东：如果点击拆解研究就跳转到相应页面，注意保存当前局面 -->
+
+
+                <li class="mui-table-view-cell" id="li-comment">
+
+                    <a id="comment" href="{php echo $this->createMobileUrl('comment', array('chessid'=>$chessid));}">评论</a>
+                    
+                </li> 
+
+
+
+
+                
+
+                
+                <li class="mui-table-view-cell" id="li-collect">
+                    {if $this->iscollected($chessid,$_W['member']['uid']) == 1}
+                    <a id="collect" href="#">已收藏</a>
+                    {else}
+                    <a id="collect" href="#">收藏棋谱</a>
+                    {/if}
+                </li>
+                
+                {if $this->ispublished($chessid,$_W['member']['uid']) == 0}
+                <li class="mui-table-view-cell">
+
+                   <a id="edit" href="#">编辑信息</a>
+
+               </li>
+               {/if}
+
+               {if $this->ispublished($chessid,$_W['member']['uid']) == 0}
+               <li class="mui-table-view-cell">
+
+                   <a id="publish" href="#">发布棋谱</a>
+
+               </li>
+               {/if}
+
+               <li class="mui-table-view-cell" id="li-new">
+
+                   <a id="new" href="#">新建棋谱</a>
+
+               </li>
+
+               <li class="mui-table-view-cell" id="li-index">
+
+                <a id="index" href="#">返回首页</a>
+
+            </li>
+
+        </ul>
+        <ul class="mui-table-view">
+            <li class="mui-table-view-cell">
+               <a href="#forward" class="" ><b>取消</b></a>
+           </li>
+       </ul>
+   </div>
+
+
+   <link rel="stylesheet" href="{MODULE_URL}template/mobile/css/mui.min.css">
+   <link rel="stylesheet" type="text/css" href="{MODULE_URL}template/mobile/lib/ggo/ggo.player.css">
+   <link rel="stylesheet" href="{MODULE_URL}template/mobile/css/iconfont.css">
+   <link rel="stylesheet" href="{MODULE_URL}template/mobile/css/wgo_redefine_new.css">
+   <style>
+    .mui-toast-container{
+        width:80%;
+        z-index:20;
+    }
+</style>
+
+
+<script type="text/javascript">
+    wx.ready(function () {
+        var shareData = {
+            title: "{$title}-{$setting['sitename']}-{$_W['account']['name']}",
+            desc: "{$sharedesc}",
+            link: "{$sharechessurl}",
+            imgUrl: "{php echo $sharelogo;}",
+            trigger: function (res) {
+            },
+            complete: function (res) {
+            },
+
+            cancel: function (res) {
+                console.log('cancel');
+            },
+            fail: function (res) {
+            }
+        };
+        wx.onMenuShareTimeline(shareData);
+        wx.onMenuShareAppMessage(shareData);
+        wx.onMenuShareQQ(shareData);
+        wx.onMenuShareWeibo(shareData);
+        wx.onMenuShareQZone(shareData);
+/*        {if !empty($_GPC['u'])}
+            var url = "{php echo $this->createMobileUrl('chess', array('op' => 'click'));}";
+            var chess_openid = "{php echo $_GPC['uid']}";
+            $.post(url,{chess_openid:chess_openid,filename:"{php echo $chess['filename'];}"}, function(dat){
+                console.log($.parseJSON(dat));
+            });
+            {/if}*/
+            shareData.success = function(){
+                var url = "{php echo $this->createMobileUrl('chess', array('op' => 'share'));}";
+                $.post(url,{chess_openid:"{php echo $chess['openid'];}",filename:"{php echo $chess['filename'];}"},function(dat){});
+            }
+
+        });
+    </script>
+
+
+
+    <script>
+
+
+      mui.init({
+
+        gestureConfig:{
+            swipe:false, //启用右滑关闭功能
+        }
+
+    });
+/*        var subWebview = mui.preload({
+                url:"{php echo $this->createMobileUrl('comment', array('chessid'=>$id));}",
+                id:'comment',//默认使用当前页面的url作为id
+                styles:{},//窗口参数
+                extras:{}//自定义扩展参数
+            });*/
+          /*  window.addEventListener("swipeleft",function(){
+              mui.openWindow({
+                url:"{php echo $this->createMobileUrl('comment', array('chessid'=>$id));}",
+                id:'comment'
+            });*/
+        /*var ws=plus.webview.currentWebview();
+        console.log( "窗口标识: "+ws.id );
+        subWebview.show();*/
+
+
+            /*mui.openWindow({
+                id: 'comment',
+                url: "{php echo $this->createMobileUrl('comment', array('chessid'=>$id));}",
+            });*/
+
+           /* var state = {
+                title: 'chess',
+                url:location.href
+            };
+           window.history.pushState(state, 'chess', "{php echo $this->createMobileUrl('comment', array('chessid'=>$id));}");
+           console.log(history.state);
+           //history.go(1);
+           location.reload();*/
+
+
+           mui('body').on('tap', '.mui-popover-action li>a', function() {
+             var a = this,
+             parent;
+			//根据点击按钮，反推当前是哪个actionsheet
+			for (parent = a.parentNode; parent != document.body; parent = parent.parentNode) {
+				if (parent.classList.contains('mui-popover-action')) {
+					break;
+				}
+			}
+			//关闭actionsheet
+			mui('#' + parent.id).popover('toggle');
+			
+		})
+
+
+
+           document.getElementById("collect").addEventListener('tap', function(e) {
+            var myButton  = mui(this);
+            var myButtonforJS =$(this);
+
+            var ajaxurl = "{php echo $this->createMobileUrl('chess', array('op'=>'edit_collect','chessid'=>$chessid));}";
+            $.ajax({
+               type:'post',
+               url:ajaxurl,
+               data:{},
+               dataType:'json',     
+               success:function(data){
+
+                  if(data['result']=='2'){
+                     mui.toast("已取消");
+                     myButtonforJS.html('收藏棋谱');
+
+                 }else if(data['result']=='1'){
+
+                     mui.toast("已收藏");
+                     myButtonforJS.html('取消收藏');
+
+                 }
+
+             }
+
+         });
+
+
+
+        });
+           {if $this->ispublished($chessid,$_W['member']['uid']) == 0}	
+           document.getElementById("publish").addEventListener('tap', function(e) {
+               mui.openWindow({
+                   id: "{php echo $this->createMobileUrl('publish',array('op'=>'release','chessid'=>$chess['id']));}",
+                   url: "{php echo $this->createMobileUrl('publish',array('op'=>'release','chessid'=>$chess['id']));}",
+                   waiting: {
+						autoShow: true,//自动显示等待框，默认为true
+						title: '正在加载...',//等待对话框上显示的提示内容
+
+					}
+				});
+
+           });
+
+           document.getElementById("edit").addEventListener('tap', function(e) {
+               mui.openWindow({
+                   id: "{php echo $this->createMobileUrl('publish',array('op'=>'edit','chessid'=>$chess['id']));}",
+                   url: "{php echo $this->createMobileUrl('publish',array('op'=>'edit','chessid'=>$chess['id']));}",
+                   waiting: {
+						autoShow: true,//自动显示等待框，默认为true
+						title: '正在加载...',//等待对话框上显示的提示内容
+
+					}
+				});
+
+           });
+           {/if}
+
+           document.getElementById("new").addEventListener('tap', function(e) {
+
+               mui.openWindow({
+                   id: "{php echo $this->createMobileUrl('publish',array('op'=>'create'));}",
+                   url: "{php echo $this->createMobileUrl('publish',array('op'=>'create'));}",
+                   waiting: {
+						autoShow: true,//自动显示等待框，默认为true
+						title: '正在加载...',//等待对话框上显示的提示内容
+
+					}
+				});
+
+           });
+           
+
+
+           document.getElementById("comment").addEventListener('tap', function(e) {
+             mui('#forward').popover('hide');
+             mui.openWindow({
+                id: this.href,
+                url: this.href,
+                waiting: {
+                    autoShow: true,//自动显示等待框，默认为true
+                    title: '正在加载...',//等待对话框上显示的提示内容
+
+                }
+            });
+
+         });
+
+           document.getElementById("index").addEventListener('tap', function (e) {
+            mui.openWindow({
+                id: "{php echo $this->createMobileUrl('index');}",
+                url: "{php echo $this->createMobileUrl('index');}",
+                waiting: {
+                autoShow: true,//自动显示等待框，默认为true
+                title: '正在加载...',//等待对话框上显示的提示内容
+
+            }
+        });
+
+        });
+
+
+         /*   document.getElementById("analyse").addEventListener('tap', function(e) {
+               mui.openWindowWithTitle({
+                url:'{php echo $this->createMobileUrl('player',array('op'=>'display'));}',
+                id:'detail'
+            },{
+                title:{//标题配置
+                text:"商品详情",//标题文字
+            },
+            back:{//左上角返回箭头
+                image:{
+                    base64Data:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAMAAABg3Am1AAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAb1BMVEUAAAAAev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8Aev8AAACubimgAAAAI3RSTlMAGfUTGfQTGPMSGPIYGhgaGBsXGxcbFxwXHBccFhwWHRYdHWufDPQAAAABYktHRACIBR1IAAAAB3RJTUUH4QETEBwooeTlkQAAAJVJREFUSMft1EkSgkAQRNFGUXFWHBDBibr/HTUwD5B/48Ig1y+io7u6MqUhf5hsNEY+j5hMgZ/FJ8Xc9ovos3T96utjbfqN/Nb0O/m96Uv5g+mP8ifTn+Ur01/ka9Nf5RvTt/I309/lH6Z/yr9Mn+Q71/MT8B34K/E58Enzv8R/K98HvnF8p3lr8F7izce7lbf3kJ/lDQp9HdBhgg3PAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDE3LTAxLTE5VDE2OjI4OjQwKzA4OjAwpTDFwQAAACV0RVh0ZGF0ZTptb2RpZnkAMjAxNy0wMS0xOVQxNjoyODo0MCswODowMNRtfX0AAAAASUVORK5CYII='
+                }
+            }
+            })
+
+         });
+         */
+		//触发	
+
+		
+		document.getElementById("verticalreverseTog").addEventListener("toggle",function(event){
+
+			var btn = document.getElementById("verticalreverseBtn");
+			mui.trigger(btn,'tap');
+
+		});	
+		
+		document.getElementById("soundTog").addEventListener("toggle",function(event){
+
+			var btn = document.getElementById("soundBtn");
+			mui.trigger(btn,'tap');
+
+		});		
+
+       {if $setting['isfollow']==1 && !empty($fans) && $fans['follow']==0}
+       $('.follow_topbar').show();
+       $('header').css('top','44px');
+       $('#liveroom-info').css('margin-top','89px');
+       {else}
+       $('.follow_topbar').hide();
+       $('#liveroom-info').css('top','45px');
+       {/if}
+
+    //点赞
+    mui(document).on('tap', ".prize", function () { 
+        var $this = $(this);
+        var type = $(this).attr('type');
+        var url = "{php echo $this->createMobileUrl('chess', array('op' => 'prize','chessid'=>$chess['id']));}";
+        mui.post(url, {type:type}, function(data, textStatus, xhr) {
+            var data =  eval('(' + data + ')');
+            if(data.type==0){
+                if(data.ptype==1){
+                    $this.html(String(data.prizesum));
+                    $this.prev().css('display','inline');
+                    $this.prev().fadeOut(1000);
+                    $this.css('color','#999999');
+                }
+                if(data.ptype==0){
+                   $this.html(String(data.prizesum));
+                   $this.prev().prev().css('display','inline');
+                   $this.prev().prev().fadeOut(1000);
+                   $this.css('color','red');
+               }
+           }
+ /*    踩   
+ if(data.type==1){
+            if(data.ttype==1){
+             $this.next().html(String(data.treadsum));
+             $this.prev().css('display','inline');
+             $this.prev().fadeOut(1000);
+             $this.css('color','#999999');
+            }
+            if(data.ttype==0){
+             $this.next().html(String(data.treadsum));
+             $this.prev().prev().css('display','inline');
+             $this.prev().prev().fadeOut(1000);
+             $this.css('color','red');
+            }
+        }*/
+        
+    });
+
+    })
+
+</script>
+
+<script type="text/javascript">
+
+
+</script>
+</body>
 </html>

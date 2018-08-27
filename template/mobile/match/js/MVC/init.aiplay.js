@@ -23,6 +23,15 @@ var MyWebsocket = function (url, bRec) {
 			}	
 		}
 		ws.onopen = function () {
+			var a = {};
+				a.type = 0;
+				a.uuid = uuid;	
+				a.index = movesIndex;
+				a.command = "";
+				a.ua = navigator.userAgent;
+				a.time = new Date().getTime();
+				var o = JSON.stringify(a);
+				ws.send(o);
 		}
 		ws.onclose = function () {
 		}			
@@ -50,8 +59,12 @@ var MyWebsocket = function (url, bRec) {
 					a.index = movesIndex;
 					a.isVerticalReverse = isVerticalReverse;
 					a.command = e;
+					a.bcache = true;
+					a.zobristKey = getKey(e.substring(13));
+					console.log(a.zobristKey);
 					a.time = new Date().getTime();
-					var o = JSON.stringify(a);					
+					var o = JSON.stringify(a);		
+					ws.send(o);
 					var _json = {"id": uuid, "msg": o};	
 					$.ajax({
 						type: "POST",
@@ -59,20 +72,10 @@ var MyWebsocket = function (url, bRec) {
 						dataType: "json",
 						data: _json,
 						success: function (data) {
-							if(data.length > 0) {
-								console.log("position-redis");
-								for(var i=0;i<data.length;i++) {
-									comm.DealMessage(data[i]);
-								}
-								//waitServerPlay = !1;
-							}
-							else {
-								console.log("engineer");
-								ws.send(o);
-							}
+							
 						},
 						error: function (response, status, xhr) {
-							ws.send(o);
+							
 						}
 					})								
 				}	
@@ -99,8 +102,12 @@ var MyTestWebsocket = function (url, bRec) {
 			}	
 		}
 		ws.onopen = function () {
+			if(uuid.length > 0 ){
+				ws.send(uuid);
+			}			
 		}
 		ws.onclose = function () {
+			console.log("onclose");
 		}			
 		ws.onerror = function () {
 		}	
@@ -213,16 +220,25 @@ function Setting() {
 	setTimeout((function () {
         showFloatTip("隐藏提示");
     }), 1000);
-	if(power == 'level-6'){
-		 /*初始化*/
-	    myws = new MyWebsocket('ws://47.96.26.54:9001/',!0);
-	    myws.initWebsocket();
+    /*初始化Websocket*/  
+	var ishttps = 'https:' == document.location.protocol ? true: false;
+
+	if(ishttps){	
+		if(power == 'level-6'){
+		    myws = new MyWebsocket('wss://chessai.chinaxueyun.com:9003/',!0); 
+		}
+		else{
+		    myws = new MyWebsocket('wss://chessai.chinaxueyun.com:9004/',!0);
+		}
+	}else{	
+		if(power == 'level-6'){
+		    myws = new MyWebsocket('ws://47.96.26.54:9001/',!0);	    
+		}
+		else{
+		    myws = new MyWebsocket('ws://47.96.26.54:9002/',!0);
+		}	
 	}
-	else{
-		 /*初始化*/
-	    myws = new MyWebsocket('ws://47.96.26.54:9002/',!0);
-	    myws.initWebsocket();
-	}
+    myws.initWebsocket();
 	/*启动定时器，检查超时*/
     interval = setInterval(CheckReturn, 1000);	    
     

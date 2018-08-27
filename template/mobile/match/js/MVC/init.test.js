@@ -126,6 +126,9 @@ var MyTestWebsocket = function (url, bRec) {
 					a.index = movesIndex;
 					a.isVerticalReverse = isVerticalReverse;
 					a.command = e;
+					a.bcache = true;
+					a.zobristKey = getKey(e.substring(13));
+					console.log(a.zobristKey);
 					a.time = new Date().getTime();
 					var o = JSON.stringify(a);					
 					ws.send(o);											
@@ -193,9 +196,17 @@ function loadConfig() {
 			setEnable("endBtn", !1);		
 			resizeCanvasAI();
 			comm.isPlay = !0;
+			if(isVerticalReverse){				
+				$("#black").hide();
+				$("#red input").prop("checked", "true");
+			}
+			else {
+				$("#red").hide();
+				$("#black input").prop("checked", "true");
+			}
 		    //方便用户设置
 		    mui('#delete').popover('toggle');   		    
-		    mode = playmode.AIPLAY;
+		    mode = playmode.AIPLAY;		    
     	}     	
     }
     else {
@@ -246,37 +257,47 @@ onload = function() {
 };
 
 function Setting() {
-	if (isPlaying) return;
+	if (isPlaying) return;	
+    
 	var PlayLevel = {'level-0':"六级棋士",'level-1':"五级棋士",'level-2':"四级棋士",'level-3':"三级棋士",'level-4':"二级棋士",'level-5':"一级棋士",'level-6':"棋协大师"};
-	showFloatTip(PlayLevel[power]);	
-	setTimeout((function () {
-        showFloatTip("隐藏提示");
-    }), 1000);
+	
+	if (computer == 'red') {
+		computerHold = RED;
+		$("#black").hide();	
+		/*黑方先手*/
+		comm.isOffensive = 1;
+		showFloatTip("黑方先手，电脑等级："+PlayLevel[power]+"，隐藏提示");    
+    }
+    else {
+    	computerHold = BLACK;
+       	$("#red").hide();	
+       	/*红方先手*/
+       	comm.isOffensive = 0;
+		showFloatTip("红方先手，电脑等级："+PlayLevel[power]+"，隐藏提示");       	
+    }	
+
+	var ishttps = 'https:' == document.location.protocol ? true: false;
 	if(power == 'level-6'){
-		 /*初始化*/
-	    myws = new MyWebsocket('ws://47.96.26.54:9001/',!0);
-	    myws.initWebsocket();
+	    if(ishttps){	
+		 	myws = new MyTestWebsocket('wss://chessai.chinaxueyun.com:9003/',!0);	
+		}else{	
+			myws = new MyWebsocket('ws://47.96.26.54:9001/',!0);	
+		}
 	}
-	else{
-		 /*初始化*/
-	    myws = new MyWebsocket('ws://47.96.26.54:9002/',!0);
-	    myws.initWebsocket();
+	else{		
+		if(ishttps){	
+		 	myws = new MyTestWebsocket('wss://chessai.chinaxueyun.com:9004/',!0);	
+		}else{	
+			myws = new MyWebsocket('ws://47.96.26.54:9002/',!0);	
+		}
+	   
 	}
+	/*初始化*/
+	myws.initWebsocket();
 	/*启动定时器，检查超时*/
     interval = setInterval(CheckReturn, 1000);	    
     
 	showLevel(power);
-    
-	if (computer == 'red') {
-		computerHold = RED;
-		onReverse();
-		Player.AIPlay();
-		$("#black").hide();		
-    }
-    else {
-    	computerHold = BLACK;
-       	$("#red").hide();		
-    }
 
 	$("#restartli").show();		
 	

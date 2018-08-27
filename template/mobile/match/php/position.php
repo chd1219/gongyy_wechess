@@ -79,7 +79,7 @@
 			 $depth = 17;
 		}
 		$redisRead = new Redis();
-		$redisRead->connect('47.96.26.54', 8640);
+		$redisRead->connect('47.98.43.81', 8641);
 		$redisRead->auth("jiao19890228");			
 		if($redisRead->exists($fen)) {
 			$redisWrite->select(6);	
@@ -102,5 +102,7 @@
 		$json_obj = json_encode($e);
 		echo $json_obj;
 	}
+	
+	
 	
 ?>

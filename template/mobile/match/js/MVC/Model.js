@@ -120,8 +120,12 @@ onSend = function (e) {
 		dataType: "text",
 		data: _json,
 		success: function (response, status, xhr) {
-			window.parent.location.href = replayURL + "&file=" + comm.filename;
-			console.log(_json);
+			if(response>0){
+				window.parent.location.href = replayURL + "&chessid=" + response;
+			}else{
+				alert('保存失败');
+				window.parent.location.href = indexURL;
+			}
 		},
 		error: function (response, status, xhr) {
 			alert(status);
@@ -237,24 +241,28 @@ onReverse = function () {
 	cleanLine();
 	if (mode == playmode.EDITBOARD) {
 		cleanChess();
-		cleanChessEx();		
-		isVerticalReverse ? (isVerticalReverse = 0, 
-			chessBottonLayer.removeChild(verticalReverseboard), 
-			chessBottonLayer.addChild(board),
-			comm.sMap = comm.arr2Clone(sMapFull),
-			emptyMap = comm.arr2Clone(EmptyMap),
-			initMap = comm.arr2Clone(InitMap)
-			) :
-			(isVerticalReverse = 1, 
-			chessBottonLayer.removeChild(board), 
-			chessBottonLayer.addChild(verticalReverseboard),
-			comm.sMap = comm.arr2Clone(sMapFullReveser),
-			emptyMap = comm.arrReverse(EmptyMap),
-			initMap = comm.arrReverse(InitMap)
-			);
-
-		comm.sMapList = JSON.parse(JSON.stringify(chessMan));		
-		comm.init(3, emptyMap, !1);
+		cleanChessEx();
+//		isVerticalReverse ? (isVerticalReverse = 0, 
+//			chessBottonLayer.removeChild(verticalReverseboard), 
+//			chessBottonLayer.addChild(board),
+//			comm.sMap = comm.arr2Clone(sMapFull),
+//			emptyMap = comm.arr2Clone(EmptyMap),
+//			initMap = comm.arr2Clone(InitMap)
+//			) :
+//			(isVerticalReverse = 1, 
+//			chessBottonLayer.removeChild(board), 
+//			chessBottonLayer.addChild(verticalReverseboard),
+//			comm.sMap = comm.arr2Clone(sMapFullReveser),
+//			emptyMap = comm.arrReverse(EmptyMap),
+//			initMap = comm.arrReverse(InitMap)
+//			);
+		isVerticalReverse = !isVerticalReverse;
+		chessBottonLayer.removeChild(verticalReverseboard), 
+		chessBottonLayer.addChild(board),
+		comm.sMap = comm.arrReverseEx(comm.sMap),
+		comm.map = comm.arrReverse(comm.map)
+		comm.sMapList = comm.getsMap(); 		
+		comm.init(3, comm.map, !1);
 		createMansEx(comm.sMap);
 		$("#fullBtn").show();
 		$("#clearBtn").hide();
@@ -554,7 +562,7 @@ onNote = function () {
 onCleanBroad = function (e) {
 	cleanChess();
 	cleanChessEx();
-	emptyMap = emptyMap || EmptyMap;
+	isVerticalReverse ? emptyMap = comm.arrReverse(EmptyMap) : emptyMap = comm.arr2Clone(EmptyMap);
 	isVerticalReverse ? comm.sMap = comm.arr2Clone(sMapFullReveser) : comm.sMap = comm.arr2Clone(sMapFull);
 	comm.sMapList = JSON.parse(JSON.stringify(chessMan));	
 	comm.init(3, emptyMap, !1);
@@ -566,7 +574,7 @@ onCleanBroad = function (e) {
 onFullBroad = function (e) {
 	cleanChess();
 	cleanChessEx();
-	initMap = initMap || InitMap;
+	isVerticalReverse ? initMap = comm.arrReverse(InitMap) : initMap = comm.arr2Clone(InitMap);
 	comm.sMap = comm.arr2Clone(sMapEmpty),
 	comm.sMapList = JSON.parse(JSON.stringify(emptychessMan)),	
 	comm.init(3, initMap, !1);
@@ -640,35 +648,35 @@ onErrordata = function() {
 			showFloatTip("已删除错误数据,请重走!");
 			onRegret();
 			comm.reCompute();
-//			var _json = {"id": uuid, "msg": msg};
-//			$.ajax({
-//				type: "POST",
-//				url: "http://westudy.chinaxueyun.com/addons/gongyy_wechess/template/mobile/match/deletedata.php",
-//				dataType: "json",
-//				data: _json,
-//				success: function (data) {	
-//						
-//				},
-//				error: function (response, status, xhr) {			
-//				}
-//			})			
+			var _json = {"id": uuid, "msg": msg};
+			$.ajax({
+				type: "POST",
+				url: "http://westudy.chinaxueyun.com/addons/gongyy_wechess/template/mobile/match/deletedata.php",
+				dataType: "json",
+				data: _json,
+				success: function (data) {	
+						
+				},
+				error: function (response, status, xhr) {			
+				}
+			})			
 		}
 		else {
 			if (isanalyse) {
 				showFloatTip("重新思考中!");
 				comm.reCompute();
-//				var _json = {"id": uuid, "msg": msg};
-//				$.ajax({
-//					type: "POST",
-//					url: "http://westudy.chinaxueyun.com/addons/gongyy_wechess/template/mobile/match/php/deletedata.php",
-//					dataType: "json",
-//					data: _json,
-//					success: function (data) {	
-//						myws.Send(msg);		
-//					},
-//					error: function (response, status, xhr) {			
-//					}
-//				})			
+				var _json = {"id": uuid, "msg": msg};
+				$.ajax({
+					type: "POST",
+					url: "http://westudy.chinaxueyun.com/addons/gongyy_wechess/template/mobile/match/php/deletedata.php",
+					dataType: "json",
+					data: _json,
+					success: function (data) {	
+						myws.Send(msg);		
+					},
+					error: function (response, status, xhr) {			
+					}
+				})			
 			}
 			else {
 				showFloatTip("请打开分析模式后再使用!");

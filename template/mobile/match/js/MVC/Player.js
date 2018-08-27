@@ -358,16 +358,65 @@ Player.stepEnd = function(move){
 	}
 	movesIndex++;
 	comm.branch(move);
-	if (isanalyse) {
-		comm.send();
-	}
-	if (mode == playmode.AIPLAY) {
-		computerHold != comm.getHold() || Player.AIPlay();		
-	}
-	if (mode == playmode.ONLINE) {
-		sendMessage(move);
-	}
-	replayBtnUpdate();
+	
+	/* 检查走棋是否被将军。如果是，说明这是在送死，撤销走棋并返回false。*/
+	if (comm.Checked(comm.getHold())) {	
+	    showFloatTip("局面无效，请重走！");
+		/*回滚*/
+		waitServerPlay = !1;
+		moves = comm.getMoves4Server();				
+		movesIndex -= 1;
+		comm.gotoStep(moves, movesIndex);			
+		comm.nodes.length = movesIndex+1;
+		comm.nodes[movesIndex].child = [];
+		id -= 1;
+		replayBtnUpdate();
+	    return false;
+	}	
+	    
+	setTimeout((function(){
+		/*存储局面的zobristKey校验码*/
+		comm.keyList.push(getKey(comm.getBoard()));
+		/*存储走完棋后，对方是否处于被将军的状态*/
+		comm.chkList.push(comm.Checked(comm.getOppHold()));
+		
+		/*判断是否出现长将*/
+		var vlRep = comm.repStatus(3);
+		if(vlRep > 0){
+			if (vlRep == 1) {			    
+			    showFloatTip("双方不变作和,请变招！");
+			}
+			else if (vlRep == 3) {
+				showFloatTip("长将作负，请变招！");
+			}
+			
+			if(b_autoset){
+		        if($("#blackautoplayTog").hasClass('mui-active')){
+		            $("#blackautoplayTog").removeClass('mui-active');
+		            $("#blackautoplayTog").html('<div class="mui-switch-handle"></div>');           
+		        }
+		        onBluePlay();
+		    }
+		    if(r_autoset){
+		        if($("#redautoplayTog").hasClass('mui-active')){
+		            $("#redautoplayTog").removeClass('mui-active');
+		            $("#redautoplayTog").html('<div class="mui-switch-handle"></div>');            
+		        }
+		        onRedPlay();
+		    }
+		}			
+		
+		if (isanalyse) {
+			comm.send();
+		}
+		if (mode == playmode.AIPLAY) {
+			computerHold != comm.getHold() || Player.AIPlay();		
+		}
+		if (mode == playmode.ONLINE) {
+			sendMessage(move);
+		}
+		replayBtnUpdate();		
+	}),600);
 }
 /*检查走法是否合法*/
 Player.indexOfPs = function (e, a) {

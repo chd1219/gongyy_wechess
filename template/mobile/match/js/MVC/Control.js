@@ -24,6 +24,8 @@ comm.init = function (e, a, k) {
     comm.mans = {},
     comm.notes = comm.notes || [],
     comm.moves =  comm.moves || [],
+    comm.keyList = comm.keyList || [],
+    comm.chkList = comm.chkList || [],
     comm.isOffensive = comm.isOffensive || 0,
     comm.historylist = comm.historylist || {};
     createMans(a);
@@ -77,6 +79,13 @@ comm.arr2Clone = function(e) {
 comm.arrReverse = function(e) {
     for (var a = [], m = 0; m < e.length; m++) {
     	a[m] = e[e.length-1-m].slice().reverse();
+    }
+    return a
+}
+/*数组翻转*/
+comm.arrReverseEx = function(e) {
+    for (var a = [], m = 0; m < e.length; m++) {
+    	a[m] = e[e.length-1-m];
     }
     return a
 }
@@ -431,6 +440,58 @@ comm.checkJiang = function () {
 		}
 	return !0;
 }
+/*检查是否被将军*/
+comm.Checked = function (my) {
+	try{
+		if(waitServerPlay){
+			setTimeout((function(){comm.Checked(my)}),500);
+			return;
+		}	
+		my == BLACK ? jiang = comm.mans["j0"] : jiang = comm.mans["J0"];
+		for(let key in comm.mans){
+			man = comm.mans[key];
+			if (man.my != my || !man.isShow) {
+				continue;
+			}
+			man.ps = man.bl();
+			if (Player.indexOfPs(man.ps, [jiang.x, jiang.y])) {
+				man.ps = [];				
+				return true;
+			}
+			man.ps = [];
+		}
+		return false;
+	}catch(e){		
+		console.log(e);
+		return false;
+	}	
+}
+/*判断是否出现重复局面*/
+comm.repStatus = function(recur_) {
+  var recur = recur_;
+  var selfSide = false;
+  var perpCheck = true;
+  var oppPerpCheck = true;
+  var index = movesIndex;
+  var perzobristKey = comm.keyList[index-1];
+  var oppperzobristKey = comm.keyList[index-2];
+  while (movesIndex > recur_*4 && index > movesIndex-recur_*4 ) {
+	if (selfSide) {
+      perpCheck = perpCheck && comm.chkList[index];
+      if (comm.keyList[index] == perzobristKey && comm.keyList[index-1] == oppperzobristKey) {
+        recur --;
+        if (recur == 0) {
+          return 1 + (perpCheck ? 2 : 0) + (oppPerpCheck ? 4 : 0);
+        }
+      }
+    } else {
+      oppPerpCheck = oppPerpCheck && comm.chkList[index];
+    }
+    selfSide = !selfSide;
+    index --;
+  }
+  return 0;
+}
 /*判断是否数字*/
 comm.isNumber = function (value) {
     var patrn = /^(-)?\d+(\.\d+)?$/;
@@ -660,6 +721,15 @@ comm.getHold = function () {
 	 * 黑方先手 isOffensive = 1
 	 */	
 	(comm.isOffensive == movesIndex%2)? ret = RED : ret = BLACK;
+	return ret;
+}
+/*获取当前执方*/
+comm.getOppHold = function () {	
+	var ret;
+	/* 红方先手 isOffensive = 0
+	 * 黑方先手 isOffensive = 1
+	 */	
+	(comm.isOffensive == movesIndex%2)? ret = BLACK : ret = RED;
 	return ret;
 }
 /*定义引擎信息的数据结构*/

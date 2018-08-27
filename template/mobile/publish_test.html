@@ -12,7 +12,7 @@
     <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
     <script type="text/javascript" src="{MODULE_URL}template/mobile/js/mui.min.js"></script>
     <link href="{MODULE_URL}template/mobile/match/css/chess.css" rel="stylesheet" type="text/css">
-    <script src="{MODULE_URL}template/mobile/match/js/settings.js"></script>
+    <script src="{MODULE_URL}template/mobile/match/js/settings.js"+'?version={$version}'></script>
     <script src="{MODULE_URL}template/mobile/match/libs/preloadjs-0.6.1.min.js"></script>
 
     <script type="application/javascript">
@@ -47,41 +47,46 @@
 
             var date = new Date();
             startLoadTime = date.getTime();
-
+			var ua = navigator.userAgent;
+            
             var loader = new createjs.LoadQueue(false, null, "");
 
             loader.addEventListener("fileload", handleFileLoad);
             loader.addEventListener("complete", handleComplete);
 
-            loader.loadFile({src: CDN_PATH + "libs/easeljs-0.8.1." + JS_VER + ".js"});
-            loader.loadFile({src: CDN_PATH + "libs/tweenjs-0.6.1." + JS_VER + ".js"});
-            loader.loadFile({src: CDN_PATH + "libs/movieclip-0.8.1." + JS_VER + ".js"});
-            loader.loadFile({src: CDN_PATH + "libs/soundjs-0.6.1." + JS_VER + ".js"});
-            loader.loadFile({src: CDN_PATH + "libs/jquery-2.1.0.min.js"});
-            loader.loadFile({src: CDN_PATH + "libs/md5.min.js"});
-            loader.loadFile({src: CDN_PATH + "libs/reconnecting-websocket.min.js"});
-            loader.loadFile({src: CDN_PATH + "libs/mobile-detect.min.js"});
-            loader.loadFile({src: CDN_PATH + "js/ScaleBitmap.min.js"});
-			loader.loadFile({src: CDN_PATH + "js/MVC/global.js"});
-			loader.loadFile({src: CDN_PATH + "js/MVC/Model.js"});
-			loader.loadFile({src: CDN_PATH + "js/MVC/View.js"});
-			loader.loadFile({src: CDN_PATH + "js/MVC/Control.js"});
-			loader.loadFile({src: CDN_PATH + "js/MVC/Player.js"});
-			loader.loadFile({src: CDN_PATH + "js/MVC/Chess.js"});
-			loader.loadFile({src: CDN_PATH + "js/MVC/init.test.js"});
+            loader.loadFile({src: CDN_PATH + "libs/easeljs-0.8.1." + JS_VER + ".js"+'?version={$version}'});
+            loader.loadFile({src: CDN_PATH + "libs/tweenjs-0.6.1." + JS_VER + ".js"+'?version={$version}'});
+            loader.loadFile({src: CDN_PATH + "libs/movieclip-0.8.1." + JS_VER + ".js"+'?version={$version}'});
+            loader.loadFile({src: CDN_PATH + "libs/soundjs-0.6.1." + JS_VER + ".js"+'?version={$version}'});
+            loader.loadFile({src: CDN_PATH + "libs/jquery-2.1.0.min.js"+'?version={$version}'});
+            loader.loadFile({src: CDN_PATH + "libs/md5.min.js"+'?version={$version}'});
+            loader.loadFile({src: CDN_PATH + "libs/reconnecting-websocket.min.js"+'?version={$version}'});
+            loader.loadFile({src: CDN_PATH + "libs/mobile-detect.min.js"+'?version={$version}'});
+            loader.loadFile({src: CDN_PATH + "js/ScaleBitmap.min.js"+'?version={$version}'});
+			loader.loadFile({src: CDN_PATH + "js/MVC/global.js"+'?version={$version}'});
+			loader.loadFile({src: CDN_PATH + "js/MVC/Model.js"+'?version={$version}'});
+			loader.loadFile({src: CDN_PATH + "js/MVC/View.js"+'?version={$version}'});
+			loader.loadFile({src: CDN_PATH + "js/MVC/ZobristTable.js"+'?version={$version}'});
+			if(ua.indexOf('WindowsWechat') > 0){
+            	loader.loadFile({src: CDN_PATH + "js/MVC/Control.old.js"+'?version={$version}'});
+				loader.loadFile({src: CDN_PATH + "js/MVC/Player.old.js"+'?version={$version}'});				
+            }
+			else{
+				loader.loadFile({src: CDN_PATH + "js/MVC/Control.js"+'?version={$version}'});
+				loader.loadFile({src: CDN_PATH + "js/MVC/Player.js"+'?version={$version}'});
+			}			
+			loader.loadFile({src: CDN_PATH + "js/MVC/Chess.js"+'?version={$version}'});
+			loader.loadFile({src: CDN_PATH + "js/MVC/init.test.js"+'?version={$version}'});
 
             loader.loadFile({
                 src: CDN_PATH + "assets/images/chess_slim_atlas_.json",
                 type: "spritesheet",
                 id: "chess_slim_atlas_"
             }, true);
-            loader.loadFile({src: CDN_PATH + "libs/gameRes.min.v1.js"});
+            loader.loadFile({src: CDN_PATH + "libs/gameRes.min.v1.js"+'?version={$version}'});
             loader.loadFile({src: CDN_PATH + "assets/images/f_atlas_.json", type: "spritesheet", id: "f_atlas_"}, true);
 			loader.loadManifest([{src: CDN_PATH + "assets/images/board2.png", id: "Board"}]);
             loader.loadManifest([{src: CDN_PATH + "assets/images/VerticalReverse.png", id: "VerticalReverseBoard"}]);
-            var ua = navigator.userAgent;
-            
-
         }
 
         function handleFileLoad(evt) {
@@ -203,7 +208,7 @@
                             style="display:none;"></button>
                             <button class="mode4 wgo-button wgo-button-multinext" id="endBtn"
                             style="display:none;"></button>
-							
+							<button type="button" id="reveseBtn" class="mode5 mui-btn" style="display:none;">翻转棋盘</button>
                             <button type="button" id="fullBtn" class="mode5 mui-btn" style="display:none;">摆满棋盘</button>
                             <button type="button" id="clearBtn" class="mode5 mui-btn" style="display:none;">清空棋盘 </button>
                             <button type="button" id="saveBtn" class="mode5 mui-btn" style="display:none;">保存棋盘 </button>

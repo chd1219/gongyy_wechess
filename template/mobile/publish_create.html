@@ -12,7 +12,7 @@
     <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
     <script type="text/javascript" src="{MODULE_URL}template/mobile/js/mui.min.js"></script>
     <link href="{MODULE_URL}template/mobile/match/css/chess.css" rel="stylesheet" type="text/css">
-    <script src="{MODULE_URL}template/mobile/match/js/settings.js"></script>
+    <script src="{MODULE_URL}template/mobile/match/js/settings.js?version={$version}"></script>
     <script src="{MODULE_URL}template/mobile/match/libs/preloadjs-0.6.1.min.js"></script>
 
     <script type="application/javascript">
@@ -29,8 +29,8 @@
         var chapterTitle = '';
 
         var saveURL = "{php echo $this->createMobileUrl('publish',array('op'=>'save','source'=>'create'));}";
-        var replayURL = "{php echo $this->createMobileUrl('chess',array('file'=>$chess['filename']));}";
-
+        var replayURL = "{php echo $this->createMobileUrl('chess');}";
+		var indexURL = "{php echo $this->createMobileUrl('index');}";
         var JS_VER_COMBINED = 'combined';
         var JS_VER_MIN = 'min';
         var JS_VER = JS_VER_MIN;
@@ -42,28 +42,35 @@
 
             var date = new Date();
             startLoadTime = date.getTime();
-
+			var ua = navigator.userAgent;
             var loader = new createjs.LoadQueue(false, null, "");
 
             loader.addEventListener("fileload", handleFileLoad);
             loader.addEventListener("complete", handleComplete);
 
-            loader.loadFile({src: CDN_PATH + "libs/easeljs-0.8.1." + JS_VER + ".js"});
-            loader.loadFile({src: CDN_PATH + "libs/tweenjs-0.6.1." + JS_VER + ".js"});
-            loader.loadFile({src: CDN_PATH + "libs/movieclip-0.8.1." + JS_VER + ".js"});
-            loader.loadFile({src: CDN_PATH + "libs/soundjs-0.6.1." + JS_VER + ".js"});
-            loader.loadFile({src: CDN_PATH + "libs/jquery-2.1.0.min.js"});
-            loader.loadFile({src: CDN_PATH + "libs/md5.min.js"});
-            loader.loadFile({src: CDN_PATH + "libs/reconnecting-websocket.min.js"});
-            loader.loadFile({src: CDN_PATH + "libs/mobile-detect.min.js"});
-            loader.loadFile({src: CDN_PATH + "js/ScaleBitmap.min.js"});
-			loader.loadFile({src: CDN_PATH + "js/MVC/global.js"});
-			loader.loadFile({src: CDN_PATH + "js/MVC/Model.js"});
-			loader.loadFile({src: CDN_PATH + "js/MVC/View.js"});
-			loader.loadFile({src: CDN_PATH + "js/MVC/Control.js"});
-			loader.loadFile({src: CDN_PATH + "js/MVC/Player.js"});
-			loader.loadFile({src: CDN_PATH + "js/MVC/Chess.js"});
-			loader.loadFile({src: CDN_PATH + "js/MVC/init.create.js"});
+            loader.loadFile({src: CDN_PATH + "libs/easeljs-0.8.1." + JS_VER + ".js"+'?version={$version}'});
+            loader.loadFile({src: CDN_PATH + "libs/tweenjs-0.6.1." + JS_VER + ".js"+'?version={$version}'});
+            loader.loadFile({src: CDN_PATH + "libs/movieclip-0.8.1." + JS_VER + ".js"+'?version={$version}'});
+            loader.loadFile({src: CDN_PATH + "libs/soundjs-0.6.1." + JS_VER + ".js"+'?version={$version}'});
+            loader.loadFile({src: CDN_PATH + "libs/jquery-2.1.0.min.js"+'?version={$version}'});
+            loader.loadFile({src: CDN_PATH + "libs/md5.min.js"+'?version={$version}'});
+            loader.loadFile({src: CDN_PATH + "libs/reconnecting-websocket.min.js"+'?version={$version}'});
+            loader.loadFile({src: CDN_PATH + "libs/mobile-detect.min.js"+'?version={$version}'});
+            loader.loadFile({src: CDN_PATH + "js/ScaleBitmap.min.js"+'?version={$version}'});
+			loader.loadFile({src: CDN_PATH + "js/MVC/global.js"+'?version={$version}'});
+			loader.loadFile({src: CDN_PATH + "js/MVC/Model.js"+'?version={$version}'});
+			loader.loadFile({src: CDN_PATH + "js/MVC/View.js"+'?version={$version}'});
+			loader.loadFile({src: CDN_PATH + "js/MVC/ZobristTable.js"+'?version={$version}'});
+			if(ua.indexOf('WindowsWechat') > 0){
+            	loader.loadFile({src: CDN_PATH + "js/MVC/Control.old.js"+'?version={$version}'});
+				loader.loadFile({src: CDN_PATH + "js/MVC/Player.old.js"+'?version={$version}'});				
+            }
+			else{
+				loader.loadFile({src: CDN_PATH + "js/MVC/Control.js"+'?version={$version}'});
+				loader.loadFile({src: CDN_PATH + "js/MVC/Player.js"+'?version={$version}'});
+			}		
+			loader.loadFile({src: CDN_PATH + "js/MVC/Chess.js"+'?version={$version}'});
+			loader.loadFile({src: CDN_PATH + "js/MVC/init.create.js"+'?version={$version}'});
             loader.loadFile({
                 src: CDN_PATH + "assets/images/chess_slim_atlas_.json",
                 type: "spritesheet",
